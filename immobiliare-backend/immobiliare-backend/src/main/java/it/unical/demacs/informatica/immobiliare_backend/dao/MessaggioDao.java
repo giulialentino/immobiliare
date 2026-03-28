@@ -17,6 +17,10 @@ public class MessaggioDao {
     private boolean perAdmin;
     public boolean isPerAdmin() { return perAdmin; }
     public void setPerAdmin(boolean b) { this.perAdmin = b; }
+    // già presente — verifica che ci sia
+    private Long idMittente;
+    public Long getIdMittente() { return idMittente; }
+    public void setIdMittente(Long idMittente) { this.idMittente = idMittente; }
 
     private Messaggio mapRow(ResultSet rs) throws SQLException {
         Messaggio m = new Messaggio();
@@ -74,15 +78,21 @@ public class MessaggioDao {
 
     public List<Messaggio> findPerAdmin() throws SQLException {
         List<Messaggio> lista = new ArrayList<>();
-        String sql = "SELECT m.*, u.nome as nome_mittente, u.cognome as cognome_mittente, u.email as email_mittente " +
+        String sql = "SELECT m.*, u.nome as nome_mittente, u.cognome as cognome_mittente, u.email as email_mittente, " +
+                "COALESCE(rp.stato, 'NESSUNA') as stato_promozione " +
                 "FROM messaggio m " +
                 "JOIN utente u ON m.id_mittente = u.id " +
+                "LEFT JOIN richiesta_promozione rp ON rp.id_utente = m.id_mittente AND m.per_admin = TRUE AND m.id_annuncio IS NULL " +
                 "WHERE m.per_admin = TRUE " +
                 "ORDER BY m.data_invio DESC";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) lista.add(mapRow(rs));
+                while (rs.next()) {
+                    Messaggio msg = mapRow(rs);
+                    try { msg.setStatoPromozione(rs.getString("stato_promozione")); } catch (Exception ignored) {}
+                    lista.add(msg);
+                }
             }
         }
         return lista;
@@ -123,7 +133,11 @@ public class MessaggioDao {
         String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo, per_admin) VALUES (?, ?, ?, ?, TRUE)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, m.getIdAnnuncio());
+            if (m.getIdAnnuncio() == null || m.getIdAnnuncio() == 0) {
+                ps.setNull(1, java.sql.Types.BIGINT);
+            } else {
+                ps.setLong(1, m.getIdAnnuncio());
+            }
             ps.setLong(2, m.getIdMittente());
             ps.setString(3, m.getOggetto());
             ps.setString(4, m.getTesto());
@@ -203,10 +217,29 @@ public class MessaggioDao {
         }
     }
     public void savePerVenditore(Messaggio m, Long idVenditore) throws SQLException {
+            String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo) VALUES (?, ?, ?, ?)";
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                if (m.getIdAnnuncio() == null || m.getIdAnnuncio() == 0) {
+                    ps.setNull(1, java.sql.Types.BIGINT);
+                } else {
+                    ps.setLong(1, m.getIdAnnuncio());
+                }
+                ps.setLong(2, m.getIdMittente());
+                ps.setString(3, m.getOggetto());
+                ps.setString(4, m.getTesto());
+                ps.executeUpdate();
+            }
+        }
+    public void saveNotificaUtente(Messaggio m, Long idDestinatario) throws SQLException {
         String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo) VALUES (?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, m.getIdAnnuncio());
+            if (m.getIdAnnuncio() == null || m.getIdAnnuncio() == 0) {
+                ps.setNull(1, java.sql.Types.BIGINT);
+            } else {
+                ps.setLong(1, m.getIdAnnuncio());
+            }
             ps.setLong(2, m.getIdMittente());
             ps.setString(3, m.getOggetto());
             ps.setString(4, m.getTesto());

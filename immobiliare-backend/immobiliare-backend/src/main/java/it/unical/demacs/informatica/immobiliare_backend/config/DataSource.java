@@ -1,25 +1,38 @@
 package it.unical.demacs.informatica.immobiliare_backend.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Component
 public class DataSource {
 
-    @Value("${spring.datasource.url}")
-    private String url;
+    private final HikariDataSource hikariDataSource;
 
-    @Value("${spring.datasource.username}")
-    private String username;
+    public DataSource(
+            @Value("${spring.datasource.url}") String url,
+            @Value("${spring.datasource.username}") String username,
+            @Value("${spring.datasource.password}") String password) {
 
-    @Value("${spring.datasource.password}")
-    private String password;
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(5);
+        config.setConnectionTimeout(3000);
+        config.setIdleTimeout(30000);
+        config.setMaxLifetime(600000);
+        config.setKeepaliveTime(30000);
+
+        this.hikariDataSource = new HikariDataSource(config);
+    }
 
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+        return hikariDataSource.getConnection();
     }
 }

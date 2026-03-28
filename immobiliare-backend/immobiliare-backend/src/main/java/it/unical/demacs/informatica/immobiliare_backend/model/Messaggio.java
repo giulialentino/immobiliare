@@ -13,7 +13,10 @@ public class Messaggio {
     private String cognomeMittente;
     private String emailMittente;
     private boolean perAdmin;
+    private String statoPromozione;
 
+    public String getStatoPromozione() { return statoPromozione; }
+    public void setStatoPromozione(String s) { this.statoPromozione = s; }
     public boolean isPerAdmin() { return perAdmin; }
     public void setPerAdmin(boolean b) { this.perAdmin = b; }
     public Long getId() { return id; }

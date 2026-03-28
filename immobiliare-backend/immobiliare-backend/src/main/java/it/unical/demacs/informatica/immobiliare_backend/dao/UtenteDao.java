@@ -28,30 +28,8 @@ public class UtenteDao {
         return u;
     }
 
-    public List<Utente> findAll() throws SQLException {
-        List<Utente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM utente";
-        try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(mapRow(rs));
-            }
-        }
-        return lista;
-    }
 
-    public Utente findById(Long id) throws SQLException {
-        String sql = "SELECT * FROM utente WHERE id = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapRow(rs);
-            }
-        }
-        return null;
-    }
+
 
     public Utente findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM utente WHERE email = ?";
@@ -101,5 +79,46 @@ public class UtenteDao {
             ps.setLong(2, id);
             ps.executeUpdate();
         }
+    }
+    public void aggiornaRuolo(Long id, String ruolo) throws SQLException {
+        String sql = "UPDATE utente SET ruolo = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, ruolo);
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        }
+    }
+
+    public Utente findById(Long id) throws SQLException {
+        String sql = "SELECT * FROM utente WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        }
+        return null;
+    }
+    public void aggiornaPassword(Long id, String nuovaPassword) throws SQLException {
+        String sql = "UPDATE utente SET password = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, nuovaPassword);
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        }
+    }
+    public List<Utente> findAll() throws SQLException {
+        List<Utente> lista = new ArrayList<>();
+        String sql = "SELECT * FROM utente";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(mapRow(rs));
+            }
+        }
+        return lista;
     }
 }
