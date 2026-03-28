@@ -149,4 +149,5 @@ public class MessaggioController {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
+
 }

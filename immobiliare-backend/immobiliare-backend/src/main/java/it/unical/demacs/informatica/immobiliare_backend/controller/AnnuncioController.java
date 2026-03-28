@@ -197,7 +197,23 @@ public class AnnuncioController {
         if (utente == null || !utente.getRuolo().equals("AMMINISTRATORE"))
             return ResponseEntity.status(403).body("Non autorizzato");
         try {
-            annuncioDao.aggiornaStato(id, body.get("stato"));
+            String stato = body.get("stato");
+            annuncioDao.aggiornaStato(id, stato);
+
+            // Manda messaggio al venditore
+            Annuncio annuncio = annuncioDao.findById(id);
+            if (annuncio != null) {
+                Messaggio msg = new Messaggio();
+                msg.setIdAnnuncio(id);
+                msg.setIdMittente(utente.getId());
+                msg.setOggetto(stato.equals("APPROVATO") ?
+                        "✅ Annuncio approvato!" : "❌ Annuncio rifiutato");
+                msg.setTesto(stato.equals("APPROVATO") ?
+                        "Il tuo annuncio \"" + annuncio.getTitolo() + "\" è stato approvato ed è ora visibile a tutti gli utenti." :
+                        "Il tuo annuncio \"" + annuncio.getTitolo() + "\" è stato rifiutato. Puoi modificarlo e ripubblicarlo.");
+                messaggioDao.savePerVenditore(msg, annuncio.getIdVenditore());
+            }
+
             return ResponseEntity.ok("Stato aggiornato");
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");
@@ -214,5 +230,16 @@ public class AnnuncioController {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
+    @GetMapping("/venditore/{idVenditore}")
+    public ResponseEntity<?> getByVenditore(@PathVariable Long idVenditore, HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
+        try {
+            return ResponseEntity.ok(annuncioDao.findByVenditore(idVenditore));
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+
 
 }
