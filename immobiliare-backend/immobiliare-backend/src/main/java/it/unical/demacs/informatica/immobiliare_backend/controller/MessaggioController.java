@@ -126,4 +126,27 @@ public class MessaggioController {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
+    @GetMapping("/admin")
+    public ResponseEntity<?> getMessaggiAdmin(HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null || !utente.getRuolo().equals("AMMINISTRATORE"))
+            return ResponseEntity.status(403).body("Non autorizzato");
+        try {
+            return ResponseEntity.ok(messaggioDao.findPerAdmin());
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+
+    @GetMapping("/count-admin")
+    public ResponseEntity<?> countAdmin(HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null || !utente.getRuolo().equals("AMMINISTRATORE"))
+            return ResponseEntity.status(403).body("Non autorizzato");
+        try {
+            return ResponseEntity.ok(messaggioDao.countNonLettiAdmin());
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
 }

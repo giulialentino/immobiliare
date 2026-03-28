@@ -12,7 +12,10 @@ public class Messaggio {
     private String nomeMittente;
     private String cognomeMittente;
     private String emailMittente;
+    private boolean perAdmin;
 
+    public boolean isPerAdmin() { return perAdmin; }
+    public void setPerAdmin(boolean b) { this.perAdmin = b; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getIdAnnuncio() { return idAnnuncio; }

@@ -17,6 +17,7 @@ public class AnnuncioDao {
 
     private Annuncio mapRow(ResultSet rs) throws SQLException {
         Annuncio a = new Annuncio();
+        try { a.setStato(rs.getString("stato")); } catch (Exception ignored) {}
         a.setId(rs.getLong("id"));
         a.setTitolo(rs.getString("titolo"));
         a.setDescrizione(rs.getString("descrizione"));
@@ -49,7 +50,7 @@ public class AnnuncioDao {
 
     public List<Annuncio> findByFiltri(String tipoOperazione, Long idCategoria) throws SQLException {
         List<Annuncio> lista = new ArrayList<>();
-        String sql = "SELECT * FROM annuncio WHERE 1=1";
+        String sql = "SELECT * FROM annuncio WHERE 1=1 AND stato='APPROVATO'";
         if (tipoOperazione != null) sql += " AND tipo_operazione = ?";
         if (idCategoria != null) sql += " AND id_categoria = ?";
 
@@ -93,8 +94,8 @@ public class AnnuncioDao {
     public Annuncio save(Annuncio a) throws SQLException {
         String sql = "INSERT INTO annuncio (titolo, descrizione, prezzo, prezzo_ribassato, " +
                 "metri_quadri, tipo_operazione, indirizzo, latitudine, longitudine, " +
-                "in_asta, id_venditore, id_categoria) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
+                "in_asta, id_venditore, id_categoria, stato) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,'IN_ATTESA') RETURNING id";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, a.getTitolo());
@@ -115,6 +116,7 @@ public class AnnuncioDao {
         }
         return a;
     }
+
 
     public void update(Annuncio a) throws SQLException {
         String sql = "UPDATE annuncio SET titolo=?, descrizione=?, prezzo=?, " +
@@ -164,5 +166,36 @@ public class AnnuncioDao {
             ps.setLong(1, id);
             ps.executeUpdate();
         }
+    }
+    public void aggiornaStato(Long id, String stato) throws SQLException {
+        String sql = "UPDATE annuncio SET stato = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, stato);
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        }
+    }
+
+    public List<Annuncio> findInAttesa() throws SQLException {
+        List<Annuncio> lista = new ArrayList<>();
+        String sql = "SELECT * FROM annuncio WHERE stato = 'IN_ATTESA' ORDER BY data_inserimento DESC";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(mapRow(rs));
+            }
+        }
+        return lista;
+    }
+    public int countInAttesa() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM annuncio WHERE stato = 'IN_ATTESA'";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        return 0;
     }
 }

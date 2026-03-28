@@ -16,7 +16,10 @@ public class Annuncio {
     private boolean inAsta;
     private Long idVenditore;
     private Long idCategoria;
+    private String stato;
 
+    public String getStato() { return stato; }
+    public void setStato(String stato) { this.stato = stato; }
     // Questi vengono caricati dal Proxy, non dal DAO direttamente
     private List<String> foto;
     private List<Recensione> recensioni;

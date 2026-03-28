@@ -14,6 +14,9 @@ public class MessaggioDao {
 
     @Autowired
     private DataSource dataSource;
+    private boolean perAdmin;
+    public boolean isPerAdmin() { return perAdmin; }
+    public void setPerAdmin(boolean b) { this.perAdmin = b; }
 
     private Messaggio mapRow(ResultSet rs) throws SQLException {
         Messaggio m = new Messaggio();
@@ -25,6 +28,7 @@ public class MessaggioDao {
         m.setLetto(rs.getBoolean("letto"));
         m.setEliminatoVenditore(rs.getBoolean("eliminato_venditore"));
         m.setEliminatoAcquirente(rs.getBoolean("eliminato_acquirente"));
+        try { m.setPerAdmin(rs.getBoolean("per_admin")); } catch (Exception ignored) {}
         try {
             m.setNomeMittente(rs.getString("nome_mittente"));
             m.setCognomeMittente(rs.getString("cognome_mittente"));
@@ -39,7 +43,7 @@ public class MessaggioDao {
                 "FROM messaggio m " +
                 "JOIN annuncio a ON m.id_annuncio = a.id " +
                 "JOIN utente u ON m.id_mittente = u.id " +
-                "WHERE a.id_venditore = ? AND m.eliminato_venditore = FALSE " +
+                "WHERE a.id_venditore = ? AND m.eliminato_venditore = FALSE AND m.per_admin = FALSE " +
                 "ORDER BY m.data_invio DESC";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -56,11 +60,27 @@ public class MessaggioDao {
         String sql = "SELECT m.*, u.nome as nome_mittente, u.cognome as cognome_mittente, u.email as email_mittente " +
                 "FROM messaggio m " +
                 "JOIN utente u ON m.id_mittente = u.id " +
-                "WHERE m.id_mittente = ? AND m.eliminato_acquirente = FALSE " +
+                "WHERE m.id_mittente = ? AND m.eliminato_acquirente = FALSE AND m.per_admin = FALSE " +
                 "ORDER BY m.data_invio DESC";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, idMittente);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(mapRow(rs));
+            }
+        }
+        return lista;
+    }
+
+    public List<Messaggio> findPerAdmin() throws SQLException {
+        List<Messaggio> lista = new ArrayList<>();
+        String sql = "SELECT m.*, u.nome as nome_mittente, u.cognome as cognome_mittente, u.email as email_mittente " +
+                "FROM messaggio m " +
+                "JOIN utente u ON m.id_mittente = u.id " +
+                "WHERE m.per_admin = TRUE " +
+                "ORDER BY m.data_invio DESC";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) lista.add(mapRow(rs));
             }
@@ -73,7 +93,7 @@ public class MessaggioDao {
         String sql = "SELECT m.*, u.nome as nome_mittente, u.cognome as cognome_mittente, u.email as email_mittente " +
                 "FROM messaggio m " +
                 "JOIN utente u ON m.id_mittente = u.id " +
-                "WHERE m.id_annuncio = ? ORDER BY m.data_invio DESC";
+                "WHERE m.id_annuncio = ? AND m.per_admin = FALSE ORDER BY m.data_invio DESC";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, idAnnuncio);
@@ -99,14 +119,37 @@ public class MessaggioDao {
         return m;
     }
 
+    public void savePerAdmin(Messaggio m) throws SQLException {
+        String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo, per_admin) VALUES (?, ?, ?, ?, TRUE)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, m.getIdAnnuncio());
+            ps.setLong(2, m.getIdMittente());
+            ps.setString(3, m.getOggetto());
+            ps.setString(4, m.getTesto());
+            ps.executeUpdate();
+        }
+    }
+
     public int countMessaggi(Long idVenditore) throws SQLException {
         String sql = "SELECT COUNT(*) FROM messaggio m " +
                 "JOIN annuncio a ON m.id_annuncio = a.id " +
                 "WHERE a.id_venditore = ? AND m.letto = FALSE " +
-                "AND m.eliminato_venditore = FALSE";
+                "AND m.eliminato_venditore = FALSE AND m.per_admin = FALSE";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, idVenditore);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public int countNonLettiAdmin() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM messaggio WHERE per_admin = TRUE AND letto = FALSE";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
@@ -143,7 +186,7 @@ public class MessaggioDao {
 
     public void eliminaTuttiPerVenditore(Long idVenditore) throws SQLException {
         String sql = "UPDATE messaggio SET eliminato_venditore = TRUE " +
-                "WHERE id_annuncio IN (SELECT id FROM annuncio WHERE id_venditore = ?)";
+                "WHERE id_annuncio IN (SELECT id FROM annuncio WHERE id_venditore = ?) AND per_admin = FALSE";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, idVenditore);
@@ -152,7 +195,7 @@ public class MessaggioDao {
     }
 
     public void eliminaTuttiPerAcquirente(Long idMittente) throws SQLException {
-        String sql = "UPDATE messaggio SET eliminato_acquirente = TRUE WHERE id_mittente = ?";
+        String sql = "UPDATE messaggio SET eliminato_acquirente = TRUE WHERE id_mittente = ? AND per_admin = FALSE";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, idMittente);

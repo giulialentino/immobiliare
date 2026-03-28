@@ -10,6 +10,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import it.unical.demacs.informatica.immobiliare_backend.dao.MessaggioDao;
+import it.unical.demacs.informatica.immobiliare_backend.model.Messaggio;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -18,6 +21,9 @@ import java.util.List;
 @RequestMapping("/api/annunci")
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class AnnuncioController {
+
+    @Autowired
+    private MessaggioDao messaggioDao;
 
     @Autowired
     private AnnuncioDao annuncioDao;
@@ -81,15 +87,23 @@ public class AnnuncioController {
 
     // Solo VENDITORE o AMMINISTRATORE può creare annunci
     @PostMapping
-    public ResponseEntity<?> crea(@RequestBody Annuncio annuncio, HttpSession session) {
+    public ResponseEntity<?> create(@RequestBody Annuncio annuncio, HttpSession session) {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        if (!utente.getRuolo().equals("VENDITORE") && !utente.getRuolo().equals("AMMINISTRATORE")) {
-            return ResponseEntity.status(403).body("Non autorizzato");
-        }
         try {
             annuncio.setIdVenditore(utente.getId());
+            annuncio.setStato("IN_ATTESA");
             Annuncio salvato = annuncioDao.save(annuncio);
+
+            // Invia messaggio automatico all'admin
+            Messaggio msg = new Messaggio();
+            msg.setIdAnnuncio(salvato.getId());
+            msg.setIdMittente(utente.getId());
+            msg.setOggetto("Nuova richiesta di approvazione");
+            msg.setTesto("Il venditore " + utente.getNome() + " " + utente.getCognome() +
+                    " ha richiesto l'approvazione dell'annuncio: \"" + salvato.getTitolo() + "\".");
+            messaggioDao.savePerAdmin(msg);
+
             return ResponseEntity.ok(salvato);
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");
@@ -159,6 +173,43 @@ public class AnnuncioController {
         try {
             annuncioDao.annullaRibasso(id);
             return ResponseEntity.ok("Ribasso annullato");
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+    @GetMapping("/in-attesa")
+    public ResponseEntity<?> getInAttesa(HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null || !utente.getRuolo().equals("AMMINISTRATORE"))
+            return ResponseEntity.status(403).body("Non autorizzato");
+        try {
+            return ResponseEntity.ok(annuncioDao.findInAttesa());
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+
+    @PatchMapping("/{id}/stato")
+    public ResponseEntity<?> aggiornaStato(@PathVariable Long id,
+                                           @RequestBody Map<String, String> body,
+                                           HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null || !utente.getRuolo().equals("AMMINISTRATORE"))
+            return ResponseEntity.status(403).body("Non autorizzato");
+        try {
+            annuncioDao.aggiornaStato(id, body.get("stato"));
+            return ResponseEntity.ok("Stato aggiornato");
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+    @GetMapping("/count-in-attesa")
+    public ResponseEntity<?> countInAttesa(HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null || !utente.getRuolo().equals("AMMINISTRATORE"))
+            return ResponseEntity.status(403).body("Non autorizzato");
+        try {
+            return ResponseEntity.ok(annuncioDao.countInAttesa());
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");
         }
