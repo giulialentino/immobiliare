@@ -59,7 +59,6 @@ public class AnnuncioController {
             Annuncio annuncio = annuncioDao.findById(id);
             if (annuncio == null) return ResponseEntity.notFound().build();
 
-            // Creiamo il Proxy e copiamo i dati base
             AnnuncioProxy proxy = new AnnuncioProxy(fotoDao, recensioneDao);
             proxy.setId(annuncio.getId());
             proxy.setTitolo(annuncio.getTitolo());
@@ -74,8 +73,9 @@ public class AnnuncioController {
             proxy.setInAsta(annuncio.isInAsta());
             proxy.setIdVenditore(annuncio.getIdVenditore());
             proxy.setIdCategoria(annuncio.getIdCategoria());
+            proxy.setStato(annuncio.getStato());
+            proxy.setDataInserimento(annuncio.getDataInserimento());
 
-            // Qui il Proxy carica foto e recensioni dal DB solo ora
             proxy.getFoto();
             proxy.getRecensioni();
 

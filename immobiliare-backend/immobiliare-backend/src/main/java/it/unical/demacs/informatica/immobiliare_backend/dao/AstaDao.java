@@ -76,4 +76,15 @@ public class AstaDao {
             ps.executeUpdate();
         }
     }
+    public Asta findById(Long idAsta) throws SQLException {
+        String sql = "SELECT * FROM asta WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, idAsta);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        }
+        return null;
+    }
 }

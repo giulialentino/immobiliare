@@ -4,6 +4,8 @@ import it.unical.demacs.informatica.immobiliare_backend.config.DataSource;
 import it.unical.demacs.informatica.immobiliare_backend.model.Annuncio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,13 +13,15 @@ import java.util.List;
 
 @Repository
 public class AnnuncioDao {
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private java.time.LocalDateTime dataInserimento;
+
 
     @Autowired
     private DataSource dataSource;
 
     private Annuncio mapRow(ResultSet rs) throws SQLException {
         Annuncio a = new Annuncio();
-        try { a.setStato(rs.getString("stato")); } catch (Exception ignored) {}
         a.setId(rs.getLong("id"));
         a.setTitolo(rs.getString("titolo"));
         a.setDescrizione(rs.getString("descrizione"));
@@ -34,8 +38,16 @@ public class AnnuncioDao {
         a.setInAsta(rs.getBoolean("in_asta"));
         a.setIdVenditore(rs.getLong("id_venditore"));
         a.setIdCategoria(rs.getLong("id_categoria"));
+        a.setStato(rs.getString("stato"));
+        Timestamp ts = rs.getTimestamp("data_inserimento");
+        String stato = rs.getString("stato");
+        System.out.println("STATO: " + stato);
+        a.setStato(stato);
+        System.out.println("DATA: " + ts);
+        if (ts != null) a.setDataInserimento(ts.toLocalDateTime());
         return a;
     }
+
 
     public List<Annuncio> findAll() throws SQLException {
         List<Annuncio> lista = new ArrayList<>();
@@ -197,5 +209,14 @@ public class AnnuncioDao {
             }
         }
         return 0;
+    }
+    public void aggiornaInAsta(Long id, boolean inAsta) throws SQLException {
+        String sql = "UPDATE annuncio SET in_asta = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, inAsta);
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        }
     }
 }

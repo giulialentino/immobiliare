@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.immobiliare_backend.model;
 
+
 import java.util.List;
 
 public class Annuncio {
@@ -17,7 +18,11 @@ public class Annuncio {
     private Long idVenditore;
     private Long idCategoria;
     private String stato;
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private java.time.LocalDateTime dataInserimento;
 
+    public java.time.LocalDateTime getDataInserimento() { return dataInserimento; }
+    public void setDataInserimento(java.time.LocalDateTime d) { this.dataInserimento = d; }
     public String getStato() { return stato; }
     public void setStato(String stato) { this.stato = stato; }
     // Questi vengono caricati dal Proxy, non dal DAO direttamente

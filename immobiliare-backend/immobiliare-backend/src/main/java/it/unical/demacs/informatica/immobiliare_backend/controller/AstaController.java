@@ -1,5 +1,6 @@
 package it.unical.demacs.informatica.immobiliare_backend.controller;
 
+import it.unical.demacs.informatica.immobiliare_backend.dao.AnnuncioDao;
 import it.unical.demacs.informatica.immobiliare_backend.dao.AstaDao;
 import it.unical.demacs.informatica.immobiliare_backend.dao.OffertaDao;
 import it.unical.demacs.informatica.immobiliare_backend.model.Asta;
@@ -25,7 +26,9 @@ public class AstaController {
     @Autowired
     private OffertaDao offertaDao;
 
-    // Ottieni asta attiva per un annuncio
+    @Autowired
+    private AnnuncioDao annuncioDao;
+
     @GetMapping("/annuncio/{idAnnuncio}")
     public ResponseEntity<?> getByAnnuncio(@PathVariable Long idAnnuncio) {
         try {
@@ -37,7 +40,6 @@ public class AstaController {
         }
     }
 
-    // Crea asta — solo VENDITORE o AMMINISTRATORE
     @PostMapping
     public ResponseEntity<?> crea(@RequestBody Asta asta, HttpSession session) {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
@@ -47,13 +49,14 @@ public class AstaController {
         }
         try {
             Asta salvata = astaDao.save(asta);
+            // Aggiorna in_asta = true sull'annuncio
+            annuncioDao.aggiornaInAsta(asta.getIdAnnuncio(), true);
             return ResponseEntity.ok(salvata);
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
 
-    // Fai un'offerta — solo utenti loggati
     @PostMapping("/{idAsta}/offerta")
     public ResponseEntity<?> offerta(@PathVariable Long idAsta,
                                      @RequestBody Map<String, Double> body,
@@ -63,24 +66,18 @@ public class AstaController {
         try {
             Double importo = body.get("importo");
             if (importo == null) return ResponseEntity.badRequest().body("Importo mancante");
-
-            // Salva offerta
             Offerta offerta = new Offerta();
             offerta.setIdAsta(idAsta);
             offerta.setIdUtente(utente.getId());
             offerta.setImporto(importo);
             offertaDao.save(offerta);
-
-            // Aggiorna offerta massima nell'asta
             astaDao.aggiornaOfferta(idAsta, importo, utente.getId());
-
             return ResponseEntity.ok("Offerta effettuata");
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
 
-    // Ottieni tutte le offerte di un'asta
     @GetMapping("/{idAsta}/offerte")
     public ResponseEntity<?> getOfferte(@PathVariable Long idAsta) {
         try {
@@ -91,13 +88,18 @@ public class AstaController {
         }
     }
 
-    // Chiudi asta — solo VENDITORE o AMMINISTRATORE
     @PatchMapping("/{idAsta}/chiudi")
     public ResponseEntity<?> chiudi(@PathVariable Long idAsta, HttpSession session) {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
         try {
+            // Trova l'idAnnuncio prima di chiudere
+            Asta asta = astaDao.findById(idAsta);
             astaDao.chiudi(idAsta);
+            // Aggiorna in_asta = false sull'annuncio
+            if (asta != null) {
+                annuncioDao.aggiornaInAsta(asta.getIdAnnuncio(), false);
+            }
             return ResponseEntity.ok("Asta chiusa");
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");

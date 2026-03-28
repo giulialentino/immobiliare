@@ -36,16 +36,22 @@ public class FotoController {
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
 
         try {
-            // Crea cartella se non esiste
+            // Controlla estensione
+            String nomeOriginale = file.getOriginalFilename();
+            if (nomeOriginale == null) return ResponseEntity.badRequest().body("File non valido");
+
+            String ext = nomeOriginale.toLowerCase().substring(nomeOriginale.lastIndexOf('.') + 1);
+            if (!ext.equals("jpg") && !ext.equals("jpeg") && !ext.equals("png")) {
+                return ResponseEntity.badRequest().body("Formato non supportato. Usa JPG o PNG");
+            }
+
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
 
-            // Genera nome unico per il file
-            String nomeFile = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String nomeFile = UUID.randomUUID() + "." + ext;
             Path percorso = Paths.get(uploadDir, nomeFile);
             Files.write(percorso, file.getBytes());
 
-            // Salva URL nel database
             String url = "http://localhost:8080/uploads/" + nomeFile;
             fotoDao.save(idAnnuncio, url);
 
