@@ -45,6 +45,8 @@ public class AnnuncioDao {
         a.setStato(stato);
         System.out.println("DATA: " + ts);
         if (ts != null) a.setDataInserimento(ts.toLocalDateTime());
+        try { a.setNumLocali(rs.getObject("num_locali") != null ? rs.getInt("num_locali") : null); } catch (Exception ignored) {}
+        try { a.setNumBagni(rs.getObject("num_bagni") != null ? rs.getInt("num_bagni") : null); } catch (Exception ignored) {}
         return a;
     }
 
@@ -106,8 +108,8 @@ public class AnnuncioDao {
     public Annuncio save(Annuncio a) throws SQLException {
         String sql = "INSERT INTO annuncio (titolo, descrizione, prezzo, prezzo_ribassato, " +
                 "metri_quadri, tipo_operazione, indirizzo, latitudine, longitudine, " +
-                "in_asta, id_venditore, id_categoria, stato) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,'IN_ATTESA') RETURNING id";
+                "in_asta, id_venditore, id_categoria, stato, num_locali, num_bagni) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,'IN_ATTESA',?,?) RETURNING id";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, a.getTitolo());
@@ -130,6 +132,8 @@ public class AnnuncioDao {
             ps.setBoolean(10, a.isInAsta());
             ps.setLong(11, a.getIdVenditore());
             ps.setLong(12, a.getIdCategoria());
+            ps.setObject(13, a.getNumLocali());
+            ps.setObject(14, a.getNumBagni());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) a.setId(rs.getLong("id"));
             }
@@ -142,22 +146,32 @@ public class AnnuncioDao {
     public void update(Annuncio a) throws SQLException {
         String sql = "UPDATE annuncio SET titolo=?, descrizione=?, prezzo=?, " +
                 "prezzo_ribassato=?, metri_quadri=?, tipo_operazione=?, " +
-                "indirizzo=?, latitudine=?, longitudine=?, in_asta=?, id_categoria=? " +
-                "WHERE id=?";
+                "indirizzo=?, latitudine=?, longitudine=?, in_asta=?, id_categoria=?, " +
+                "num_locali=?, num_bagni=? WHERE id=?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, a.getTitolo());
             ps.setString(2, a.getDescrizione());
             ps.setDouble(3, a.getPrezzo());
             ps.setObject(4, a.getPrezzoRibassato());
-            ps.setInt(5, a.getMetriQuadri());
+            ps.setObject(5, a.getMetriQuadri());
             ps.setString(6, a.getTipoOperazione());
             ps.setString(7, a.getIndirizzo());
-            ps.setDouble(8, a.getLatitudine());
-            ps.setDouble(9, a.getLongitudine());
+            if (a.getLatitudine() != null && a.getLatitudine() != 0) {
+                ps.setDouble(8, a.getLatitudine());
+            } else {
+                ps.setNull(8, java.sql.Types.DOUBLE);
+            }
+            if (a.getLongitudine() != null && a.getLongitudine() != 0) {
+                ps.setDouble(9, a.getLongitudine());
+            } else {
+                ps.setNull(9, java.sql.Types.DOUBLE);
+            }
             ps.setBoolean(10, a.isInAsta());
             ps.setLong(11, a.getIdCategoria());
-            ps.setLong(12, a.getId());
+            ps.setObject(12, a.getNumLocali());
+            ps.setObject(13, a.getNumBagni());
+            ps.setLong(14, a.getId());
             ps.executeUpdate();
         }
     }

@@ -20,6 +20,13 @@ public class Annuncio {
     private String stato;
     @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private java.time.LocalDateTime dataInserimento;
+    private Integer numLocali;
+    private Integer numBagni;
+
+    public Integer getNumLocali() { return numLocali; }
+    public void setNumLocali(Integer n) { this.numLocali = n; }
+    public Integer getNumBagni() { return numBagni; }
+    public void setNumBagni(Integer n) { this.numBagni = n; }
 
     public java.time.LocalDateTime getDataInserimento() { return dataInserimento; }
     public void setDataInserimento(java.time.LocalDateTime d) { this.dataInserimento = d; }
