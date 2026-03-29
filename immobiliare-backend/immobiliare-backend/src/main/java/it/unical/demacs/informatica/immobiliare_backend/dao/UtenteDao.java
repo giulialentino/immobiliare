@@ -25,6 +25,7 @@ public class UtenteDao {
         u.setPassword(rs.getString("password"));
         u.setRuolo(rs.getString("ruolo"));
         u.setBannato(rs.getBoolean("bannato"));
+        try { u.setFotoProfilo(rs.getString("foto_profilo")); } catch (Exception ignored) {}
         return u;
     }
 
@@ -120,5 +121,18 @@ public class UtenteDao {
             }
         }
         return lista;
+    }
+    public void aggiornaFotoProfilo(Long id, String url) throws SQLException {
+        String sql = "UPDATE utente SET foto_profilo = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (url == null) {
+                ps.setNull(1, java.sql.Types.VARCHAR);
+            } else {
+                ps.setString(1, url);
+            }
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        }
     }
 }

@@ -114,11 +114,19 @@ public class AnnuncioDao {
             ps.setString(2, a.getDescrizione());
             ps.setDouble(3, a.getPrezzo());
             ps.setObject(4, a.getPrezzoRibassato());
-            ps.setInt(5, a.getMetriQuadri());
+            ps.setObject(5, a.getMetriQuadri());
             ps.setString(6, a.getTipoOperazione());
             ps.setString(7, a.getIndirizzo());
-            ps.setDouble(8, a.getLatitudine());
-            ps.setDouble(9, a.getLongitudine());
+            if (a.getLatitudine() != null && a.getLatitudine() != 0) {
+                ps.setDouble(8, a.getLatitudine());
+            } else {
+                ps.setNull(8, java.sql.Types.DOUBLE);
+            }
+            if (a.getLongitudine() != null && a.getLongitudine() != 0) {
+                ps.setDouble(9, a.getLongitudine());
+            } else {
+                ps.setNull(9, java.sql.Types.DOUBLE);
+            }
             ps.setBoolean(10, a.isInAsta());
             ps.setLong(11, a.getIdVenditore());
             ps.setLong(12, a.getIdCategoria());
@@ -128,6 +136,7 @@ public class AnnuncioDao {
         }
         return a;
     }
+
 
 
     public void update(Annuncio a) throws SQLException {

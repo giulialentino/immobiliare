@@ -7,6 +7,14 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 import java.sql.SQLException;
 
@@ -14,6 +22,8 @@ import java.sql.SQLException;
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class AuthController {
+    @Value("${upload.dir}")
+    private String uploadDir;
 
     @Autowired
     private UtenteDao utenteDao;
@@ -57,6 +67,17 @@ public class AuthController {
         }
         return ResponseEntity.ok(utente);
     }
+    @GetMapping("/utente/{id}")
+    public ResponseEntity<?> getUtenteById(@PathVariable Long id) {
+        try {
+            Utente utente = utenteDao.findById(id);
+            if (utente == null) return ResponseEntity.notFound().build();
+            utente.setPassword(null);
+            return ResponseEntity.ok(utente);
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
 
     @PostMapping("/registra")
     public ResponseEntity<?> registra(@RequestBody Utente nuovo) {
@@ -92,6 +113,45 @@ public class AuthController {
             }
             utenteDao.aggiornaPassword(utente.getId(), passwordUtil.cifra(nuova));
             return ResponseEntity.ok("Password aggiornata");
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+    @PostMapping("/foto-profilo")
+    public ResponseEntity<?> uploadFotoProfilo(@RequestParam("file") MultipartFile file,
+                                               HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
+        try {
+            String ext = file.getOriginalFilename().toLowerCase()
+                    .substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+            if (!ext.equals("jpg") && !ext.equals("jpeg")) {
+                return ResponseEntity.badRequest().body("Solo JPG accettato");
+            }
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+            String nomeFile = "profilo_" + utente.getId() + "_" + UUID.randomUUID() + "." + ext;
+            Path percorso = Paths.get(uploadDir, nomeFile);
+            Files.write(percorso, file.getBytes());
+            String url = "http://localhost:8080/uploads/" + nomeFile;
+            utenteDao.aggiornaFotoProfilo(utente.getId(), url);
+            utente.setFotoProfilo(url);
+            session.setAttribute("utenteLoggato", utente);
+            return ResponseEntity.ok(url);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Errore upload: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/foto-profilo")
+    public ResponseEntity<?> rimuoviFotoProfilo(HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
+        try {
+            utenteDao.aggiornaFotoProfilo(utente.getId(), null);
+            utente.setFotoProfilo(null);
+            session.setAttribute("utenteLoggato", utente);
+            return ResponseEntity.ok("Foto rimossa");
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");
         }

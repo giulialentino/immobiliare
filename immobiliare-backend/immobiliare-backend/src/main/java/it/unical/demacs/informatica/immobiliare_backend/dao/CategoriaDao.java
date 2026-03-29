@@ -24,7 +24,7 @@ public class CategoriaDao {
 
     public List<Categoria> findAll() throws SQLException {
         List<Categoria> lista = new ArrayList<>();
-        String sql = "SELECT * FROM categoria";
+        String sql = "SELECT * FROM categoria ORDER BY ordine ASC";
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {

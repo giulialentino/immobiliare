@@ -8,12 +8,13 @@ public class Utente {
     private String password;
     private String ruolo; // "AMMINISTRATORE", "VENDITORE", "ACQUIRENTE"
     private boolean bannato;
+    private String fotoProfilo;
+    public String getFotoProfilo() { return fotoProfilo; }
 
+    public void setFotoProfilo(String f) { this.fotoProfilo = f; }
     public Utente() {}
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 

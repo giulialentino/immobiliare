@@ -15,4 +15,5 @@ public class PasswordUtil {
     public boolean verifica(String password, String hash) {
         return encoder.matches(password, hash);
     }
+
 }
