@@ -75,4 +75,25 @@ public class AuthController {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
+    @PostMapping("/cambia-password")
+    public ResponseEntity<?> cambiaPassword(@RequestBody java.util.Map<String, String> body,
+                                            HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
+        try {
+            String vecchia = body.get("vecchiaPassword");
+            String nuova = body.get("nuovaPassword");
+            Utente u = utenteDao.findByEmail(utente.getEmail());
+            if (!passwordUtil.verifica(vecchia, u.getPassword())) {
+                return ResponseEntity.status(400).body("Password attuale non corretta");
+            }
+            if (nuova.length() < 6) {
+                return ResponseEntity.status(400).body("La nuova password deve essere di almeno 6 caratteri");
+            }
+            utenteDao.aggiornaPassword(utente.getId(), passwordUtil.cifra(nuova));
+            return ResponseEntity.ok("Password aggiornata");
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
 }
