@@ -41,9 +41,7 @@ public class AnnuncioDao {
         a.setStato(rs.getString("stato"));
         Timestamp ts = rs.getTimestamp("data_inserimento");
         String stato = rs.getString("stato");
-        System.out.println("STATO: " + stato);
         a.setStato(stato);
-        System.out.println("DATA: " + ts);
         if (ts != null) a.setDataInserimento(ts.toLocalDateTime());
         try { a.setNumLocali(rs.getObject("num_locali") != null ? rs.getInt("num_locali") : null); } catch (Exception ignored) {}
         try { a.setNumBagni(rs.getObject("num_bagni") != null ? rs.getInt("num_bagni") : null); } catch (Exception ignored) {}
