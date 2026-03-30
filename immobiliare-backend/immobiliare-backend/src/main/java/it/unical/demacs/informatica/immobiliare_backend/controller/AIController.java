@@ -2,55 +2,67 @@ package it.unical.demacs.informatica.immobiliare_backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ai")
-//@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class AIController {
 
-    private static final String API_KEY = "AIzaSyDRcfxjEPeAP8WA5U9ULGt3DIf45ftZl38";
-    private static final String API_URL =  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+    @Value("${gemini.api.key}")
+    private String apiKey;
+
+    @Value("${gemini.api.url}")
+    private String apiUrl;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping("/descrizione")
-    public ResponseEntity<?> generaDescrizione(@RequestBody Map<String,Object> body,
+    public ResponseEntity<?> generaDescrizione(@RequestBody Map<String, Object> body,
                                                HttpSession session) {
         try {
             String prompt = (String) body.get("prompt");
 
-            RestTemplate restTemplate = new RestTemplate();
+            if (prompt == null || prompt.isBlank()) {
+                return ResponseEntity.badRequest().body("Prompt mancante");
+            }
 
+            RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            Map<String, Object> requestMap = Map.of(
-                    "contents", List.of(
-                            Map.of("parts", List.of(
-                                    Map.of("text", prompt)
-                            ))
-                    )
-            );
+            Map<String, Object> part = new HashMap<>();
+            part.put("text", prompt);
+
+            Map<String, Object> content = new HashMap<>();
+            content.put("parts", List.of(part));
+
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("contents", List.of(content));
 
             String requestBody = objectMapper.writeValueAsString(requestMap);
-
             HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
+
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                    API_URL + "?key=" + API_KEY, request, Map.class
+                    apiUrl + "?key=" + apiKey, request, Map.class
             );
 
             return ResponseEntity.ok(response.getBody());
+
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 429) {
+                return ResponseEntity.status(429).body("Servizio AI temporaneamente non disponibile. Riprova tra qualche secondo.");
+            }
+            return ResponseEntity.status(500).body("Errore AI: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            // Aggiungi questa riga:
-            System.err.println("CAUSA: " + e.getCause());
-            System.err.println("MESSAGGIO: " + e.getMessage());
             return ResponseEntity.status(500).body("Errore AI: " + e.getMessage());
         }
     }
