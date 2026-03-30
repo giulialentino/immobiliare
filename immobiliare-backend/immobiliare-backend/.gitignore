@@ -65,5 +65,4 @@ build/
 ### VS Code ###
 .vscode/
 
-### Secrets ###
 src/main/resources/application-local.properties
