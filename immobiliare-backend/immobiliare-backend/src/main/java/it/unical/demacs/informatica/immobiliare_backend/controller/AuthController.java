@@ -3,25 +3,27 @@ package it.unical.demacs.informatica.immobiliare_backend.controller;
 import it.unical.demacs.informatica.immobiliare_backend.config.PasswordUtil;
 import it.unical.demacs.informatica.immobiliare_backend.dao.UtenteDao;
 import it.unical.demacs.informatica.immobiliare_backend.model.Utente;
+import it.unical.demacs.informatica.immobiliare_backend.service.EmailService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
-
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class AuthController {
+
     @Value("${upload.dir}")
     private String uploadDir;
 
@@ -30,6 +32,9 @@ public class AuthController {
 
     @Autowired
     private PasswordUtil passwordUtil;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Utente credenziali, HttpSession session) {
@@ -40,6 +45,9 @@ public class AuthController {
             }
             if (utente.isBannato()) {
                 return ResponseEntity.status(403).body("Utente bannato");
+            }
+            if (!utente.isEmailVerificata()) {
+                return ResponseEntity.status(403).body("EMAIL_NON_VERIFICATA");
             }
             boolean passwordOk = passwordUtil.verifica(credenziali.getPassword(), utente.getPassword());
             if (!passwordOk) {
@@ -67,6 +75,7 @@ public class AuthController {
         }
         return ResponseEntity.ok(utente);
     }
+
     @GetMapping("/utente/{id}")
     public ResponseEntity<?> getUtenteById(@PathVariable Long id) {
         try {
@@ -87,17 +96,81 @@ public class AuthController {
                 return ResponseEntity.status(400).body("Email già registrata");
             }
             nuovo.setPassword(passwordUtil.cifra(nuovo.getPassword()));
-            nuovo.setRuolo("ACQUIRENTE");
+            if (nuovo.getRuolo() == null || nuovo.getRuolo().isBlank()) {
+                nuovo.setRuolo("ACQUIRENTE");
+            }
             nuovo.setBannato(false);
+            nuovo.setEmailVerificata(false);
             Utente salvato = utenteDao.save(nuovo);
+
+            String token = UUID.randomUUID().toString();
+            utenteDao.salvaTokenVerifica(salvato.getId(), token);
+            emailService.inviaVerificaEmail(salvato.getEmail(), token);
+
             salvato.setPassword(null);
-            return ResponseEntity.ok(salvato);
+            return ResponseEntity.ok("Registrazione avvenuta! Controlla la tua email per verificare l'account.");
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
+
+    @GetMapping("/verifica-email")
+    public ResponseEntity<?> verificaEmail(@RequestParam String token) {
+        try {
+            Utente utente = utenteDao.findByTokenVerifica(token);
+            if (utente == null) {
+                return ResponseEntity.status(400).body("Token non valido o già utilizzato");
+            }
+            utenteDao.verificaEmail(utente.getId());
+            return ResponseEntity.ok("Email verificata con successo!");
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+
+    @PostMapping("/recupera-password")
+    public ResponseEntity<?> recuperaPassword(@RequestBody Map<String, String> body) {
+        try {
+            String email = body.get("email");
+            Utente utente = utenteDao.findByEmail(email);
+            if (utente != null) {
+                String token = UUID.randomUUID().toString();
+                java.time.LocalDateTime scadenza = java.time.LocalDateTime.now().plusHours(1);
+                utenteDao.salvaTokenReset(utente.getId(), token, scadenza);
+                emailService.inviaResetPassword(utente.getEmail(), token);
+            }
+            return ResponseEntity.ok("Se l'email è registrata, riceverai le istruzioni.");
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            String token = body.get("token");
+            String nuovaPassword = body.get("nuovaPassword");
+
+            Utente utente = utenteDao.findByTokenReset(token);
+            if (utente == null) {
+                return ResponseEntity.status(400).body("Token non valido");
+            }
+            if (utente.getTokenResetScadenza().isBefore(java.time.LocalDateTime.now())) {
+                return ResponseEntity.status(400).body("Token scaduto. Richiedi un nuovo recupero.");
+            }
+            if (nuovaPassword == null || nuovaPassword.length() < 6) {
+                return ResponseEntity.status(400).body("La password deve essere di almeno 6 caratteri");
+            }
+            utenteDao.aggiornaPassword(utente.getId(), passwordUtil.cifra(nuovaPassword));
+            utenteDao.cancellaTokenReset(utente.getId());
+            return ResponseEntity.ok("Password aggiornata con successo!");
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+
     @PostMapping("/cambia-password")
-    public ResponseEntity<?> cambiaPassword(@RequestBody java.util.Map<String, String> body,
+    public ResponseEntity<?> cambiaPassword(@RequestBody Map<String, String> body,
                                             HttpSession session) {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
@@ -117,6 +190,7 @@ public class AuthController {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
+
     @PostMapping("/foto-profilo")
     public ResponseEntity<?> uploadFotoProfilo(@RequestParam("file") MultipartFile file,
                                                HttpSession session) {

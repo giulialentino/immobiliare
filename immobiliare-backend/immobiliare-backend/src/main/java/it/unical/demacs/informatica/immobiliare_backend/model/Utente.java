@@ -6,15 +6,19 @@ public class Utente {
     private String cognome;
     private String email;
     private String password;
-    private String ruolo; // "AMMINISTRATORE", "VENDITORE", "ACQUIRENTE"
+    private String ruolo;
     private boolean bannato;
     private String fotoProfilo;
-    public String getFotoProfilo() { return fotoProfilo; }
+    private boolean emailVerificata;
+    private String tokenVerifica;
+    private String tokenReset;
+    private java.time.LocalDateTime tokenResetScadenza;
 
-    public void setFotoProfilo(String f) { this.fotoProfilo = f; }
     public Utente() {}
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 
@@ -32,4 +36,19 @@ public class Utente {
 
     public boolean isBannato() { return bannato; }
     public void setBannato(boolean bannato) { this.bannato = bannato; }
+
+    public String getFotoProfilo() { return fotoProfilo; }
+    public void setFotoProfilo(String fotoProfilo) { this.fotoProfilo = fotoProfilo; }
+
+    public boolean isEmailVerificata() { return emailVerificata; }
+    public void setEmailVerificata(boolean emailVerificata) { this.emailVerificata = emailVerificata; }
+
+    public String getTokenVerifica() { return tokenVerifica; }
+    public void setTokenVerifica(String tokenVerifica) { this.tokenVerifica = tokenVerifica; }
+
+    public String getTokenReset() { return tokenReset; }
+    public void setTokenReset(String tokenReset) { this.tokenReset = tokenReset; }
+
+    public java.time.LocalDateTime getTokenResetScadenza() { return tokenResetScadenza; }
+    public void setTokenResetScadenza(java.time.LocalDateTime tokenResetScadenza) { this.tokenResetScadenza = tokenResetScadenza; }
 }
