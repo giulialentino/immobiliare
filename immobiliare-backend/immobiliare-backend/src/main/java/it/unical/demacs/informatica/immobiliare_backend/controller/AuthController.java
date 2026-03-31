@@ -158,8 +158,8 @@ public class AuthController {
             if (utente.getTokenResetScadenza().isBefore(java.time.LocalDateTime.now())) {
                 return ResponseEntity.status(400).body("Token scaduto. Richiedi un nuovo recupero.");
             }
-            if (nuovaPassword == null || nuovaPassword.length() < 6) {
-                return ResponseEntity.status(400).body("La password deve essere di almeno 6 caratteri");
+            if (nuovaPassword == null || nuovaPassword.length() < 8) {
+                return ResponseEntity.status(400).body("La password deve essere di almeno 8 caratteri");
             }
             utenteDao.aggiornaPassword(utente.getId(), passwordUtil.cifra(nuovaPassword));
             utenteDao.cancellaTokenReset(utente.getId());
