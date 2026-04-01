@@ -91,6 +91,11 @@ public class AnnuncioController {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
         try {
+            List<Annuncio> annunciVenditore = annuncioDao.findByVenditore(utente.getId());
+            if (annunciVenditore.size() >= 50) {
+                return ResponseEntity.badRequest().body("Hai raggiunto il limite massimo di 50 annunci.");
+            }
+
             annuncio.setIdVenditore(utente.getId());
             annuncio.setStato("IN_ATTESA");
             Annuncio salvato = annuncioDao.save(annuncio);

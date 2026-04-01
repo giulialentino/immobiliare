@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,6 +29,29 @@ public class FotoController {
     @Value("${upload.dir}")
     private String uploadDir;
 
+    @GetMapping("/annuncio/{idAnnuncio}")
+    public ResponseEntity<?> getFoto(@PathVariable Long idAnnuncio) {
+        try {
+            return ResponseEntity.ok(fotoDao.findUrlsByAnnuncio(idAnnuncio));
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server");
+        }
+    }
+
+    @DeleteMapping("/{idAnnuncio}")
+    public ResponseEntity<?> elimina(@PathVariable Long idAnnuncio,
+                                     @RequestBody String url,
+                                     HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
+        try {
+            fotoDao.deleteByUrl(idAnnuncio, url);
+            return ResponseEntity.ok("Foto eliminata");
+        } catch (SQLException e) {
+            return ResponseEntity.status(500).body("Errore server: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/upload/{idAnnuncio}")
     public ResponseEntity<?> upload(@PathVariable Long idAnnuncio,
                                     @RequestParam("file") MultipartFile file,
@@ -35,8 +59,20 @@ public class FotoController {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
 
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File vuoto");
+        }
+
+        if (file.getSize() > 5 * 1024 * 1024) {
+            return ResponseEntity.badRequest().body("File troppo grande. Massimo 5MB.");
+        }
+
         try {
-            // Controlla estensione
+            List<String> fotoEsistenti = fotoDao.findUrlsByAnnuncio(idAnnuncio);
+            if (fotoEsistenti.size() >= 10) {
+                return ResponseEntity.badRequest().body("Massimo 10 foto per annuncio");
+            }
+
             String nomeOriginale = file.getOriginalFilename();
             if (nomeOriginale == null) return ResponseEntity.badRequest().body("File non valido");
 
@@ -58,29 +94,6 @@ public class FotoController {
             return ResponseEntity.ok(url);
         } catch (IOException | SQLException e) {
             return ResponseEntity.status(500).body("Errore upload: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/annuncio/{idAnnuncio}")
-    public ResponseEntity<?> getFoto(@PathVariable Long idAnnuncio) {
-        try {
-            return ResponseEntity.ok(fotoDao.findUrlsByAnnuncio(idAnnuncio));
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
-    }
-    @DeleteMapping("/{idAnnuncio}")
-    @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
-    public ResponseEntity<?> elimina(@PathVariable Long idAnnuncio,
-                                     @RequestBody String url,
-                                     HttpSession session) {
-        Utente utente = (Utente) session.getAttribute("utenteLoggato");
-        if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            fotoDao.deleteByUrl(idAnnuncio, url);
-            return ResponseEntity.ok("Foto eliminata");
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server: " + e.getMessage());
         }
     }
 }
