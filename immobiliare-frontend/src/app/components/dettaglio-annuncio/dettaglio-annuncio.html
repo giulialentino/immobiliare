@@ -86,9 +86,9 @@
               <img [src]="annuncio.foto[fotoSelezionata]" class="lightbox-img" [alt]="annuncio.titolo">
               @if (annuncio.foto.length > 1) {
                 <button class="lightbox-nav lightbox-prev"
-                        (click)="fotoSelezionata = (fotoSelezionata - 1 + annuncio.foto.length) % annuncio.foto.length">&#8249;</button>
+                        (click)="fotoSelezionata = (fotoSelezionata - 1 + annuncio.foto.length) % annuncio.foto.length">‹</button>
                 <button class="lightbox-nav lightbox-next"
-                        (click)="fotoSelezionata = (fotoSelezionata + 1) % annuncio.foto.length">&#8250;</button>
+                        (click)="fotoSelezionata = (fotoSelezionata + 1) % annuncio.foto.length">›</button>
               }
             </div>
           </div>
@@ -139,7 +139,6 @@
           </div>
         }
 
-        <!-- ASTA IN CORSO -->
         @if (asta && asta.attiva) {
           <div class="card mb-4 border-warning">
             <div class="card-body">
@@ -168,8 +167,8 @@
                   <div>
                     <strong>Accedi per partecipare all'asta</strong>
                     <div class="mt-2">
-                      <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
-                      <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
+                      <button (click)="modal.apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
+                      <button (click)="modal.apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
                     </div>
                   </div>
                 </div>
@@ -196,7 +195,6 @@
           </div>
         }
 
-        <!-- CREA ASTA -->
         @if (utente && ((utente.ruolo === 'VENDITORE' && utente.id === annuncio.idVenditore) || utente.ruolo === 'AMMINISTRATORE') && !asta) {
           <div class="card mb-4">
             <div class="card-body">
@@ -254,8 +252,8 @@
                 <div>
                   <strong>Accedi per scrivere una recensione</strong>
                   <div class="mt-2">
-                    <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
-                    <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
+                    <button (click)="modal.apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
+                    <button (click)="modal.apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
                   </div>
                 </div>
               </div>
@@ -319,8 +317,8 @@
                 <div>
                   <strong>Accedi per contattare il venditore</strong>
                   <div class="mt-2">
-                    <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
-                    <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
+                    <button (click)="modal.apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
+                    <button (click)="modal.apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
                   </div>
                 </div>
               </div>

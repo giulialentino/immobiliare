@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import { ModalService } from '../../services/modal.service';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
@@ -18,7 +18,7 @@ import { BadgeService } from '../../services/badge';
 export class Navbar implements OnInit, OnDestroy {
   utente: any = null;
   messaggiCount = 0;
-  private subs: Subscription = new Subscription(); // Contenitore per tutte le sottoscrizioni
+  private subs: Subscription = new Subscription();
   mobileOpen = false;
 
   constructor(
@@ -26,32 +26,32 @@ export class Navbar implements OnInit, OnDestroy {
     private annuncioService: AnnuncioService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private appRef: ApplicationRef,
     public modal: ModalService,
     private toast: ToastService,
     private badgeService: BadgeService
   ) {}
 
   ngOnInit() {
-    // 1. ASCOLTO REATTIVO UTENTE (Cervello della Navbar)
+    // 1. Ascolto reattivo utente
     this.subs.add(
       this.authService.utente$.subscribe({
         next: (u) => {
           this.utente = u;
           if (u) {
-            // Se l'utente entra, carichiamo i suoi dati
             this.aggiornaBadge();
           } else {
-            // Se l'utente esce, PULIZIA TOTALE ISTANTANEA
             this.utente = null;
             this.messaggiCount = 0;
-            this.badgeService.reset(); // Reset del servizio badge
+            this.badgeService.reset();
           }
-          this.cdr.detectChanges(); // Notifica Angular del cambiamento
+          this.cdr.detectChanges();
+          this.appRef.tick();
         }
       })
     );
 
-    // 2. ASCOLTO BADGE MESSAGGI
+    // 2. Ascolto badge messaggi
     this.subs.add(
       this.badgeService.count$.subscribe(count => {
         this.messaggiCount = count;
@@ -59,22 +59,37 @@ export class Navbar implements OnInit, OnDestroy {
       })
     );
 
-    // 3. POLLING PERIODICO (ogni 30 secondi)
+    // 3. Polling periodico ogni 30 secondi
     this.subs.add(
       interval(30000).subscribe(() => {
         if (this.utente) this.aggiornaBadge();
       })
     );
+
+    // 4. Ricarica utente quando login dal modal
+    this.subs.add(
+      this.modal.loginEffettuato$.subscribe(() => {
+        setTimeout(() => {
+          this.authService.getUtenteLoggato().subscribe({
+            next: (u) => {
+              this.utente = u;
+              if (u) this.aggiornaBadge();
+              this.cdr.detectChanges();
+              this.appRef.tick();
+            },
+            error: () => {}
+          });
+        }, 200);
+      })
+    );
   }
 
   ngOnDestroy() {
-    // Cancella tutte le iscrizioni quando il componente viene distrutto
     this.subs.unsubscribe();
   }
 
   aggiornaBadge() {
     if (!this.utente) return;
-    
     if (this.utente.ruolo === 'VENDITORE') {
       this.annuncioService.countMessaggi(this.utente.id).subscribe({
         next: (count: number) => this.badgeService.setCount(count),
@@ -94,10 +109,8 @@ export class Navbar implements OnInit, OnDestroy {
         next: () => {
           this.toast.success('Logout effettuato!');
           this.router.navigate(['/']);
-          // Non serve azzerare l'utente qui: lo farà il subscribe nel ngOnInit!
         },
         error: () => {
-          // Anche se il server fallisce, puliamo la sessione lato client
           this.authService.clearUtente();
           this.router.navigate(['/']);
         }

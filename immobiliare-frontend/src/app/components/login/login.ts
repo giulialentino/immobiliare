@@ -1,3 +1,4 @@
+import { ModalService } from '../../services/modal.service';
 import { Component, Output, EventEmitter } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
@@ -5,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../services/toast.service';
 import { ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-login',
@@ -24,13 +26,15 @@ export class Login {
     private authService: AuthService,
     private router: Router,
     private toast: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private modalService: ModalService
   ) {}
 
   login() {
     this.errore = '';
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
+        this.modalService.notificaLogin();
         this.loginRiuscito.emit();
           this.router.navigate(['/']);
         setTimeout(() => {

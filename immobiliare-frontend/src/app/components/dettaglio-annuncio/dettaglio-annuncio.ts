@@ -1,3 +1,4 @@
+import { ModalService } from '../../services/modal.service'; // Assicurati che il percorso sia giusto
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -47,7 +48,8 @@ export class DettaglioAnnuncio implements OnInit {
     private preferitoService: PreferitoService,
     private router: Router,
     private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public modal: ModalService
   ) {}
 
   ngOnInit() {

@@ -1,9 +1,11 @@
 import { Injectable, signal } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
   mostraLogin = signal(false);
   mostraRegistrazione = signal(false);
+  loginEffettuato$ = new Subject<void>();
 
   apriLogin() {
     this.mostraRegistrazione.set(false);
@@ -21,5 +23,9 @@ export class ModalService {
     this.mostraLogin.set(false);
     this.mostraRegistrazione.set(false);
     document.body.style.overflow = '';
+  }
+
+  notificaLogin() {
+    this.loginEffettuato$.next();
   }
 }
