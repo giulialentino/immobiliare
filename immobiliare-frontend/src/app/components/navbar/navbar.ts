@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { Router, RouterLink, NavigationEnd } from '@angular/router';
+import { ModalService } from '../../services/modal.service';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { AnnuncioService } from '../../services/annuncio';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
 import { Subscription, interval } from 'rxjs';
 import { ToastService } from '../../services/toast.service';
 import { BadgeService } from '../../services/badge';
@@ -18,9 +18,7 @@ import { BadgeService } from '../../services/badge';
 export class Navbar implements OnInit, OnDestroy {
   utente: any = null;
   messaggiCount = 0;
-  private routerSub!: Subscription;
-  private pollSub!: Subscription;
-  private badgeSub!: Subscription;
+  private subs: Subscription = new Subscription(); // Contenitore per tutte le sottoscrizioni
   mobileOpen = false;
 
   constructor(
@@ -28,63 +26,65 @@ export class Navbar implements OnInit, OnDestroy {
     private annuncioService: AnnuncioService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    public modal: ModalService,
     private toast: ToastService,
     private badgeService: BadgeService
   ) {}
 
   ngOnInit() {
-    this.badgeSub = this.badgeService.count$.subscribe(count => {
-      this.messaggiCount = count;
-      this.cdr.detectChanges();
-    });
-    this.caricaUtente();
-    this.routerSub = this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.caricaUtente();
-    });
-    this.pollSub = interval(30000).subscribe(() => {
-      this.aggiornaBadge();
-    });
+    // 1. ASCOLTO REATTIVO UTENTE (Cervello della Navbar)
+    this.subs.add(
+      this.authService.utente$.subscribe({
+        next: (u) => {
+          this.utente = u;
+          if (u) {
+            // Se l'utente entra, carichiamo i suoi dati
+            this.aggiornaBadge();
+          } else {
+            // Se l'utente esce, PULIZIA TOTALE ISTANTANEA
+            this.utente = null;
+            this.messaggiCount = 0;
+            this.badgeService.reset(); // Reset del servizio badge
+          }
+          this.cdr.detectChanges(); // Notifica Angular del cambiamento
+        }
+      })
+    );
+
+    // 2. ASCOLTO BADGE MESSAGGI
+    this.subs.add(
+      this.badgeService.count$.subscribe(count => {
+        this.messaggiCount = count;
+        this.cdr.detectChanges();
+      })
+    );
+
+    // 3. POLLING PERIODICO (ogni 30 secondi)
+    this.subs.add(
+      interval(30000).subscribe(() => {
+        if (this.utente) this.aggiornaBadge();
+      })
+    );
   }
 
   ngOnDestroy() {
-    if (this.routerSub) this.routerSub.unsubscribe();
-    if (this.pollSub) this.pollSub.unsubscribe();
-    if (this.badgeSub) this.badgeSub.unsubscribe();
-  }
-
-  caricaUtente() {
-    this.authService.getUtenteLoggato().subscribe({
-      next: (u: any) => {
-        this.utente = u;
-        this.aggiornaBadge();
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.utente = null;
-        this.messaggiCount = 0;
-        this.badgeService.reset();
-        this.authService.clearUtente();
-        this.cdr.detectChanges();
-      }
-    });
+    // Cancella tutte le iscrizioni quando il componente viene distrutto
+    this.subs.unsubscribe();
   }
 
   aggiornaBadge() {
     if (!this.utente) return;
+    
     if (this.utente.ruolo === 'VENDITORE') {
       this.annuncioService.countMessaggi(this.utente.id).subscribe({
-        next: (count: number) => { this.badgeService.setCount(count); this.cdr.detectChanges(); },
+        next: (count: number) => this.badgeService.setCount(count),
         error: () => {}
       });
     } else if (this.utente.ruolo === 'AMMINISTRATORE') {
       this.annuncioService.countMessaggiAdmin().subscribe({
-        next: (count: number) => { this.badgeService.setCount(count); this.cdr.detectChanges(); },
+        next: (count: number) => this.badgeService.setCount(count),
         error: () => {}
       });
-    } else {
-      this.badgeService.setCount(0);
     }
   }
 
@@ -92,21 +92,19 @@ export class Navbar implements OnInit, OnDestroy {
     if (confirm('Sei sicuro di voler uscire?')) {
       this.authService.logout().subscribe({
         next: () => {
-          this.utente = null;
-          this.messaggiCount = 0;
-          this.badgeService.reset();
-          this.authService.clearUtente();
-          this.cdr.detectChanges();
           this.toast.success('Logout effettuato!');
           this.router.navigate(['/']);
+          // Non serve azzerare l'utente qui: lo farà il subscribe nel ngOnInit!
         },
         error: () => {
-          this.utente = null;
+          // Anche se il server fallisce, puliamo la sessione lato client
           this.authService.clearUtente();
-          this.cdr.detectChanges();
           this.router.navigate(['/']);
         }
       });
     }
   }
+
+  apriLogin() { this.modal.apriLogin(); }
+  apriRegistrazione() { this.modal.apriRegistrazione(); }
 }

@@ -295,11 +295,7 @@ body.ha-banner { padding-bottom: 60px; }
   min-width: 260px;
   letter-spacing: 0.01em;
 }
-html, body {
-  overflow-x: hidden;
-  overflow-y: auto !important;
-  height: auto !important;
-}
+
 .toast-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
 .toast-danger { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
 .toast-warning { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
@@ -318,4 +314,20 @@ html, body {
 @media (max-width: 768px) {
   .container { padding: 0 16px; }
   .kpi-number { font-size: 1.6rem; }
+}
+
+/* ===== ROUTE TRANSITION ===== */
+router-outlet + * {
+  animation: pageFadeIn 0.3s ease both;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

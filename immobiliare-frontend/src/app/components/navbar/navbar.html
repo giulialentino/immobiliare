@@ -60,12 +60,11 @@
         </a>
 
         <button class="btn-logout" (click)="logout()">
-  <i class="bi bi-box-arrow-right"></i> Esci
-</button>
+  <i class="bi bi-box-arrow-right"></i> <span>Esci</span> </button>
 
       } @else {
-        <a class="nav-link" routerLink="/login">Accedi</a>
-        <a class="btn-registrati" routerLink="/registrazione">Registrati</a>
+        <button class="nav-link" (click)="apriLogin()">Accedi</button>
+        <button class="btn-registrati" (click)="apriRegistrazione()">Registrati</button>
       }
     </div>
 
@@ -102,8 +101,8 @@
           <i class="bi bi-box-arrow-right"></i> Logout
         </button>
       } @else {
-        <a class="mobile-link" routerLink="/login" (click)="mobileOpen = false">Accedi</a>
-        <a class="mobile-link" routerLink="/registrazione" (click)="mobileOpen = false">Registrati</a>
+        <button class="mobile-link" (click)="apriLogin(); mobileOpen = false">Accedi</button>
+        <button class="mobile-link" (click)="apriRegistrazione(); mobileOpen = false">Registrati</button>
       }
     </div>
   }

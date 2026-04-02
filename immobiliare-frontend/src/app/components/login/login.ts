@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ import { ChangeDetectorRef } from '@angular/core';
   styleUrl: './login.css'
 })
 export class Login {
+  @Output() loginRiuscito = new EventEmitter<void>();
   email = '';
   password = '';
   errore = '';
@@ -30,7 +31,8 @@ export class Login {
     this.errore = '';
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        this.loginRiuscito.emit();
+          this.router.navigate(['/']);
         setTimeout(() => {
           this.toast.success('Accesso effettuato!');
         }, 500);

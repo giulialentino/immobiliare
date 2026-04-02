@@ -1,117 +1,117 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
+<div class="p-4">
 
-      @if (registrazioneCompletata) {
-        <div class="card shadow text-center p-4">
-          <i class="bi bi-envelope-check-fill text-success" style="font-size: 3rem;"></i>
-          <h4 class="mt-3">Controlla la tua email!</h4>
-          <p class="text-muted">
-            Abbiamo inviato un link di verifica a <strong>{{ email }}</strong>.
-          </p>
-          <p class="text-muted small">
-            Clicca il link nell'email per attivare il tuo account.<br>
-            Controlla anche la cartella spam.
-          </p>
-          <a routerLink="/login" class="btn btn-dark mt-2">Torna al login</a>
-        </div>
+  @if (registrazioneCompletata) {
+    <div class="text-center py-3">
+      <i class="bi bi-envelope-check-fill success-icon"></i>
+      <h4 class="fw-bold mt-3 mb-3">Controlla la tua email!</h4>
+      <p class="text-muted">
+        Abbiamo inviato un link di verifica a <strong>{{ email }}</strong>.
+      </p>
+      <p class="text-muted small">
+        Clicca il link nell'email per attivare il tuo account.<br>
+        Controlla anche la cartella spam.
+      </p>
+    </div>
+  }
+
+  @if (!registrazioneCompletata) {
+
+    <h3 class="reg-title">Crea un account</h3>
+    <p class="reg-subtitle">Unisciti a migliaia di utenti</p>
+    <div class="reg-divider"></div>
+
+    @if (errore) {
+      <div class="alert alert-danger d-flex align-items-center gap-2 mb-3" role="alert">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <strong>{{ errore }}</strong>
+        <button type="button" class="btn-close ms-auto" (click)="errore = ''"></button>
+      </div>
+    }
+
+    <div class="row g-3 mb-3">
+      <div class="col-6">
+        <label class="form-label">Nome</label>
+        <input type="text" class="form-control" [(ngModel)]="nome" placeholder="Il tuo nome">
+      </div>
+      <div class="col-6">
+        <label class="form-label">Cognome</label>
+        <input type="text" class="form-control" [(ngModel)]="cognome" placeholder="Il tuo cognome">
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-control"
+             [(ngModel)]="email" placeholder="La tua email"
+             [class.is-valid]="emailValida()"
+             [class.is-invalid]="email && !emailValida()">
+      @if (email && !emailValida()) {
+        <div class="invalid-feedback">Email non valida</div>
       }
+    </div>
 
-      @if (!registrazioneCompletata) {
-        <div class="card shadow">
-          <div class="card-body p-4">
-            <h3 class="card-title text-center mb-4">
-              <i class="bi bi-person-plus-fill"></i> Registrati
-            </h3>
-            @if (errore) {
-              <div class="position-fixed top-0 start-50 translate-middle-x mt-3"
-                   style="z-index: 9999; min-width: 350px;">
-                <div class="alert alert-danger alert-dismissible shadow d-flex align-items-center gap-2" role="alert">
-                  <i class="bi bi-exclamation-circle-fill fs-5"></i>
-                  <strong>{{ errore }}</strong>
-                  <button type="button" class="btn-close ms-auto" (click)="errore = ''"></button>
-                </div>
-              </div>
-            }
-            <div class="mb-3">
-              <label class="form-label">Nome</label>
-              <input type="text" class="form-control" [(ngModel)]="nome" placeholder="Il tuo nome">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Cognome</label>
-              <input type="text" class="form-control" [(ngModel)]="cognome" placeholder="Il tuo cognome">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control"
-                     [(ngModel)]="email" placeholder="La tua email"
-                     [class.is-valid]="emailValida()"
-                     [class.is-invalid]="email && !emailValida()">
-              @if (email && !emailValida()) {
-                <div class="invalid-feedback">Email non valida</div>
-              }
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Password</label>
-              <div class="input-group">
-                <input [type]="mostraPassword ? 'text' : 'password'"
-                       class="form-control" [(ngModel)]="password"
-                       placeholder="Scegli una password">
-                <button class="btn btn-outline-secondary" type="button"
-                        (click)="mostraPassword = !mostraPassword">
-                  <i [class]="mostraPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                </button>
-              </div>
-              @if (password) {
-                <div class="mt-2 p-3 rounded" style="background: #f8f9fa; border: 1px solid #eee;">
-                  <div class="requisito" [class.ok]="password.length >= 8" [class.no]="password.length < 8">
-                    <i [class]="password.length >= 8 ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
-                    Almeno 8 caratteri
-                  </div>
-                  <div class="requisito" [class.ok]="haMaiuscola()" [class.no]="!haMaiuscola()">
-                    <i [class]="haMaiuscola() ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
-                    Almeno una lettera maiuscola
-                  </div>
-                  <div class="requisito" [class.ok]="haNumero()" [class.no]="!haNumero()">
-                    <i [class]="haNumero() ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
-                    Almeno un numero
-                  </div>
-                </div>
-              }
-              <div class="mb-3">
-  <label class="form-label">Conferma password</label>
-  <input type="password" class="form-control"
-         [(ngModel)]="confermaPassword"
-         placeholder="Ripeti la password" />
-  @if (confermaPassword && password !== confermaPassword) {
-    <div class="small text-danger mt-1">
-      <i class="bi bi-x-circle-fill"></i> Le password non coincidono
-    </div>
-  }
-  @if (confermaPassword && password === confermaPassword) {
-    <div class="small text-success mt-1">
-      <i class="bi bi-check-circle-fill"></i> Le password coincidono
-    </div>
-  }
-</div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Ruolo</label>
-              <select class="form-select" [(ngModel)]="ruolo">
-                <option value="ACQUIRENTE">Acquirente</option>
-                <option value="VENDITORE">Venditore</option>
-              </select>
-            </div>
-            <button class="btn btn-dark w-100" (click)="registra()" [disabled]="!formValido()">
-              Registrati
-            </button>
-            <p class="text-center mt-3">
-              Hai già un account? <a routerLink="/login">Accedi</a>
-            </p>
+    <div class="mb-3">
+      <label class="form-label">Password</label>
+      <div class="input-group">
+        <input [type]="mostraPassword ? 'text' : 'password'"
+               class="form-control" [(ngModel)]="password"
+               placeholder="Scegli una password">
+        <button class="btn btn-outline-secondary" type="button"
+                (click)="mostraPassword = !mostraPassword">
+          <i [class]="mostraPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+        </button>
+      </div>
+      @if (password) {
+        <div class="requisiti-box mt-2">
+          <div class="requisito" [class.ok]="password.length >= 8" [class.no]="password.length < 8">
+            <i [class]="password.length >= 8 ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
+            Almeno 8 caratteri
+          </div>
+          <div class="requisito" [class.ok]="haMaiuscola()" [class.no]="!haMaiuscola()">
+            <i [class]="haMaiuscola() ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
+            Almeno una lettera maiuscola
+          </div>
+          <div class="requisito" [class.ok]="haNumero()" [class.no]="!haNumero()">
+            <i [class]="haNumero() ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'"></i>
+            Almeno un numero
           </div>
         </div>
       }
-
     </div>
-  </div>
+
+    <div class="mb-3">
+      <label class="form-label">Conferma password</label>
+      <input type="password" class="form-control"
+             [(ngModel)]="confermaPassword"
+             placeholder="Ripeti la password" />
+      @if (confermaPassword && password !== confermaPassword) {
+        <div class="small text-danger mt-1">
+          <i class="bi bi-x-circle-fill"></i> Le password non coincidono
+        </div>
+      }
+      @if (confermaPassword && password === confermaPassword) {
+        <div class="small text-success mt-1">
+          <i class="bi bi-check-circle-fill"></i> Le password coincidono
+        </div>
+      }
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label">Ruolo</label>
+      <select class="form-select" [(ngModel)]="ruolo">
+        <option value="ACQUIRENTE">Acquirente</option>
+        <option value="VENDITORE">Venditore</option>
+      </select>
+    </div>
+
+    <button class="btn-registra" (click)="registra()" [disabled]="!formValido()">
+      Crea account
+    </button>
+
+    <p class="testo-login">
+      Hai già un account? <a routerLink="/login" class="link-login">Accedi</a>
+    </p>
+
+  }
+
 </div>

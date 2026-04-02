@@ -1,50 +1,51 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-5">
-      <div class="card shadow">
-        <div class="card-body p-4">
-          <h3 class="card-title text-center mb-4">
-            <i class="bi bi-lock-fill"></i> Accedi
-          </h3>
-          @if (errore) {
-            <div class="position-fixed top-0 start-50 translate-middle-x mt-3"
-                 style="z-index: 9999; min-width: 350px;">
-              <div class="alert alert-danger shadow">
-                <i class="bi bi-exclamation-circle-fill me-2"></i>{{ errore }}
-              </div>
-            </div>
-          }
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" [(ngModel)]="email"
-                   placeholder="La tua email"
-                   (keyup.enter)="login()">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Password</label>
-            <div class="input-group">
-              <input [type]="mostraPassword ? 'text' : 'password'"
-                     class="form-control"
-                     [(ngModel)]="password"
-                     placeholder="La tua password"
-                     (keyup.enter)="login()">
-              <button class="btn btn-outline-secondary" type="button"
-                      (click)="mostraPassword = !mostraPassword">
-                <i [class]="mostraPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-              </button>
-            </div>
-            <div class="text-end mt-1">
-              <a routerLink="/recupera-password" class="text-muted small">
-                Password dimenticata?
-              </a>
-            </div>
-          </div>
-          <button class="btn btn-dark w-100" (click)="login()">Accedi</button>
-          <p class="text-center mt-3">
-            Non hai un account? <a routerLink="/registrazione">Registrati</a>
-          </p>
-        </div>
-      </div>
+<div style="padding: 40px 36px 32px;">
+
+  <h3 style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:#111318; text-align:center; margin-bottom:6px;">
+    Chi si rivede!
+  </h3>
+  <p style="font-size:14px; color:#8a919e; text-align:center; margin-bottom:12px;">
+    Accedi al tuo account
+  </p>
+  <div style="width:36px; height:3px; background:#b5001a; border-radius:2px; margin:0 auto 28px;"></div>
+
+  @if (errore) {
+    <div class="alert alert-danger d-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <strong>{{ errore }}</strong>
+    </div>
+  }
+
+  <div class="mb-3">
+    <label class="form-label" style="font-size:12px; font-weight:600; color:#4a5260; letter-spacing:0.06em; text-transform:uppercase;">Email</label>
+    <input type="email" class="form-control" [(ngModel)]="email"
+           placeholder="La tua email" (keyup.enter)="login()">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label" style="font-size:12px; font-weight:600; color:#4a5260; letter-spacing:0.06em; text-transform:uppercase;">Password</label>
+    <div class="input-group">
+      <input [type]="mostraPassword ? 'text' : 'password'"
+             class="form-control" [(ngModel)]="password"
+             placeholder="La tua password" (keyup.enter)="login()">
+      <button class="btn btn-outline-secondary" type="button"
+              (click)="mostraPassword = !mostraPassword">
+        <i [class]="mostraPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+      </button>
+    </div>
+    <div class="text-end mt-2">
+      <a routerLink="/recupera-password" style="font-size:12px; color:#8a919e; text-decoration:none;">
+        Password dimenticata?
+      </a>
     </div>
   </div>
+
+  <button (click)="login()" style="width:100%; background:#111318; color:white; border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:600; cursor:pointer; transition:all 0.2s; margin-top:8px;">
+    Accedi
+  </button>
+
+  <p style="font-size:14px; color:#8a919e; text-align:center; margin-top:20px; margin-bottom:0;">
+    Non hai un account?
+    <a routerLink="/registrazione" style="color:#b5001a; font-weight:600; text-decoration:none;">Registrati</a>
+  </p>
+
 </div>

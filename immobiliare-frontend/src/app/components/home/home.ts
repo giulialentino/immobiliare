@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { AnnuncioService } from '../../services/annuncio';
 import { CategoriaService } from '../../services/categoria';
 import { AuthService } from '../../services/auth';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -19,6 +20,7 @@ export class Home implements OnInit, AfterViewInit {
   annunciFiltrati: any[] = [];
   ultimiAnnunci: any[] = [];
   categorie: any[] = [];
+  loadingCategorie = true;
   utente: any = null;
   messaggiCount = 0;
   tipoOperazione = '';
@@ -35,6 +37,7 @@ export class Home implements OnInit, AfterViewInit {
   richiestaInviata = false;
   richiestaErrore = '';
   statoPromozione = 'NESSUNA';
+  mostraTornaSu = false;
 
   constructor(
     private annuncioService: AnnuncioService,
@@ -43,6 +46,28 @@ export class Home implements OnInit, AfterViewInit {
     private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) {}
+
+  // ── Torna su: mostra pulsante dopo 300px di scroll ──
+  @HostListener('window:scroll')
+  onScroll() {
+    this.mostraTornaSu = window.scrollY > 300;
+    this.cdr.detectChanges();
+  }
+
+  // ── Chiudi autocomplete cliccando fuori ──
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.autocomplete-wrapper')) {
+      this.comuniFiltrati = [];
+      this.indiceSelezionato = -1;
+      this.cdr.detectChanges();
+    }
+  }
+
+  tornaAlTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   ngOnInit() {
     this.authService.getUtenteLoggato().subscribe({
@@ -100,9 +125,18 @@ export class Home implements OnInit, AfterViewInit {
   }
 
   caricaCategorie() {
+    this.loadingCategorie = true;
     this.categoriaService.getAll().subscribe({
-      next: (data: any) => { this.categorie = data; this.cdr.detectChanges(); },
-      error: (err: any) => console.error(err)
+      next: (data: any) => {
+        this.categorie = data;
+        this.loadingCategorie = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.loadingCategorie = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -175,51 +209,45 @@ export class Home implements OnInit, AfterViewInit {
     this.caricaAnnunci();
   }
 
-scrollToSelected() {
-  setTimeout(() => {
-    const lista = document.querySelector('.autocomplete-list') as HTMLElement;
-    if (!lista || this.indiceSelezionato < 0) return;
-
-    const items = lista.querySelectorAll('.autocomplete-item');
-    if (!items || items.length === 0) return;
-
-    const item = items[this.indiceSelezionato] as HTMLElement;
-    if (!item) return;
-
-    // Porta l'elemento selezionato sempre in vista
-    item.scrollIntoView({ block: 'nearest' });
-  }, 50);
-}
-
+  scrollToSelected() {
+    setTimeout(() => {
+      const lista = document.querySelector('.autocomplete-list') as HTMLElement;
+      if (!lista || this.indiceSelezionato < 0) return;
+      const items = lista.querySelectorAll('.autocomplete-item');
+      if (!items || items.length === 0) return;
+      const item = items[this.indiceSelezionato] as HTMLElement;
+      if (!item) return;
+      item.scrollIntoView({ block: 'nearest' });
+    }, 50);
+  }
 
   gestisciTasto(event: KeyboardEvent) {
-  if (this.comuniFiltrati.length === 0) {
-    if (event.key === 'Enter') this.filtra();
-    return;
-  }
-  if (event.key === 'ArrowDown') {
-    event.preventDefault();
-    this.indiceSelezionato = Math.min(this.indiceSelezionato + 1, this.comuniFiltrati.length - 1);
-    this.cdr.detectChanges();
-    this.scrollToSelected();
-  } else if (event.key === 'ArrowUp') {
-    event.preventDefault();
-    this.indiceSelezionato = Math.max(this.indiceSelezionato - 1, -1);
-    this.cdr.detectChanges();
-    this.scrollToSelected();
-  } else if (event.key === 'Enter') {
-    if (this.indiceSelezionato >= 0) {
-      this.citta = this.comuniFiltrati[this.indiceSelezionato];
+    if (this.comuniFiltrati.length === 0) {
+      if (event.key === 'Enter') this.filtra();
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.indiceSelezionato = Math.min(this.indiceSelezionato + 1, this.comuniFiltrati.length - 1);
+      this.cdr.detectChanges();
+      this.scrollToSelected();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.indiceSelezionato = Math.max(this.indiceSelezionato - 1, -1);
+      this.cdr.detectChanges();
+      this.scrollToSelected();
+    } else if (event.key === 'Enter') {
+      if (this.indiceSelezionato >= 0) {
+        this.citta = this.comuniFiltrati[this.indiceSelezionato];
+        this.comuniFiltrati = [];
+        this.indiceSelezionato = -1;
+      }
+      this.filtra();
+    } else if (event.key === 'Escape') {
       this.comuniFiltrati = [];
       this.indiceSelezionato = -1;
     }
-    this.filtra();
-  } else if (event.key === 'Escape') {
-    this.comuniFiltrati = [];
-    this.indiceSelezionato = -1;
   }
-}
-
 
   filtra() {
     this.comuniFiltrati = [];

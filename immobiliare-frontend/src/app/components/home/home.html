@@ -26,7 +26,7 @@
                 }
               </select>
             </div>
-            <div class="col-md-3" style="position: relative;">
+            <div class="col-md-3 autocomplete-wrapper" style="position: relative;">
               <input type="text" class="form-control border-0 bg-light"
                      [(ngModel)]="citta"
                      placeholder="Città o comune..."
@@ -165,21 +165,32 @@
     <div class="section-line"></div>
   </div>
   <div class="row g-3 justify-content-center mb-5">
-    @for (cat of categorie; track cat.id) {
-      <div class="col-6 col-md-2">
-        <div class="card categoria-card text-center p-3" (click)="filtraPerCategoria(cat.id)">
-          <div class="categoria-icon">
-            @if (cat.nome === 'Appartamento/Casa') { <i class="bi bi-building"></i> }
-            @else if (cat.nome === 'Villa') { <i class="bi bi-house-door"></i> }
-            @else if (cat.nome === 'Box auto') { <i class="bi bi-car-front"></i> }
-            @else if (cat.nome === 'Terreno edificabile') { <i class="bi bi-tree"></i> }
-            @else if (cat.nome === 'Ufficio') { <i class="bi bi-briefcase"></i> }
-            @else if (cat.nome === 'Locale commerciale') { <i class="bi bi-shop"></i> }
-            @else { <i class="bi bi-house"></i> }
+    @if (loadingCategorie) {
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="col-6 col-md-2">
+          <div class="card text-center p-3" style="border-radius:10px; border:1px solid #e8eaed;">
+            <div class="skeleton" style="width:48px; height:48px; border-radius:10px; margin: 0 auto 10px;"></div>
+            <div class="skeleton" style="height:12px; width:70%; margin: 0 auto;"></div>
           </div>
-          <div style="font-size: 13px; font-weight: 600; color: #333;">{{ cat.nome }}</div>
         </div>
-      </div>
+      }
+    } @else {
+      @for (cat of categorie; track cat.id) {
+        <div class="col-6 col-md-2">
+          <div class="card categoria-card text-center p-3" (click)="filtraPerCategoria(cat.id)">
+            <div class="categoria-icon">
+              @if (cat.nome === 'Appartamento/Casa') { <i class="bi bi-building"></i> }
+              @else if (cat.nome === 'Villa') { <i class="bi bi-house-door"></i> }
+              @else if (cat.nome === 'Box auto') { <i class="bi bi-car-front"></i> }
+              @else if (cat.nome === 'Terreno edificabile') { <i class="bi bi-tree"></i> }
+              @else if (cat.nome === 'Ufficio') { <i class="bi bi-briefcase"></i> }
+              @else if (cat.nome === 'Locale commerciale') { <i class="bi bi-shop"></i> }
+              @else { <i class="bi bi-house"></i> }
+            </div>
+            <div style="font-size: 13px; font-weight: 600; color: #333;">{{ cat.nome }}</div>
+          </div>
+        </div>
+      }
     }
   </div>
 
@@ -627,6 +638,13 @@
     </div>
   </div>
 </footer>
+
+<!-- TORNA SU -->
+@if (mostraTornaSu) {
+  <button class="btn-torna-su" (click)="tornaAlTop()" *ngIf="mostraTornaSu">
+  <i class="bi bi-arrow-up-short"></i>
+</button>
+}
 
 <script>
   setTimeout(() => {

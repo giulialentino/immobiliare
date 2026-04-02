@@ -139,24 +139,24 @@ interface Messaggio {
       align-items: center;
       gap: 10px;
       padding: 8px 16px 8px 8px;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: #111318;
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 50px;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(192,0,26,0.2);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(181,0,26,0.2);
       transition: transform 0.2s, box-shadow 0.2s;
       position: relative;
     }
 
     .chat-toggle:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(0,0,0,0.4), 0 0 0 1px rgba(192,0,26,0.4);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4), 0 0 0 1px rgba(181,0,26,0.4);
     }
 
     .toggle-avatar {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, #c0001a, #8b0012);
+      background: linear-gradient(135deg, #b5001a, #850012);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -174,14 +174,14 @@ interface Messaggio {
 
     .toggle-nome {
       color: white;
-      font-size: 13px;
+      font-size: 16px;
       font-weight: 700;
       line-height: 1.2;
     }
 
     .toggle-ruolo {
       color: rgba(255,255,255,0.5);
-      font-size: 10px;
+      font-size: 12px;
       line-height: 1.2;
     }
 
@@ -190,7 +190,7 @@ interface Messaggio {
       height: 8px;
       background: #22c55e;
       border-radius: 50%;
-      border: 2px solid #1a1a2e;
+      border: 2px solid #111318;
       position: absolute;
       bottom: 10px;
       left: 42px;
@@ -224,7 +224,7 @@ interface Messaggio {
 
     /* ── Header ── */
     .chat-header {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: #111318;
       padding: 16px 20px;
       display: flex;
       align-items: center;
@@ -240,7 +240,7 @@ interface Messaggio {
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, #c0001a, transparent);
+      background: linear-gradient(90deg, #b5001a, transparent);
     }
 
     .chat-header:active { cursor: grabbing; }
@@ -248,7 +248,7 @@ interface Messaggio {
     .header-avatar {
       width: 44px;
       height: 44px;
-      background: linear-gradient(135deg, #c0001a, #8b0012);
+      background: linear-gradient(135deg, #b5001a, #850012);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -264,7 +264,7 @@ interface Messaggio {
       height: 10px;
       background: #22c55e;
       border-radius: 50%;
-      border: 2px solid #1a1a2e;
+      border: 2px solid #111318;
       position: absolute;
       bottom: 1px;
       right: 1px;
@@ -275,7 +275,7 @@ interface Messaggio {
     .header-nome {
       color: white;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 17px;
     }
 
     .header-stato {
@@ -311,7 +311,7 @@ interface Messaggio {
     }
 
     .chat-close:hover {
-      background: rgba(192,0,26,0.3);
+      background: rgba(181,0,26,0.3);
       color: white;
     }
 
@@ -338,7 +338,7 @@ interface Messaggio {
       background: white;
       border-radius: 16px;
       padding: 16px;
-      border-left: 3px solid #c0001a;
+      border-left: 3px solid #b5001a;
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
@@ -378,8 +378,8 @@ interface Messaggio {
     }
 
     .suggerimento:hover {
-      border-color: #c0001a;
-      color: #c0001a;
+      border-color: #b5001a;
+      color: #b5001a;
       transform: translateX(3px);
     }
 
@@ -403,7 +403,7 @@ interface Messaggio {
     .msg-avatar-small {
       width: 30px;
       height: 30px;
-      background: linear-gradient(135deg, #c0001a, #8b0012);
+      background: linear-gradient(135deg, #b5001a, #850012);
       color: white;
       border-radius: 50%;
       display: flex;
@@ -429,7 +429,7 @@ interface Messaggio {
     }
 
     .msg-bolla.utente {
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      background: #111318;
       color: white;
       border-bottom-right-radius: 4px;
     }
@@ -467,7 +467,7 @@ interface Messaggio {
 
     .chat-errore {
       font-size: 11px;
-      color: #c0001a;
+      color: #b5001a;
       margin-bottom: 6px;
       text-align: center;
     }
@@ -491,8 +491,8 @@ interface Messaggio {
     }
 
     .input-row input:focus {
-      border-color: #c0001a;
-      box-shadow: 0 0 0 3px rgba(192,0,26,0.08);
+      border-color: #b5001a;
+      box-shadow: 0 0 0 3px rgba(181,0,26,0.08);
       background: white;
     }
 
@@ -501,7 +501,7 @@ interface Messaggio {
     .send-btn {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, #c0001a, #8b0012);
+      background: #b5001a;
       color: white;
       border: none;
       border-radius: 50%;
@@ -512,12 +512,12 @@ interface Messaggio {
       font-size: 14px;
       transition: transform 0.15s, box-shadow 0.15s;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(192,0,26,0.3);
+      box-shadow: 0 2px 8px rgba(181,0,26,0.3);
     }
 
     .send-btn:hover:not(:disabled) {
       transform: scale(1.08);
-      box-shadow: 0 4px 12px rgba(192,0,26,0.4);
+      box-shadow: 0 4px 12px rgba(181,0,26,0.4);
     }
 
     .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }

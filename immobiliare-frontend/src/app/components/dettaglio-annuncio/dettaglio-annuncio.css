@@ -1,60 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+.dettaglio-page {
+  font-family: 'Inter', sans-serif;
+  background: #f4f5f7;
+  padding-bottom: 60px;
+}
+
+/* ── Header annuncio ── */
+.annuncio-header {
+  background: white;
+  border-bottom: 1px solid #e8eaed;
+  padding: 24px 0;
+  margin-bottom: 32px;
+}
+
+.annuncio-titolo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #111318;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.badge-operazione {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Carousel foto ── */
+.foto-carousel {
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin-bottom: 12px;
+}
+
+.foto-thumbnail {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  opacity: 0.7;
+}
+
+.foto-thumbnail:hover { opacity: 1; }
+.foto-thumbnail.attiva {
+  border-color: #b5001a;
+  opacity: 1;
+}
+
+/* ── Cards sezione ── */
+.sezione-card {
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #e8eaed;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.sezione-titolo {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111318;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sezione-titolo i { color: #b5001a; }
+
+/* ── Card prezzo sticky ── */
+.prezzo-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e8eaed;
+  padding: 28px 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  position: sticky;
+  top: 80px;
+}
+
+.prezzo-principale {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111318;
+  text-align: center;
+}
+
+.prezzo-ribassato {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #b5001a;
+  text-align: center;
+}
+
+.prezzo-vecchio {
+  font-size: 0.95rem;
+  text-decoration: line-through;
+  color: #c9cdd4;
+  text-align: center;
+}
+
+.dettaglio-riga {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f4f5f7;
+  font-size: 14px;
+  color: #4a5260;
+}
+
+.dettaglio-riga:last-child { border-bottom: none; }
+.dettaglio-riga i { color: #b5001a; width: 16px; }
+
+.btn-preferiti {
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+/* ── Lightbox ── */
 .lightbox-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.9);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95);
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.lightbox-content {
-  position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
-}
+.lightbox-content { position: relative; max-width: 90vw; max-height: 90vh; }
 
 .lightbox-img {
   max-width: 90vw;
   max-height: 85vh;
-  border-radius: 8px;
+  border-radius: 10px;
   object-fit: contain;
 }
 
-.lightbox-close {
-  position: absolute;
-  top: -40px;
-  right: 0;
-}
+.lightbox-close { position: absolute; top: -40px; right: 0; }
 
 .lightbox-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255,255,255,0.2);
-  border: none;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
   color: white;
-  font-size: 3rem;
-  padding: 0 15px;
-  border-radius: 4px;
+  font-size: 2.5rem;
+  padding: 0 16px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background 0.2s;
 }
+
+.lightbox-nav:hover { background: rgba(255,255,255,0.22); }
+.lightbox-prev { left: -60px; }
+.lightbox-next { right: -60px; }
+
+/* ── Asta ── */
+.asta-card {
+  background: #fffbf0;
+  border: 1px solid #fcd34d !important;
+  border-left: 4px solid #f59e0b !important;
+}
+
+/* ── Recensioni ── */
+.recensione-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f4f5f7;
+  font-size: 14px;
+}
+
+.recensione-item:last-child { border-bottom: none; }
+
+/* ── Alert accesso ── */
+.alert-accesso {
+  background: #fffbf0;
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+/* ── Facebook ── */
 .btn-facebook {
   background: #1877f2;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 500;
-  transition: background 0.2s ease;
+  padding: 11px;
+  width: 100%;
+  transition: background 0.2s;
 }
 
-.btn-facebook:hover {
-  background: #1664d8;
-  color: white;
+.btn-facebook:hover { background: #1664d8; color: white; }
+
+/* ── Bottone torna ── */
+.btn-torna {
+  color: #4a5260;
+  border: 1px solid #e8eaed;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: white;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.lightbox-prev { left: -60px; }
-.lightbox-next { right: -60px; }
+.btn-torna:hover {
+  background: #f4f5f7;
+  color: #111318;
+  border-color: #c9cdd4;
+}
+
+@media (max-width: 768px) {
+  .annuncio-titolo { font-size: 1.4rem; }
+  .prezzo-card { position: static; margin-top: 20px; }
+}

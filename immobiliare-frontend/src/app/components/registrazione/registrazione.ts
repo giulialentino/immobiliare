@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { ChangeDetectorRef } from '@angular/core';
   styleUrl: './registrazione.css'
 })
 export class Registrazione {
+  @Output() registrazioneRiuscita = new EventEmitter<void>();
 
   nome = '';
   cognome = '';
@@ -67,6 +68,7 @@ export class Registrazione {
     }).subscribe({
       next: () => {
         this.registrazioneCompletata = true;
+      this.registrazioneRiuscita.emit();
         this.cdr.detectChanges();
       },
       error: (err: any) => {

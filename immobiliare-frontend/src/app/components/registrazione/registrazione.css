@@ -1,17 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+.registrazione-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0f14 0%, #1e2229 100%);
+  display: flex;
+  align-items: center;
+  padding: 40px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.registrazione-card {
+  background: white;
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25) !important;
+  overflow: hidden;
+}
+
+.registrazione-card .card-body {
+  padding: 48px 40px !important;
+}
+
+
+.reg-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111318;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.reg-subtitle {
+  font-size: 14px;
+  color: #8a919e;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.reg-divider {
+  height: 3px;
+  width: 40px;
+  background: #b5001a;
+  border-radius: 2px;
+  margin: 0 auto 28px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5260;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.form-control, .form-select {
+  border-radius: 10px;
+  border: 1.5px solid #e8eaed;
+  padding: 11px 16px;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: #f8f9fb;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #b5001a;
+  box-shadow: 0 0 0 3px rgba(181,0,26,0.08);
+  background: white;
+}
+
+.input-group .form-control {
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+}
+
+.input-group .btn-outline-secondary {
+  border: 1.5px solid #e8eaed;
+  border-left: none;
+  border-radius: 0 10px 10px 0;
+  background: #f8f9fb;
+  color: #8a919e;
+}
+
+.input-group .btn-outline-secondary:hover {
+  background: #f0f1f3;
+  color: #4a5260;
+}
+
+.requisiti-box {
+  background: #f8f9fb;
+  border: 1px solid #e8eaed;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 10px;
+}
+
 .requisito {
-  font-size: 13px;
-  padding: 3px 0;
+  font-size: 12px;
+  padding: 4px 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #666;
-  transition: color 0.2s ease;
+  color: #8a919e;
+  transition: color 0.2s;
 }
 
-.requisito.ok {
+.requisito.ok { color: #198754; }
+.requisito.no { color: #dc3545; }
+
+.btn-registra {
+  background: #111318;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  width: 100%;
+  transition: all 0.2s;
+  letter-spacing: 0.01em;
+  margin-top: 8px;
+}
+
+.btn-registra:hover:not(:disabled) {
+  background: #b5001a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(181,0,26,0.3);
+}
+
+.btn-registra:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.link-login {
+  color: #b5001a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-login:hover { text-decoration: underline; }
+
+.testo-login {
+  font-size: 14px;
+  color: #8a919e;
+  text-align: center;
+  margin-top: 24px;
+  margin-bottom: 0;
+}
+
+.success-card {
+  background: white;
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25) !important;
+  padding: 48px 40px;
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 4rem;
   color: #198754;
+  margin-bottom: 20px;
+}
+/* Reset per uso in modal */
+.login-page, .registrazione-page {
+  min-height: unset !important;
+  background: transparent !important;
+  padding: 0 !important;
+  display: block !important;
 }
 
-.requisito.no {
-  color: #dc3545;
+.login-card, .registrazione-card {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.login-card .card-body,
+.registrazione-card .card-body {
+  padding: 32px 32px 24px !important;
+}
+
+.btn-registrati, .link-registrati, .link-login {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 576px) {
+  .registrazione-card .card-body { padding: 32px 24px !important; }
 }
