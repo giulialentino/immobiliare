@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
 
 * { box-sizing: border-box; }
 
@@ -6,17 +6,19 @@
   position: sticky;
   top: 0;
   z-index: 900;
-  background: #0f0c0c;
-  border-bottom: 1px solid rgba(139, 26, 43, 0.3);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.4);
-  font-family: 'DM Sans', sans-serif;
+  background: rgba(17, 19, 24, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 1px 24px rgba(0,0,0,0.3);
+  font-family: 'Inter', sans-serif;
 }
 
 .navbar-inner {
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 64px;
+  padding: 0 32px;
+  height: 66px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,44 +33,37 @@
   text-decoration: none;
   flex-shrink: 0;
 }
-.brand-icon-container {
-  width: 42px;           /* Dimensione fissa del cerchio */
-  height: 42px;          /* Dimensione fissa del cerchio */
-  background-color: #ffffff;
-  border-radius: 50%;    /* Rende il div un cerchio */
-  display: flex;
-  align-items: center;   /* Centra il logo verticalmente */
-  justify-content: center; /* Centra il logo orizzontalmente */
-  padding: 5px;          /* Padding uniforme per far respirare il logo */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.brand:hover .brand-icon-container {
-  transform: scale(1.1);
-}
 
-.brand-icon {
+.brand-icon-container {
   width: 40px;
   height: 40px;
+  background: #ffffff;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Ombra leggera per dare profondità al cerchio bianco */
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 5px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
 }
+
+.brand:hover .brand-icon-container {
+  transform: scale(1.08);
+  box-shadow: 0 4px 20px rgba(181,0,26,0.3);
+}
+
 .brand-icon-svg {
-  width: 90%;            /* Occupa quasi tutto lo spazio del cerchio */
+  width: 90%;
   height: 90%;
   display: block;
 }
 
 .brand-name {
   font-family: 'Playfair Display', serif;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   line-height: 1;
 }
 
@@ -76,57 +71,58 @@
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   padding: 8px 14px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255,255,255,0.6);
   text-decoration: none;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   border-radius: 8px;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
+  letter-spacing: 0.01em;
 }
 
 .nav-link:hover {
   color: #ffffff;
-  background: rgba(139, 26, 43, 0.1); /* Sfumatura bordeaux al passaggio */
+  background: rgba(255,255,255,0.07);
 }
 
-.nav-link i { font-size: 16px; }
+.nav-link i { font-size: 15px; }
 
 /* ── Profilo ── */
 .nav-profilo {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 12px 6px 6px;
-  border-radius: 50px;
+  padding: 5px 12px 5px 5px;
+  border-radius: 40px;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: background 0.18s;
   border: 1px solid rgba(255,255,255,0.08);
-  margin-left: 8px;
+  margin-left: 6px;
 }
 
 .nav-profilo:hover {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(139,26,43,0.4);
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(181,0,26,0.35);
 }
 
 .profilo-avatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #8b1a2b, #c0001a);
+  background: linear-gradient(135deg, #850012, #b5001a);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 15px;
+  font-size: 14px;
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
@@ -142,9 +138,9 @@
   position: absolute;
   top: -3px;
   right: -3px;
-  width: 16px;
-  height: 16px;
-  background: #c0001a;
+  width: 15px;
+  height: 15px;
+  background: #b5001a;
   color: white;
   border-radius: 50%;
   font-size: 9px;
@@ -152,99 +148,100 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #0f0c0c;
+  border: 1.5px solid #111318;
 }
 
-.profilo-info {
-  display: flex;
-  flex-direction: column;
-}
+.profilo-info { display: flex; flex-direction: column; }
 
 .profilo-nome {
   color: white;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .profilo-ruolo {
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.35);
   font-size: 11px;
   line-height: 1.2;
+  letter-spacing: 0.03em;
 }
 
 /* ── Logout ── */
 .btn-logout {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.4);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
-  transition: all 0.2s;
+  font-size: 14px;
+  transition: all 0.18s;
   margin-left: 4px;
 }
 
 .btn-logout:hover {
-  background: rgba(192,0,26,0.15);
-  border-color: rgba(192,0,26,0.4);
-  color: #c0001a;
+  background: rgba(181,0,26,0.12);
+  border-color: rgba(181,0,26,0.35);
+  color: #b5001a;
 }
 
 /* ── Registrati ── */
 .btn-registrati {
-  padding: 9px 20px;
-  background: linear-gradient(135deg, #8b1a2b, #c0001a);
+  padding: 8px 20px;
+  background: #b5001a;
   color: white;
   text-decoration: none;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  transition: opacity 0.2s, transform 0.1s;
-  box-shadow: 0 2px 8px rgba(192,0,26,0.3);
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 10px rgba(181,0,26,0.25);
   margin-left: 4px;
+  letter-spacing: 0.01em;
 }
 
 .btn-registrati:hover {
-  opacity: 0.9;
+  background: #850012;
+  color: white;
   transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(181,0,26,0.35);
 }
 
 /* ── Mobile toggle ── */
 .mobile-toggle {
   display: none;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.12);
   color: white;
   width: 38px;
   height: 38px;
   border-radius: 8px;
-  font-size: 18px;
+  font-size: 17px;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: background 0.18s;
 }
 
-.mobile-toggle:hover { background: rgba(255,255,255,0.07); }
+.mobile-toggle:hover { background: rgba(255,255,255,0.06); }
 
 /* ── Mobile menu ── */
 .mobile-menu {
   display: flex;
   flex-direction: column;
-  padding: 12px 16px 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  gap: 4px;
-  animation: fadeDown 0.2s ease;
+  padding: 8px 16px 16px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  gap: 2px;
+  animation: fadeDown 0.18s ease;
 }
 
 @keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -253,7 +250,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,0.6);
   text-decoration: none;
   font-size: 14px;
   border-radius: 8px;
@@ -261,13 +258,13 @@
 }
 
 .mobile-link:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.05);
   color: white;
 }
 
 .badge-mobile {
   margin-left: auto;
-  background: #c0001a;
+  background: #b5001a;
   color: white;
   border-radius: 10px;
   padding: 1px 7px;
@@ -280,27 +277,25 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  color: rgba(192,0,26,0.8);
+  color: rgba(181,0,26,0.85);
   background: transparent;
   border: none;
   font-size: 14px;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.15s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
+.mobile-logout:hover { background: rgba(181,0,26,0.08); }
 
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .mobile-toggle { display: flex; }
+  .navbar-inner { padding: 0 20px; }
+}
 
-.mobile-logout:hover { background: rgba(192,0,26,0.1); }
-
-@media (max-width: 768px) {
-  .brand-name {
-    font-size: 22px;
-  }
-  .brand-icon-container {
-    width: 36px;
-    height: 36px;
-    padding: 4px;
-  }
+@media (max-width: 480px) {
+  .brand-name { font-size: 20px; }
+  .brand-icon-container { width: 34px; height: 34px; }
 }

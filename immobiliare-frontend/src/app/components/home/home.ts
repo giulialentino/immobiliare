@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,7 +6,6 @@ import { HttpClient } from '@angular/common/http';
 import { AnnuncioService } from '../../services/annuncio';
 import { CategoriaService } from '../../services/categoria';
 import { AuthService } from '../../services/auth';
-
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -14,7 +13,7 @@ import { AuthService } from '../../services/auth';
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
-export class Home implements OnInit {
+export class Home implements OnInit, AfterViewInit {
 
   annunci: any[] = [];
   annunciFiltrati: any[] = [];
@@ -35,7 +34,7 @@ export class Home implements OnInit {
   indiceSelezionato = -1;
   richiestaInviata = false;
   richiestaErrore = '';
-  statoPromozione='NESSUNA';
+  statoPromozione = 'NESSUNA';
 
   constructor(
     private annuncioService: AnnuncioService,
@@ -51,14 +50,14 @@ export class Home implements OnInit {
         this.utente = u;
         this.cdr.detectChanges();
         if (u && u.ruolo === 'ACQUIRENTE') {
-  this.annuncioService.getStatoPromozione().subscribe({
-    next: (stato: string) => {
-      this.statoPromozione = stato;
-      this.cdr.detectChanges();
-    },
-    error: () => this.statoPromozione = 'NESSUNA'
-  });
-}
+          this.annuncioService.getStatoPromozione().subscribe({
+            next: (stato: string) => {
+              this.statoPromozione = stato;
+              this.cdr.detectChanges();
+            },
+            error: () => this.statoPromozione = 'NESSUNA'
+          });
+        }
         if (u && (u.ruolo === 'VENDITORE' || u.ruolo === 'AMMINISTRATORE')) {
           this.annuncioService.countMessaggi(u.id).subscribe({
             next: (count: number) => {
@@ -84,6 +83,20 @@ export class Home implements OnInit {
 
     this.caricaCategorie();
     this.caricaAnnunci();
+  }
+
+  ngAfterViewInit() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    setTimeout(() => {
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }, 300);
   }
 
   caricaCategorie() {
@@ -162,29 +175,51 @@ export class Home implements OnInit {
     this.caricaAnnunci();
   }
 
+scrollToSelected() {
+  setTimeout(() => {
+    const lista = document.querySelector('.autocomplete-list') as HTMLElement;
+    if (!lista || this.indiceSelezionato < 0) return;
+
+    const items = lista.querySelectorAll('.autocomplete-item');
+    if (!items || items.length === 0) return;
+
+    const item = items[this.indiceSelezionato] as HTMLElement;
+    if (!item) return;
+
+    // Porta l'elemento selezionato sempre in vista
+    item.scrollIntoView({ block: 'nearest' });
+  }, 50);
+}
+
+
   gestisciTasto(event: KeyboardEvent) {
-    if (this.comuniFiltrati.length === 0) {
-      if (event.key === 'Enter') this.filtra();
-      return;
-    }
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      this.indiceSelezionato = Math.min(this.indiceSelezionato + 1, this.comuniFiltrati.length - 1);
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      this.indiceSelezionato = Math.max(this.indiceSelezionato - 1, -1);
-    } else if (event.key === 'Enter') {
-      if (this.indiceSelezionato >= 0) {
-        this.citta = this.comuniFiltrati[this.indiceSelezionato];
-        this.comuniFiltrati = [];
-        this.indiceSelezionato = -1;
-      }
-      this.filtra();
-    } else if (event.key === 'Escape') {
+  if (this.comuniFiltrati.length === 0) {
+    if (event.key === 'Enter') this.filtra();
+    return;
+  }
+  if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    this.indiceSelezionato = Math.min(this.indiceSelezionato + 1, this.comuniFiltrati.length - 1);
+    this.cdr.detectChanges();
+    this.scrollToSelected();
+  } else if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    this.indiceSelezionato = Math.max(this.indiceSelezionato - 1, -1);
+    this.cdr.detectChanges();
+    this.scrollToSelected();
+  } else if (event.key === 'Enter') {
+    if (this.indiceSelezionato >= 0) {
+      this.citta = this.comuniFiltrati[this.indiceSelezionato];
       this.comuniFiltrati = [];
       this.indiceSelezionato = -1;
     }
+    this.filtra();
+  } else if (event.key === 'Escape') {
+    this.comuniFiltrati = [];
+    this.indiceSelezionato = -1;
   }
+}
+
 
   filtra() {
     this.comuniFiltrati = [];
@@ -230,18 +265,18 @@ export class Home implements OnInit {
   }
 
   richiediPromozione() {
-  this.richiestaErrore = '';
-  if (!confirm('Sei sicuro di voler richiedere di diventare venditore?')) return;
-  this.annuncioService.richiediPromozione().subscribe({
-    next: () => {
-      this.statoPromozione = 'IN_ATTESA';
-      this.richiestaInviata = true;
-      this.cdr.detectChanges();
-    },
-    error: (err: any) => {
-      this.richiestaErrore = err.error || 'Errore durante la richiesta';
-      this.cdr.detectChanges();
-    }
-  });
-}
+    this.richiestaErrore = '';
+    if (!confirm('Sei sicuro di voler richiedere di diventare venditore?')) return;
+    this.annuncioService.richiediPromozione().subscribe({
+      next: () => {
+        this.statoPromozione = 'IN_ATTESA';
+        this.richiestaInviata = true;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.richiestaErrore = err.error || 'Errore durante la richiesta';
+        this.cdr.detectChanges();
+      }
+    });
+  }
 }
