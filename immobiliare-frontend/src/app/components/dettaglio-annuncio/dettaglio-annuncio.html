@@ -1,0 +1,393 @@
+<div class="container mt-4">
+
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2>{{ annuncio?.titolo }}</h2>
+      <span class="badge bg-dark me-2">{{ annuncio?.tipoOperazione }}</span>
+      @if (annuncio?.inAsta) {
+        <span class="badge bg-warning text-dark"><i class="bi bi-hammer"></i> In asta</span>
+      }
+      @if (annuncio?.dataInserimento) {
+        <span class="badge bg-light text-dark border ms-2">
+          <i class="bi bi-calendar"></i> Pubblicato il {{ annuncio.dataInserimento | date:'dd/MM/yyyy' }}
+        </span>
+      }
+    </div>
+    <div class="d-flex gap-2">
+      @if (utente && ((utente.ruolo === 'VENDITORE' && utente.id === annuncio?.idVenditore) || utente.ruolo === 'AMMINISTRATORE')) {
+        <a [routerLink]="['/modifica-annuncio', annuncio?.id]" class="btn btn-warning">
+          <i class="bi bi-pencil"></i> Modifica
+        </a>
+        <button class="btn btn-danger" (click)="eliminaAnnuncio()">
+          <i class="bi bi-trash"></i> Elimina
+        </button>
+      }
+      <a routerLink="/" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Torna agli annunci
+      </a>
+    </div>
+  </div>
+
+  @if (!annuncio) {
+    <div class="text-center mt-5">
+      <div class="spinner-border" role="status"></div>
+      <p class="mt-2">Caricamento...</p>
+    </div>
+  }
+
+  @if (annuncio) {
+    <div class="row">
+      <div class="col-md-8">
+
+        @if (annuncio.foto && annuncio.foto.length > 0) {
+          <div id="caroselloFoto" class="carousel slide mb-2" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              @for (foto of annuncio.foto; track foto; let i = $index) {
+                <div class="carousel-item" [class.active]="i === 0">
+                  <img [src]="foto" class="d-block w-100 rounded"
+                       style="height: 350px; object-fit: cover; cursor: pointer;"
+                       [alt]="annuncio.titolo"
+                       (click)="apriLightbox(i)">
+                </div>
+              }
+            </div>
+            @if (annuncio.foto.length > 1) {
+              <button class="carousel-control-prev" type="button" data-bs-target="#caroselloFoto" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#caroselloFoto" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+              </button>
+            }
+          </div>
+
+          <div class="d-flex gap-2 mb-4 flex-wrap">
+            @for (foto of annuncio.foto; track foto; let i = $index) {
+              <div style="position: relative;">
+                <img [src]="foto"
+                     style="width: 80px; height: 60px; object-fit: cover; cursor: pointer; border-radius: 6px; border: 2px solid transparent;"
+                     [style.border-color]="fotoSelezionata === i ? '#000' : 'transparent'"
+                     (click)="selezionaFoto(i)"
+                     [alt]="'Foto ' + (i+1)">
+                @if (utente && ((utente.ruolo === 'VENDITORE' && utente.id === annuncio.idVenditore) || utente.ruolo === 'AMMINISTRATORE')) {
+                  <button class="btn btn-danger btn-sm"
+                          style="position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; padding: 0; font-size: 10px; border-radius: 50%; line-height: 1;"
+                          (click)="eliminaFoto(foto, i)">✕</button>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @if (lightboxAperto) {
+          <div class="lightbox-overlay" (click)="chiudiLightbox()">
+            <div class="lightbox-content" (click)="$event.stopPropagation()">
+              <button class="btn-close btn-close-white lightbox-close" (click)="chiudiLightbox()"></button>
+              <img [src]="annuncio.foto[fotoSelezionata]" class="lightbox-img" [alt]="annuncio.titolo">
+              @if (annuncio.foto.length > 1) {
+                <button class="lightbox-nav lightbox-prev"
+                        (click)="fotoSelezionata = (fotoSelezionata - 1 + annuncio.foto.length) % annuncio.foto.length">&#8249;</button>
+                <button class="lightbox-nav lightbox-next"
+                        (click)="fotoSelezionata = (fotoSelezionata + 1) % annuncio.foto.length">&#8250;</button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5><i class="bi bi-info-circle"></i> Descrizione</h5>
+            <p>{{ annuncio.descrizione }}</p>
+            @if (annuncio.dataInserimento) {
+              <p class="text-muted small mb-0">
+                <i class="bi bi-calendar"></i> Pubblicato il:
+                <strong>{{ annuncio.dataInserimento | date:'dd/MM/yyyy HH:mm' }}</strong>
+              </p>
+            }
+          </div>
+        </div>
+
+        @if (utente && ((utente.ruolo === 'VENDITORE' && utente.id === annuncio.idVenditore) || utente.ruolo === 'AMMINISTRATORE')) {
+          <div class="card mb-4 border-warning">
+            <div class="card-body">
+              <h5><i class="bi bi-tag"></i> Ribassa il prezzo</h5>
+              <div class="d-flex gap-2 align-items-center">
+                <input type="number" class="form-control w-50" [(ngModel)]="nuovoPrezzo" placeholder="Nuovo prezzo €">
+                <button class="btn btn-warning" (click)="ribassaPrezzo()">
+                  <i class="bi bi-arrow-down-circle"></i> Ribassa
+                </button>
+              </div>
+              @if (prezzoRibassato) {
+                <div class="alert alert-success mt-2">Prezzo ribassato!</div>
+              }
+              @if (annuncio.prezzoRibassato) {
+                <button class="btn btn-outline-danger btn-sm mt-2" (click)="annullaRibasso()">
+                  <i class="bi bi-x-circle"></i> Annulla ribasso
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5><i class="bi bi-facebook"></i> Promuovi su Facebook</h5>
+              <p class="text-muted small">Condividi questo annuncio sulla tua pagina Facebook.</p>
+              <button class="btn btn-facebook w-100" (click)="promuoviSuFacebook()">
+                <i class="bi bi-facebook"></i> Condividi su Facebook
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- ASTA IN CORSO -->
+        @if (asta && asta.attiva) {
+          <div class="card mb-4 border-warning">
+            <div class="card-body">
+              <h5><i class="bi bi-hammer"></i> Asta in corso</h5>
+              <p>Prezzo base: <strong>€ {{ asta.prezzoBase | number }}</strong></p>
+              @if (asta.offertaMax) {
+                <p>Offerta attuale: <strong class="text-success">€ {{ asta.offertaMax | number }}</strong></p>
+              } @else {
+                <p class="text-muted">Nessuna offerta ancora</p>
+              }
+              <p>Scadenza: <strong>{{ asta.dataScadenza | date:'dd/MM/yyyy HH:mm' }}</strong></p>
+              <p class="text-muted small">
+                <i class="bi bi-clock"></i> Ora attuale: {{ oggi | date:'dd/MM/yyyy HH:mm' }}
+              </p>
+              @if (offerte.length > 0) {
+                <h6 class="mt-3">Storico offerte</h6>
+                @for (o of offerte; track o.id) {
+                  <div class="border-bottom py-1">
+                    <span>€ {{ o.importo | number }}</span>
+                  </div>
+                }
+              }
+              @if (!utente) {
+                <div class="alert alert-warning d-flex align-items-center gap-3 mt-3">
+                  <i class="bi bi-lock-fill fs-4"></i>
+                  <div>
+                    <strong>Accedi per partecipare all'asta</strong>
+                    <div class="mt-2">
+                      <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
+                      <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
+                    </div>
+                  </div>
+                </div>
+              } @else if (utente.ruolo === 'ACQUIRENTE') {
+                <div class="mt-3">
+                  @if (offertaInviata) {
+                    <div class="alert alert-success">Offerta inviata!</div>
+                  }
+                  <div class="d-flex gap-2 align-items-center">
+                    <input type="number" class="form-control w-50" [(ngModel)]="nuovaOfferta"
+                           [placeholder]="'Min: ' + (asta.offertaMax ? asta.offertaMax + 1 : asta.prezzoBase)">
+                    <button class="btn btn-warning" (click)="faiOfferta()">
+                      <i class="bi bi-hammer"></i> Offri
+                    </button>
+                  </div>
+                </div>
+              }
+              @if (utente && ((utente.ruolo === 'VENDITORE' && utente.id === annuncio.idVenditore) || utente.ruolo === 'AMMINISTRATORE')) {
+                <button class="btn btn-danger btn-sm mt-3" (click)="chiudiAsta()">
+                  <i class="bi bi-x-circle"></i> Chiudi asta
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- CREA ASTA -->
+        @if (utente && ((utente.ruolo === 'VENDITORE' && utente.id === annuncio.idVenditore) || utente.ruolo === 'AMMINISTRATORE') && !asta) {
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5><i class="bi bi-hammer"></i> Crea un'asta</h5>
+              @if (erroreAsta) {
+                <div class="alert alert-danger py-2">{{ erroreAsta }}</div>
+              }
+              @if (astaCreata) {
+                <div class="alert alert-success">Asta creata!</div>
+              }
+              <div class="mb-2">
+                <label class="form-label">Prezzo base (€)</label>
+                <input type="number" class="form-control" [(ngModel)]="nuovaAsta.prezzoBase">
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Data scadenza</label>
+                <input type="datetime-local" class="form-control"
+                       [(ngModel)]="nuovaAsta.dataScadenza"
+                       [min]="dataMinima">
+                @if (nuovaAsta.dataScadenza && !dataValida()) {
+                  <div class="form-text text-danger">
+                    <i class="bi bi-exclamation-circle"></i> La data deve essere successiva ad ora
+                  </div>
+                } @else if (nuovaAsta.dataScadenza && dataValida()) {
+                  <div class="form-text text-success">
+                    <i class="bi bi-check-circle"></i> Data valida
+                  </div>
+                }
+                <div class="form-text text-muted">
+                  <i class="bi bi-clock"></i> Ora attuale: {{ oggi | date:'dd/MM/yyyy HH:mm' }}
+                </div>
+              </div>
+              <button class="btn btn-dark" (click)="creaAsta()">
+                <i class="bi bi-plus-circle"></i> Crea asta
+              </button>
+            </div>
+          </div>
+        }
+
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5><i class="bi bi-star"></i> Recensioni</h5>
+            @if (annuncio.recensioni && annuncio.recensioni.length > 0) {
+              @for (r of annuncio.recensioni; track r.id) {
+                <div class="border-bottom py-2">
+                  <p class="mb-0">⭐ {{ r.punteggio }}/5 — {{ r.commento }}</p>
+                </div>
+              }
+            } @else {
+              <p class="text-muted">Nessuna recensione ancora</p>
+            }
+            @if (!utente) {
+              <div class="alert alert-warning d-flex align-items-center gap-3 mt-3">
+                <i class="bi bi-lock-fill fs-4"></i>
+                <div>
+                  <strong>Accedi per scrivere una recensione</strong>
+                  <div class="mt-2">
+                    <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
+                    <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
+                  </div>
+                </div>
+              </div>
+            } @else if (utente.ruolo === 'ACQUIRENTE') {
+              <div class="mt-3">
+                <h6>Scrivi una recensione</h6>
+                @if (recensioneInviata) {
+                  <div class="alert alert-success">Recensione inviata!</div>
+                }
+                <div class="mb-2">
+                  <label class="form-label">Punteggio</label>
+                  <select class="form-select" [(ngModel)]="nuovaRecensione.punteggio">
+                    <option [value]="1">1</option>
+                    <option [value]="2">2</option>
+                    <option [value]="3">3</option>
+                    <option [value]="4">4</option>
+                    <option [value]="5">5</option>
+                  </select>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Commento</label>
+                  <textarea class="form-control" [(ngModel)]="nuovaRecensione.commento" rows="3"></textarea>
+                </div>
+                <button class="btn btn-dark" (click)="inviaRecensione()">Invia recensione</button>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5><i class="bi bi-person-circle"></i> Il venditore</h5>
+            <a [routerLink]="['/profilo', annuncio.idVenditore]" class="btn btn-outline-dark btn-sm">
+              <i class="bi bi-eye"></i> Vedi profilo venditore
+            </a>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5><i class="bi bi-envelope"></i> Contatta il venditore</h5>
+            @if (utente && utente.ruolo === 'ACQUIRENTE') {
+              @if (messaggioInviato) {
+                <div class="alert alert-success">
+                  <i class="bi bi-check-circle"></i> Messaggio inviato! Il venditore ti contatterà via email.
+                </div>
+              } @else {
+                <div class="bg-light p-3 rounded-3 mb-3">
+                  <p class="small mb-0 fst-italic text-muted">
+                    "Salve, sono interessato/a all'annuncio <strong>{{ annuncio.titolo }}</strong>.
+                    Contattatemi via email per ulteriori informazioni. Grazie."
+                  </p>
+                </div>
+                <button class="btn btn-dark w-100" (click)="inviaMessaggioStandard()">
+                  <i class="bi bi-send"></i> Invia interesse al venditore
+                </button>
+              }
+            } @else if (!utente) {
+              <div class="alert alert-warning d-flex align-items-center gap-3">
+                <i class="bi bi-lock-fill fs-4"></i>
+                <div>
+                  <strong>Accedi per contattare il venditore</strong>
+                  <div class="mt-2">
+                    <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
+                    <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5><i class="bi bi-geo-alt"></i> Posizione</h5>
+            @if (mappaUrl) {
+              <iframe
+                [src]="mappaUrl"
+                style="height: 300px; width: 100%; border: none; border-radius: 8px;"
+                loading="lazy">
+              </iframe>
+            }
+            @if (annuncio.latitudine && annuncio.longitudine) {
+              <a [href]="'https://www.google.com/maps?q=' + annuncio.latitudine + ',' + annuncio.longitudine"
+                 target="_blank" class="btn btn-outline-dark btn-sm mt-2">
+                <i class="bi bi-map"></i> Apri in Google Maps
+              </a>
+            } @else {
+              <p class="text-muted">Posizione non disponibile</p>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-md-4">
+        <div class="card sticky-top" style="top: 80px">
+          <div class="card-body text-center">
+            @if (annuncio.prezzoRibassato) {
+              <p class="text-decoration-line-through text-muted">€ {{ annuncio.prezzo | number }}</p>
+              <h3 class="text-danger">€ {{ annuncio.prezzoRibassato | number }}</h3>
+            } @else {
+              <h3>€ {{ annuncio.prezzo | number }}</h3>
+            }
+            <hr>
+            <p><i class="bi bi-aspect-ratio"></i> {{ annuncio.metriQuadri }} m²</p>
+            @if (annuncio.numLocali) {
+              <p><i class="bi bi-door-open"></i> {{ annuncio.numLocali }} locali</p>
+            }
+            @if (annuncio.numBagni) {
+              <p><i class="bi bi-droplet"></i> {{ annuncio.numBagni }} bagni</p>
+            }
+            <p><i class="bi bi-geo-alt"></i> {{ annuncio.indirizzo }}</p>
+            @if (annuncio.dataInserimento) {
+              <p class="text-muted small">
+                <i class="bi bi-calendar"></i> {{ annuncio.dataInserimento | date:'dd/MM/yyyy' }}
+              </p>
+            }
+            @if (utente) {
+              <button class="btn w-100 mt-2"
+                      [class.btn-warning]="isPreferito"
+                      [class.btn-outline-dark]="!isPreferito"
+                      (click)="togglePreferito()">
+                <i [class]="isPreferito ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+                {{ isPreferito ? 'Salvato' : 'Salva nei preferiti' }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

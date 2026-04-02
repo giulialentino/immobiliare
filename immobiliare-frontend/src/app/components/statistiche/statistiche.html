@@ -1,0 +1,75 @@
+<div class="container mt-4">
+  <div class="mb-5">
+    <h2 class="fw-bold">Statistiche del mercato</h2>
+    <p class="text-muted">Panoramica degli annunci presenti sulla piattaforma</p>
+  </div>
+
+  <!-- KPI ANIMATI -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="kpi-card text-center p-4">
+        <div class="kpi-icon-wrapper mb-3">
+          <i class="bi bi-house-fill"></i>
+        </div>
+        <div class="kpi-number">{{ animatedTotale }}</div>
+        <div class="kpi-label">Annunci totali</div>
+        <div class="kpi-bar mt-3">
+          <div class="kpi-bar-fill" [style.width]="barTotale + '%'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="kpi-card text-center p-4">
+        <div class="kpi-icon-wrapper mb-3">
+          <i class="bi bi-currency-euro"></i>
+        </div>
+        <div class="kpi-number">€ {{ animatedPrezzo | number }}</div>
+        <div class="kpi-label">Prezzo medio</div>
+        <div class="kpi-bar mt-3">
+          <div class="kpi-bar-fill" [style.width]="barPrezzo + '%'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="kpi-card text-center p-4">
+        <div class="kpi-icon-wrapper mb-3">
+          <i class="bi bi-hammer"></i>
+        </div>
+        <div class="kpi-number">{{ animatedAsta }}</div>
+        <div class="kpi-label">In asta</div>
+        <div class="kpi-bar mt-3">
+          <div class="kpi-bar-fill" [style.width]="barAsta + '%'"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAFICI -->
+  <div class="row g-4">
+    <div class="col-md-5">
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">
+          <i class="bi bi-pie-chart-fill me-2" style="color: #c0001a;"></i>
+          Annunci per categoria
+        </h6>
+        <canvas #graficoCategorie></canvas>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <div class="card p-4 mb-4">
+        <h6 class="fw-bold mb-3">
+          <i class="bi bi-bar-chart-fill me-2" style="color: #c0001a;"></i>
+          Vendita vs Affitto
+        </h6>
+        <canvas #graficoTipi></canvas>
+      </div>
+      <div class="card p-4">
+        <h6 class="fw-bold mb-3">
+          <i class="bi bi-graph-up me-2" style="color: #c0001a;"></i>
+          Distribuzione prezzi
+        </h6>
+        <canvas #graficoPrezzi></canvas>
+      </div>
+    </div>
+  </div>
+</div>

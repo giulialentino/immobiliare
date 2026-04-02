@@ -1,0 +1,17 @@
+.requisito {
+  font-size: 13px;
+  padding: 3px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.requisito.ok {
+  color: #198754;
+}
+
+.requisito.no {
+  color: #dc3545;
+}

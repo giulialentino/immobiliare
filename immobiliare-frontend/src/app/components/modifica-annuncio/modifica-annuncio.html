@@ -1,0 +1,239 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-body p-4">
+          <h3 class="card-title mb-4">
+            <i class="bi bi-pencil"></i> Modifica annuncio
+          </h3>
+
+          @if (errore) {
+            <div class="position-fixed top-0 start-50 translate-middle-x mt-3"
+       style="z-index: 9999; min-width: 350px;">
+    <div class="alert alert-danger shadow">
+      <i class="bi bi-exclamation-circle-fill me-2"></i>{{ errore }}
+    </div>
+  </div>
+          }
+
+          @if (annuncio.dataInserimento) {
+            <div class="alert alert-light border mb-3 py-2">
+              <i class="bi bi-calendar"></i> Pubblicato il:
+              <strong>{{ annuncio.dataInserimento | date:'dd/MM/yyyy HH:mm' }}</strong>
+            </div>
+          }
+
+          <div class="mb-3">
+            <label class="form-label">Titolo *</label>
+            <input type="text" class="form-control" [(ngModel)]="annuncio.titolo">
+          </div>
+
+          
+          <div class="mb-3">
+  <label class="form-label">Descrizione</label>
+  <textarea class="form-control" [(ngModel)]="annuncio.descrizione" rows="4"
+            placeholder="Descrivi l'immobile..."></textarea>
+  <button type="button" class="btn btn-outline-dark btn-sm mt-2"
+          (click)="generaDescrizioneAI()"
+          [disabled]="generandoDescrizione">
+    @if (generandoDescrizione) {
+      <span class="spinner-border spinner-border-sm me-1"></span> Generando...
+    } @else {
+      <i class="bi bi-stars"></i> Genera descrizione con AI
+    }
+  </button>
+</div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Prezzo (€) *</label>
+              <input type="number" class="form-control" [(ngModel)]="annuncio.prezzo">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Metri quadri</label>
+              <input type="number" class="form-control" [(ngModel)]="annuncio.metriQuadri">
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+  <div class="col-md-6">
+    <label class="form-label">Numero locali</label>
+    <input type="number" class="form-control" [(ngModel)]="annuncio.numLocali"
+           min="1" placeholder="Es. 3">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Numero bagni</label>
+    <input type="number" class="form-control" [(ngModel)]="annuncio.numBagni"
+           min="1" placeholder="Es. 1">
+  </div>
+</div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Tipo operazione</label>
+              <select class="form-select" [(ngModel)]="annuncio.tipoOperazione">
+                <option value="VENDITA">Vendita</option>
+                <option value="AFFITTO">Affitto</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Categoria *</label>
+              <select class="form-select" [(ngModel)]="annuncio.idCategoria">
+                <option [value]="null">Seleziona...</option>
+                @for (cat of categorie; track cat.id) {
+                  <option [value]="cat.id">{{ cat.nome }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- CITTÀ CON AUTOCOMPLETE -->
+          <div class="mb-3" style="position: relative;">
+            <label class="form-label">Città *</label>
+            <div class="input-group">
+              <input type="text" class="form-control"
+                     [(ngModel)]="cittaInput"
+                     placeholder="Scrivi il nome del comune..."
+                     (input)="filtraComuni()"
+                     (keydown)="gestisciTasto($event)"
+                     autocomplete="off">
+              @if (cittaInput) {
+                <button class="btn btn-outline-secondary" type="button"
+                        (click)="cittaInput = ''; comuniFiltrati = []; via = ''">
+                  <i class="bi bi-x"></i>
+                </button>
+              }
+            </div>
+            @if (comuniFiltrati.length > 0 && cittaInput.length > 1) {
+              <div class="autocomplete-list">
+                @for (c of comuniFiltrati; track c; let i = $index) {
+                  <div class="autocomplete-item"
+                       [class.autocomplete-selected]="i === indiceSelezionato"
+                       (click)="selezionaComune(c)">{{ c }}</div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- VIA -->
+          <div class="mb-3">
+            <label class="form-label">Via / Indirizzo</label>
+            <div class="input-group">
+              @if (cittaInput) {
+                <span class="input-group-text bg-light fw-bold text-dark">
+                  {{ cittaInput }},
+                </span>
+              }
+              <input type="text" class="form-control"
+                     [(ngModel)]="via"
+                     placeholder="Via Roma 5">
+            </div>
+            @if (cittaInput && via) {
+              <div class="form-text text-success mt-1">
+                <i class="bi bi-check-circle"></i> Indirizzo completo:
+                <strong>{{ cittaInput }}, {{ via }}</strong>
+              </div>
+            } @else if (cittaInput) {
+              <div class="form-text text-muted">
+                Aggiungi via e numero civico (opzionale)
+              </div>
+            }
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Latitudine</label>
+              <input type="number" class="form-control" [(ngModel)]="annuncio.latitudine" step="0.0001">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Longitudine</label>
+              <input type="number" class="form-control" [(ngModel)]="annuncio.longitudine" step="0.0001">
+            </div>
+          </div>
+
+          <!-- ASTA -->
+          <div class="mb-3">
+            <div class="form-check mb-2">
+              <input type="checkbox" class="form-check-input" [(ngModel)]="annuncio.inAsta" id="inAsta">
+              <label class="form-check-label fw-bold" for="inAsta">
+                <i class="bi bi-hammer"></i> Metti in asta
+              </label>
+            </div>
+            @if (annuncio.inAsta) {
+              <div class="card border-warning p-3">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Prezzo base asta (€) *</label>
+                    <input type="number" class="form-control" [(ngModel)]="asta.prezzoBase"
+                           placeholder="Prezzo minimo offerta">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Data scadenza asta *</label>
+                    <input type="datetime-local" class="form-control"
+                           [(ngModel)]="asta.dataScadenza"
+                           [min]="dataMinima">
+                    @if (asta.dataScadenza && !dataValida()) {
+                      <div class="form-text text-danger">
+                        <i class="bi bi-exclamation-circle"></i> La data deve essere successiva ad ora
+                      </div>
+                    } @else if (asta.dataScadenza && dataValida()) {
+                      <div class="form-text text-success">
+                        <i class="bi bi-check-circle"></i> Data valida
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="mt-2">
+                  <small class="text-muted">
+                    <i class="bi bi-clock"></i> Ora attuale:
+                    <strong>{{ oggi | date:'dd/MM/yyyy HH:mm' }}</strong>
+                  </small>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- FOTO ESISTENTI -->
+          @if (fotoEsistenti.length > 0) {
+            <div class="mb-3">
+              <label class="form-label">Foto attuali</label>
+              <div class="d-flex gap-2 flex-wrap">
+                @for (foto of fotoEsistenti; track foto) {
+                  <div style="position: relative;">
+                    <img [src]="foto"
+                         style="width: 100px; height: 80px; object-fit: cover; border-radius: 8px;">
+                    <button class="btn btn-danger btn-sm"
+                            style="position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; padding: 0; border-radius: 50%; font-size: 12px;"
+                            (click)="rimuoviFoto(foto)">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- NUOVE FOTO -->
+          <div class="mb-3">
+  <label class="form-label">Aggiungi nuove foto</label>
+  <input type="file" class="form-control" multiple accept=".jpg,.jpeg"
+         (change)="onFileSelected($event)">
+  @if (nuoveFoto.length > 0) {
+    <div class="mt-2">
+      <small class="text-muted">{{ nuoveFoto.length }} nuove foto selezionate</small>
+    </div>
+  }
+  <div class="form-text text-muted">Formato accettato: JPG</div>
+</div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-dark" (click)="salva()">
+              <i class="bi bi-save"></i> Salva modifiche
+            </button>
+            <a [routerLink]="['/annuncio', annuncio.id]" class="btn btn-outline-secondary">Annulla</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

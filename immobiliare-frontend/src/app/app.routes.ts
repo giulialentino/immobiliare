@@ -1,0 +1,30 @@
+import { Routes } from '@angular/router';
+import { Home } from './components/home/home';
+import { Login } from './components/login/login';
+import { Registrazione } from './components/registrazione/registrazione';
+import { DettaglioAnnuncio } from './components/dettaglio-annuncio/dettaglio-annuncio';
+import { CreaAnnuncio } from './components/crea-annuncio/crea-annuncio';
+import { Admin } from './components/admin/admin';
+import { ModificaAnnuncio } from './components/modifica-annuncio/modifica-annuncio';
+import { Profilo } from './components/profilo/profilo';
+import { Statistiche } from './components/statistiche/statistiche';
+import { VerificaEmail } from './components/verifica-email/verifica-email';
+import { RecuperaPassword } from './components/recupera-password/recupera-password';
+import { ResetPassword } from './components/reset-password/reset-password';
+
+export const routes: Routes = [
+  { path: '', component: Home },
+  { path: 'login', component: Login },
+  { path: 'registrazione', component: Registrazione },
+  { path: 'annuncio/:id', component: DettaglioAnnuncio },
+  { path: 'crea-annuncio', component: CreaAnnuncio },
+  { path: 'admin', component: Admin },
+  { path: 'modifica-annuncio/:id', component: ModificaAnnuncio },
+  { path: 'profilo', component: Profilo },
+  { path: 'profilo/:id', component: Profilo },
+  { path: 'statistiche', component: Statistiche },
+  { path: 'verifica-email', component: VerificaEmail },
+  { path: 'recupera-password', component: RecuperaPassword },
+  { path: 'reset-password', component: ResetPassword },
+  { path: '**', redirectTo: '' },
+];

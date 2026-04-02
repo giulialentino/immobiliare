@@ -1,0 +1,612 @@
+<!-- HERO CON FOTO DI SFONDO -->
+<div class="hero-section">
+  <div class="hero-overlay">
+    <div class="container text-center">
+      <h1 class="hero-title">Trova casa in Italia</h1>
+      <p class="hero-subtitle">Appartamenti, ville, uffici e molto altro in vendita e affitto</p>
+
+      <div class="search-bar card mx-auto mt-4" style="max-width: 900px;">
+        <div class="card-body p-3">
+          <div class="row g-2">
+            <div class="col-md-2">
+              <select class="form-select border-0 bg-light" [(ngModel)]="tipoOperazione">
+                <option value="">Vendita/Affitto</option>
+                <option value="VENDITA">Vendita</option>
+                <option value="AFFITTO">Affitto</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select border-0 bg-light" [(ngModel)]="idCategoria">
+                <option [value]="null">Tipo immobile</option>
+                @for (cat of categorie; track cat.id) {
+                  <option [value]="cat.id">{{ cat.nome }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-md-3" style="position: relative;">
+              <input type="text" class="form-control border-0 bg-light"
+                     [(ngModel)]="citta"
+                     placeholder="Città o comune..."
+                     (input)="filtraComuni()"
+                     (keydown)="gestisciTasto($event)"
+                     autocomplete="off">
+              @if (comuniFiltrati.length > 0 && citta.length > 1) {
+                <div class="autocomplete-list">
+                  @for (c of comuniFiltrati; track c; let i = $index) {
+                    <div class="autocomplete-item"
+                         [class.autocomplete-selected]="i === indiceSelezionato"
+                         (click)="selezionaComune(c)">{{ c }}</div>
+                  }
+                </div>
+              }
+            </div>
+            <div class="col-md-2">
+              <input type="number" class="form-control border-0 bg-light" [(ngModel)]="prezzoMin"
+                     placeholder="Prezzo min €"
+                     (input)="applicaFiltri()">
+            </div>
+            <div class="col-md-2">
+              <input type="number" class="form-control border-0 bg-light" [(ngModel)]="prezzoMax"
+                     placeholder="Prezzo max €"
+                     (input)="applicaFiltri()">
+            </div>
+            <div class="col-md-1">
+              <button class="btn w-100 btn-search" (click)="filtra()">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-4 stat-item">
+        <div class="stat-number">{{ annunci.length }}+</div>
+        <div class="stat-label">Annunci attivi</div>
+      </div>
+      <div class="col-4 stat-item">
+        <div class="stat-number">{{ categorie.length }}</div>
+        <div class="stat-label">Categorie</div>
+      </div>
+      <div class="col-4 stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Verificati</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-5">
+
+  <!-- DASHBOARD UTENTE LOGGATO -->
+  @if (utente) {
+    <div class="dashboard-utente mb-5 p-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h5 class="fw-bold mb-1">Come va, {{ utente.nome }}?</h5>
+          <p class="text-muted mb-0 small">
+            @if (utente.ruolo === 'VENDITORE' || utente.ruolo === 'AMMINISTRATORE') {
+              @if (messaggiCount > 0) {
+                Hai <strong>{{ messaggiCount }}</strong> messaggi non letti
+              } @else {
+                Nessun nuovo messaggio
+              }
+            } @else if (utente.ruolo === 'ACQUIRENTE') {
+              Esplora gli annunci e trova la tua casa ideale
+            }
+          </p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          @if (utente.ruolo === 'VENDITORE' || utente.ruolo === 'AMMINISTRATORE') {
+            <a routerLink="/crea-annuncio" class="btn btn-red btn-sm">
+              <i class="bi bi-plus-circle"></i> Nuovo annuncio
+            </a>
+            <a routerLink="/profilo" class="btn btn-outline-dark btn-sm">
+              <i class="bi bi-envelope"></i> Messaggi
+              @if (messaggiCount > 0) {
+                <span class="badge bg-danger ms-1">{{ messaggiCount }}</span>
+              }
+            </a>
+          }
+          @if (utente.ruolo === 'AMMINISTRATORE') {
+            <a routerLink="/admin" class="btn btn-outline-danger btn-sm">
+              <i class="bi bi-shield-lock"></i> Admin
+            </a>
+          }
+          <a routerLink="/statistiche" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-bar-chart"></i> Statistiche
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- PERCHE' SCEGLIERCI -->
+  <div class="mb-2">
+    <h2 class="section-title">Perché sceglierci</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="why-card">
+        <div class="why-icon"><i class="bi bi-shield-check"></i></div>
+        <h5 class="fw-bold">Annunci verificati</h5>
+        <p class="text-muted small mb-0">Ogni annuncio viene controllato prima della pubblicazione per garantire la massima affidabilità.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="why-card">
+        <div class="why-icon"><i class="bi bi-lightning-charge"></i></div>
+        <h5 class="fw-bold">Pubblica in pochi minuti</h5>
+        <p class="text-muted small mb-0">Crea il tuo annuncio con foto, descrizione e posizione in meno di 5 minuti.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="why-card">
+        <div class="why-icon"><i class="bi bi-search"></i></div>
+        <h5 class="fw-bold">Cerca con precisione</h5>
+        <p class="text-muted small mb-0">Filtra per città, categoria, tipo e prezzo per trovare esattamente quello che cerchi.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORIE -->
+  <div class="mb-2">
+    <h2 class="section-title">Esplora per categoria</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="row g-3 justify-content-center mb-5">
+    @for (cat of categorie; track cat.id) {
+      <div class="col-6 col-md-2">
+        <div class="card categoria-card text-center p-3" (click)="filtraPerCategoria(cat.id)">
+          <div class="categoria-icon">
+            @if (cat.nome === 'Appartamento/Casa') { <i class="bi bi-building"></i> }
+            @else if (cat.nome === 'Villa') { <i class="bi bi-house-door"></i> }
+            @else if (cat.nome === 'Box auto') { <i class="bi bi-car-front"></i> }
+            @else if (cat.nome === 'Terreno edificabile') { <i class="bi bi-tree"></i> }
+            @else if (cat.nome === 'Ufficio') { <i class="bi bi-briefcase"></i> }
+            @else if (cat.nome === 'Locale commerciale') { <i class="bi bi-shop"></i> }
+            @else { <i class="bi bi-house"></i> }
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: #333;">{{ cat.nome }}</div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- ULTIMI ANNUNCI -->
+  @if (ultimiAnnunci.length > 0) {
+    <div class="mb-2">
+      <h2 class="section-title">Ultimi inserimenti</h2>
+      <div class="section-line"></div>
+      <p class="section-subtitle">Le proposte più recenti</p>
+    </div>
+    <div class="row g-4 mb-5">
+      @for (annuncio of ultimiAnnunci; track annuncio.id) {
+        <div class="col-md-4">
+          <div class="card h-100 annuncio-card featured-card">
+            <div class="img-wrapper" style="position: relative; overflow: hidden;">
+              @if (annuncio.foto && annuncio.foto.length > 0) {
+                <div [id]="'carousel-u-' + annuncio.id" class="carousel slide" data-bs-ride="false">
+                  <div class="carousel-inner">
+                    @for (foto of annuncio.foto; track foto; let i = $index) {
+                      <div class="carousel-item" [class.active]="i === 0">
+                        <img [src]="foto" class="card-img-top"
+                             style="height: 220px; object-fit: cover;" [alt]="annuncio.titolo">
+                      </div>
+                    }
+                  </div>
+                  @if (annuncio.foto.length > 1) {
+                    <button class="carousel-control-prev" type="button"
+                            [attr.data-bs-target]="'#carousel-u-' + annuncio.id"
+                            data-bs-slide="prev"
+                            (click)="$event.stopPropagation()">
+                      <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button"
+                            [attr.data-bs-target]="'#carousel-u-' + annuncio.id"
+                            data-bs-slide="next"
+                            (click)="$event.stopPropagation()">
+                      <span class="carousel-control-next-icon"></span>
+                    </button>
+                  }
+                </div>
+              } @else {
+                <div class="d-flex align-items-center justify-content-center bg-light"
+                     style="height: 220px;">
+                  <i class="bi bi-house" style="font-size: 4rem; color: #ccc;"></i>
+                </div>
+              }
+              <span class="floating-badge bg-dark text-white">{{ annuncio.tipoOperazione }}</span>
+              <span class="floating-badge-right badge-nuovo">Nuovo</span>
+            </div>
+            <div class="card-body">
+              <h6 class="fw-bold mb-1">{{ annuncio.titolo }}</h6>
+              <p class="text-muted small mb-2">
+                <i class="bi bi-geo-alt-fill" style="color: #c0001a;"></i> {{ annuncio.indirizzo }}
+              </p>
+              <span class="price-tag">€ {{ annuncio.prezzo | number }}</span>
+              <p class="text-muted small mt-1 mb-0">
+                <i class="bi bi-aspect-ratio"></i> {{ annuncio.metriQuadri }} m²
+                @if (annuncio.numLocali) {
+                  &nbsp;·&nbsp;<i class="bi bi-door-open"></i> {{ annuncio.numLocali }} locali
+                }
+                @if (annuncio.numBagni) {
+                  &nbsp;·&nbsp;<i class="bi bi-droplet"></i> {{ annuncio.numBagni }} bagni
+                }
+              </p>
+              @if (annuncio.dataInserimento) {
+                <p class="text-muted small mt-1 mb-0">
+                  <i class="bi bi-calendar"></i> {{ annuncio.dataInserimento | date:'dd/MM/yyyy' }}
+                </p>
+              }
+            </div>
+            <div class="card-footer border-0 bg-transparent pb-3">
+              <a [routerLink]="['/annuncio', annuncio.id]" class="btn w-100 btn-dark-custom btn-sm">
+                Vedi annuncio
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- BANNER VENDITORE -->
+  <div class="banner-venditore mb-5 p-4 text-white">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div>
+        <h5 class="fw-bold mb-1">Hai un immobile da vendere o affittare?</h5>
+        <p class="mb-0 opacity-75 small">
+          @if (!utente) {
+            Registrati come venditore e pubblica gratuitamente.
+          } @else if (utente.ruolo === 'ACQUIRENTE') {
+            Diventa venditore e pubblica i tuoi annunci gratuitamente.
+          } @else {
+            Pubblica il tuo annuncio e raggiungi migliaia di acquirenti.
+          }
+        </p>
+      </div>
+      <div class="d-flex gap-2 flex-column flex-md-row">
+        @if (!utente) {
+          <a routerLink="/registrazione" class="btn btn-red fw-bold px-4">
+            <i class="bi bi-person-plus"></i> Registrati
+          </a>
+          <a routerLink="/login" class="btn btn-outline-light px-4">
+            <i class="bi bi-box-arrow-in-right"></i> Accedi
+          </a>
+        } @else if (utente.ruolo === 'ACQUIRENTE') {
+          @if (statoPromozione === 'IN_ATTESA') {
+            <span class="btn btn-outline-light fw-bold px-4 disabled">
+              <i class="bi bi-clock"></i> Richiesta in attesa di approvazione
+            </span>
+          } @else if (statoPromozione === 'APPROVATO') {
+            <span class="btn btn-success fw-bold px-4 disabled">
+              <i class="bi bi-check-circle"></i> Richiesta approvata!
+            </span>
+          } @else if (statoPromozione === 'RIFIUTATO') {
+            <div class="d-flex flex-column gap-2 align-items-start">
+              <span class="badge bg-danger p-2">
+                <i class="bi bi-x-circle"></i> Richiesta precedente rifiutata
+              </span>
+              <button class="btn btn-red fw-bold px-4" (click)="richiediPromozione()">
+                <i class="bi bi-arrow-up-circle"></i> Invia nuova richiesta
+              </button>
+            </div>
+          } @else {
+            <button class="btn btn-red fw-bold px-4" (click)="richiediPromozione()">
+              <i class="bi bi-arrow-up-circle"></i> Diventa venditore
+            </button>
+          }
+          @if (richiestaErrore) {
+            <span class="text-warning small align-self-center">{{ richiestaErrore }}</span>
+          }
+        } @else {
+          <a routerLink="/crea-annuncio" class="btn btn-red fw-bold px-4">
+            <i class="bi bi-plus-circle"></i> Pubblica annuncio
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTRI BAR -->
+  <div class="mb-2" id="tutti-annunci">
+    <h2 class="section-title">Tutti gli annunci</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="filtri-bar d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+      <select class="form-select form-select-sm border-0 bg-white shadow-sm"
+              style="width: auto; border-radius: 6px;"
+              [(ngModel)]="ordinamento" (change)="appliedOrdinamento()">
+        <option value="">Ordina per</option>
+        <option value="data_desc">Più recenti</option>
+        <option value="data_asc">Meno recenti</option>
+        <option value="prezzo_asc">Prezzo crescente</option>
+        <option value="prezzo_desc">Prezzo decrescente</option>
+        <option value="mq_asc">Metri quadri crescenti</option>
+        <option value="mq_desc">Metri quadri decrescenti</option>
+      </select>
+      @if (tipoOperazione || idCategoria || citta || prezzoMin || prezzoMax) {
+        <button class="btn btn-sm btn-outline-danger" style="border-radius: 6px;" (click)="resetFiltri()">
+          <i class="bi bi-x-circle"></i> Reset filtri
+        </button>
+      }
+      <span class="text-muted small">{{ annunciFiltrati.length }} annunci trovati</span>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-sm px-3" style="border-radius: 6px 0 0 6px;"
+              [class.btn-dark]="vistaGriglia" [class.btn-outline-secondary]="!vistaGriglia"
+              (click)="vistaGriglia = true">
+        <i class="bi bi-grid-3x3-gap"></i>
+      </button>
+      <button class="btn btn-sm px-3" style="border-radius: 0 6px 6px 0;"
+              [class.btn-dark]="!vistaGriglia" [class.btn-outline-secondary]="vistaGriglia"
+              (click)="vistaGriglia = false">
+        <i class="bi bi-list-ul"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- SKELETON -->
+  @if (loading) {
+    <div class="row g-4 mb-5">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="col-md-4">
+          <div class="card skeleton-card">
+            <div class="skeleton skeleton-img"></div>
+            <div class="card-body">
+              <div class="skeleton skeleton-title mb-2"></div>
+              <div class="skeleton skeleton-text mb-1"></div>
+              <div class="skeleton skeleton-text-sm"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- VISTA GRIGLIA -->
+  @if (!loading && vistaGriglia) {
+    @if (annunciFiltrati.length > 0) {
+      <div class="row g-4 mb-5">
+        @for (annuncio of annunciFiltrati; track annuncio.id) {
+          <div class="col-md-4">
+            <div class="card h-100 annuncio-card">
+              <div class="img-wrapper" style="position: relative; overflow: hidden;">
+                @if (annuncio.foto && annuncio.foto.length > 0) {
+                  <div [id]="'carousel-g-' + annuncio.id" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner">
+                      @for (foto of annuncio.foto; track foto; let i = $index) {
+                        <div class="carousel-item" [class.active]="i === 0">
+                          <img [src]="foto" class="card-img-top"
+                               style="height: 200px; object-fit: cover;" [alt]="annuncio.titolo">
+                        </div>
+                      }
+                    </div>
+                    @if (annuncio.foto.length > 1) {
+                      <button class="carousel-control-prev" type="button"
+                              [attr.data-bs-target]="'#carousel-g-' + annuncio.id"
+                              data-bs-slide="prev"
+                              (click)="$event.stopPropagation()">
+                        <span class="carousel-control-prev-icon"></span>
+                      </button>
+                      <button class="carousel-control-next" type="button"
+                              [attr.data-bs-target]="'#carousel-g-' + annuncio.id"
+                              data-bs-slide="next"
+                              (click)="$event.stopPropagation()">
+                        <span class="carousel-control-next-icon"></span>
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  <div class="d-flex align-items-center justify-content-center bg-light"
+                       style="height: 200px;">
+                    <i class="bi bi-house" style="font-size: 3.5rem; color: #ccc;"></i>
+                  </div>
+                }
+                <span class="floating-badge bg-dark text-white">{{ annuncio.tipoOperazione }}</span>
+                @if (annuncio.inAsta) {
+                  <span class="floating-badge-right bg-warning text-dark">
+                    <i class="bi bi-hammer"></i> Asta
+                  </span>
+                }
+                @if (annuncio.foto && annuncio.foto.length > 1) {
+                  <span class="floating-badge-right bg-dark text-white"
+                        style="top: auto; bottom: 10px; right: 10px;">
+                    <i class="bi bi-images"></i> {{ annuncio.foto.length }}
+                  </span>
+                }
+              </div>
+              <div class="card-body pb-2">
+                <h6 class="fw-bold mb-1">{{ annuncio.titolo }}</h6>
+                <p class="text-muted small mb-2">
+                  <i class="bi bi-geo-alt-fill" style="color: #c0001a;"></i> {{ annuncio.indirizzo }}
+                </p>
+                @if (annuncio.prezzoRibassato) {
+                  <div>
+                    <span class="price-old">€ {{ annuncio.prezzo | number }}</span>
+                    <span class="price-new ms-2">€ {{ annuncio.prezzoRibassato | number }}</span>
+                  </div>
+                } @else {
+                  <span class="price-tag">€ {{ annuncio.prezzo | number }}</span>
+                }
+                <p class="text-muted small mt-1 mb-0">
+                  <i class="bi bi-aspect-ratio"></i> {{ annuncio.metriQuadri }} m²
+                  @if (annuncio.numLocali) {
+                    &nbsp;·&nbsp;<i class="bi bi-door-open"></i> {{ annuncio.numLocali }} locali
+                  }
+                  @if (annuncio.numBagni) {
+                    &nbsp;·&nbsp;<i class="bi bi-droplet"></i> {{ annuncio.numBagni }} bagni
+                  }
+                </p>
+                @if (annuncio.dataInserimento) {
+                  <p class="text-muted small mt-1 mb-0">
+                    <i class="bi bi-calendar"></i> {{ annuncio.dataInserimento | date:'dd/MM/yyyy' }}
+                  </p>
+                }
+              </div>
+              <div class="card-footer border-0 bg-transparent pb-3 pt-1">
+                <a [routerLink]="['/annuncio', annuncio.id]" class="btn w-100 btn-dark-custom btn-sm">
+                  Vedi annuncio
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-5">
+        <i class="bi bi-house-x display-1 text-muted"></i>
+        <p class="mt-3 text-muted">Nessun annuncio trovato</p>
+        <button class="btn btn-outline-dark btn-sm" (click)="resetFiltri()">Mostra tutti</button>
+      </div>
+    }
+  }
+
+  <!-- VISTA LISTA -->
+  @if (!loading && !vistaGriglia) {
+    @if (annunciFiltrati.length > 0) {
+      <div class="d-flex flex-column gap-3 mb-5">
+        @for (annuncio of annunciFiltrati; track annuncio.id) {
+          <div class="card annuncio-card">
+            <div class="row g-0">
+              <div class="col-md-3 img-wrapper" style="border-radius: 10px 0 0 10px; overflow: hidden; position: relative;">
+                @if (annuncio.foto && annuncio.foto.length > 0) {
+                  <div [id]="'carousel-l-' + annuncio.id" class="carousel slide h-100" data-bs-ride="false">
+                    <div class="carousel-inner h-100">
+                      @for (foto of annuncio.foto; track foto; let i = $index) {
+                        <div class="carousel-item h-100" [class.active]="i === 0">
+                          <img [src]="foto"
+                               style="height: 100%; min-height: 160px; width: 100%; object-fit: cover;"
+                               [alt]="annuncio.titolo">
+                        </div>
+                      }
+                    </div>
+                    @if (annuncio.foto.length > 1) {
+                      <button class="carousel-control-prev" type="button"
+                              [attr.data-bs-target]="'#carousel-l-' + annuncio.id"
+                              data-bs-slide="prev"
+                              (click)="$event.stopPropagation()">
+                        <span class="carousel-control-prev-icon"></span>
+                      </button>
+                      <button class="carousel-control-next" type="button"
+                              [attr.data-bs-target]="'#carousel-l-' + annuncio.id"
+                              data-bs-slide="next"
+                              (click)="$event.stopPropagation()">
+                        <span class="carousel-control-next-icon"></span>
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  <div class="d-flex align-items-center justify-content-center bg-light"
+                       style="height: 160px;">
+                    <i class="bi bi-house" style="font-size: 3rem; color: #ccc;"></i>
+                  </div>
+                }
+                <span class="floating-badge bg-dark text-white">{{ annuncio.tipoOperazione }}</span>
+              </div>
+              <div class="col-md-9">
+                <div class="card-body d-flex flex-column h-100 p-3">
+                  <div class="d-flex justify-content-between align-items-start mb-1">
+                    <h6 class="fw-bold mb-0">{{ annuncio.titolo }}</h6>
+                    @if (annuncio.prezzoRibassato) {
+                      <div class="text-end">
+                        <span class="price-old d-block">€ {{ annuncio.prezzo | number }}</span>
+                        <span class="price-new">€ {{ annuncio.prezzoRibassato | number }}</span>
+                      </div>
+                    } @else {
+                      <span class="price-tag">€ {{ annuncio.prezzo | number }}</span>
+                    }
+                  </div>
+                  <p class="text-muted small mb-1">
+                    <i class="bi bi-geo-alt-fill" style="color: #c0001a;"></i> {{ annuncio.indirizzo }}
+                  </p>
+                  <p class="text-muted small mb-1">
+                    <i class="bi bi-aspect-ratio"></i> {{ annuncio.metriQuadri }} m²
+                    @if (annuncio.numLocali) {
+                      &nbsp;·&nbsp;<i class="bi bi-door-open"></i> {{ annuncio.numLocali }} locali
+                    }
+                    @if (annuncio.numBagni) {
+                      &nbsp;·&nbsp;<i class="bi bi-droplet"></i> {{ annuncio.numBagni }} bagni
+                    }
+                  </p>
+                  @if (annuncio.dataInserimento) {
+                    <p class="text-muted small mb-2">
+                      <i class="bi bi-calendar"></i> {{ annuncio.dataInserimento | date:'dd/MM/yyyy' }}
+                    </p>
+                  }
+                  @if (annuncio.inAsta) {
+                    <span class="badge bg-warning text-dark mb-2"
+                          style="width: fit-content; border-radius: 4px; font-size: 0.75rem;">
+                      <i class="bi bi-hammer"></i> In asta
+                    </span>
+                  }
+                  <div class="mt-auto">
+                    <a [routerLink]="['/annuncio', annuncio.id]" class="btn btn-dark-custom btn-sm">
+                      Vedi annuncio
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-5">
+        <i class="bi bi-house-x display-1 text-muted"></i>
+        <p class="mt-3 text-muted">Nessun annuncio trovato</p>
+        <button class="btn btn-outline-dark btn-sm" (click)="resetFiltri()">Mostra tutti</button>
+      </div>
+    }
+  }
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer mt-5 py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h5 class="footer-brand"><i class="bi bi-house-heart-fill"></i> Domus</h5>
+        <p class="small mt-2" style="color: #666;">Portale per annunci di vendita e affitto. Progetto UNICAL 2025/26.</p>
+      </div>
+      <div class="col-md-2">
+        <h6 class="footer-title">Navigazione</h6>
+        <ul class="list-unstyled">
+          <li><a routerLink="/" class="footer-link">Home</a></li>
+          <li><a routerLink="/login" class="footer-link">Accedi</a></li>
+          <li><a routerLink="/registrazione" class="footer-link">Registrati</a></li>
+          <li><a routerLink="/statistiche" class="footer-link">Statistiche</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="footer-title">Categorie</h6>
+        <ul class="list-unstyled">
+          @for (cat of categorie; track cat.id) {
+            <li><a class="footer-link" style="cursor:pointer;" (click)="filtraPerCategoria(cat.id)">{{ cat.nome }}</a></li>
+          }
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="footer-title">Contatti</h6>
+        <p class="small" style="color: #666;"><i class="bi bi-envelope"></i> info&#64;immobiliare.it</p>
+        <p class="small" style="color: #666;"><i class="bi bi-telephone"></i> +39 0984 000000</p>
+        <p class="small" style="color: #666;"><i class="bi bi-geo-alt"></i> Cosenza, Calabria</p>
+      </div>
+    </div>
+    <hr style="border-color: #333; margin: 24px 0;">
+    <div class="text-center small" style="color: #555;">
+      © 2026 Immobiliare — Web Applications UNICAL
+    </div>
+  </div>
+</footer>

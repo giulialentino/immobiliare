@@ -1,0 +1,272 @@
+<div class="container mt-4">
+  <h2><i class="bi bi-shield-lock"></i> Pannello Amministratore</h2>
+
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="sezione === 'messaggi'" (click)="sezione = 'messaggi'">
+        <i class="bi bi-envelope"></i> Messaggi
+        @if (nonLettiAdminCount > 0) {
+          <span class="badge bg-danger ms-1">{{ nonLettiAdminCount }}</span>
+        } @else {
+          <span class="badge bg-secondary ms-1">{{ messaggiAdmin.length }}</span>
+        }
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="sezione === 'approvazioni'" (click)="sezione = 'approvazioni'">
+        <i class="bi bi-check-circle"></i> Approvazioni
+        @if (annunciInAttesa.length > 0) {
+          <span class="badge bg-warning text-dark ms-1">{{ annunciInAttesa.length }}</span>
+        }
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="sezione === 'utenti'" (click)="sezione = 'utenti'">
+        <i class="bi bi-people"></i> Utenti
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="sezione === 'annunci'" (click)="sezione = 'annunci'">
+        <i class="bi bi-house"></i> Annunci
+      </button>
+    </li>
+  </ul>
+
+  <!-- MESSAGGI ADMIN -->
+  @if (sezione === 'messaggi') {
+    <div class="card shadow-sm p-4">
+      <h5 class="fw-bold mb-3">
+        Messaggi ricevuti
+        @if (nonLettiAdminCount > 0) {
+          <span class="badge bg-danger ms-2">{{ nonLettiAdminCount }} non letti</span>
+        }
+      </h5>
+      @if (messaggiAdmin.length > 0) {
+        <div class="d-flex flex-column gap-2">
+          @for (m of messaggiAdmin; track m.id) {
+            <div class="rounded-3 overflow-hidden"
+                 style="border: 1px solid #eee;"
+                 [style.border-left]="!m.letto ? '4px solid #c0001a' : '4px solid #eee'">
+              <div class="p-3 d-flex justify-content-between align-items-center"
+                   [style.background]="m.letto ? '#f8f8f8' : 'white'"
+                   style="cursor: pointer;"
+                   (click)="apriMessaggioAdmin(m)">
+                <div>
+                  @if (!m.letto) {
+                    <span class="badge bg-danger me-2" style="font-size: 0.65rem;">Nuovo</span>
+                  }
+                  <span class="fw-bold small">{{ m.nomeMittente }} {{ m.cognomeMittente }}</span>
+                  <p class="text-muted small mb-0 mt-1">{{ m.oggetto }}</p>
+                </div>
+                <i class="bi text-muted"
+                   [class.bi-chevron-down]="messaggioAdminAperto?.id === m.id"
+                   [class.bi-chevron-right]="messaggioAdminAperto?.id !== m.id"></i>
+              </div>
+              @if (messaggioAdminAperto?.id === m.id) {
+                <div class="p-3 bg-light border-top">
+                  <p class="small mb-3">{{ m.testo }}</p>
+
+                  <!-- RICHIESTA PROMOZIONE -->
+                  @if (m.oggetto.includes('promozione')) {
+  @if (m.statoPromozione === 'APPROVATO') {
+    <span class="badge bg-success p-2">
+      <i class="bi bi-check-circle"></i> Utente già promosso a venditore
+    </span>
+  } @else if (m.statoPromozione === 'RIFIUTATO') {
+    <span class="badge bg-danger p-2">
+      <i class="bi bi-x-circle"></i> Richiesta rifiutata
+    </span>
+  } @else {
+    <div class="d-flex gap-2">
+      <button class="btn btn-success btn-sm" (click)="approvaPromozione(m.idMittente)">
+        <i class="bi bi-person-check"></i> Approva — diventa venditore
+      </button>
+      <button class="btn btn-danger btn-sm" (click)="rifiutaPromozione(m.idMittente)">
+        <i class="bi bi-x-circle"></i> Rifiuta
+      </button>
+    </div>
+  }
+}
+
+                  <!-- RICHIESTA APPROVAZIONE ANNUNCIO -->
+                  @else if (m.idAnnuncio && m.idAnnuncio > 0) {
+                    @if (getStatoAnnuncio(m.idAnnuncio) === 'APPROVATO') {
+                      <span class="badge bg-success p-2">
+                        <i class="bi bi-check-circle"></i> Annuncio già approvato
+                      </span>
+                    } @else if (getStatoAnnuncio(m.idAnnuncio) === 'RIFIUTATO') {
+                      <span class="badge bg-danger p-2">
+                        <i class="bi bi-x-circle"></i> Annuncio rifiutato
+                      </span>
+                    } @else {
+                      <div class="d-flex gap-2">
+                        <button class="btn btn-success btn-sm" (click)="approva(m.idAnnuncio)">
+                          <i class="bi bi-check-circle"></i> Approva annuncio
+                        </button>
+                        <button class="btn btn-danger btn-sm" (click)="rifiuta(m.idAnnuncio)">
+                          <i class="bi bi-x-circle"></i> Rifiuta annuncio
+                        </button>
+                      </div>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="text-center py-4">
+          <i class="bi bi-envelope-x display-4 text-muted"></i>
+          <p class="text-muted mt-2">Nessun messaggio ricevuto</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- APPROVAZIONI -->
+  @if (sezione === 'approvazioni') {
+    @if (annunciInAttesa.length > 0) {
+      <div class="d-flex flex-column gap-3">
+        @for (a of annunciInAttesa; track a.id) {
+          <div class="card shadow-sm p-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+              <div>
+                <h5 class="fw-bold mb-1">{{ a.titolo }}</h5>
+                <p class="text-muted small mb-1">
+                  <i class="bi bi-geo-alt"></i> {{ a.indirizzo }}
+                  &nbsp;·&nbsp; € {{ a.prezzo | number }}
+                  &nbsp;·&nbsp; {{ a.metriQuadri }} m²
+                </p>
+                <span class="badge bg-dark me-2">{{ a.tipoOperazione }}</span>
+                <span class="badge bg-warning text-dark">In attesa</span>
+                @if (a.descrizione) {
+                  <p class="small mt-2 mb-0">{{ a.descrizione }}</p>
+                }
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-success btn-sm" (click)="approva(a.id)">
+                  <i class="bi bi-check-circle"></i> Approva
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="rifiuta(a.id)">
+                  <i class="bi bi-x-circle"></i> Rifiuta
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-5">
+        <i class="bi bi-check-circle display-1 text-success"></i>
+        <p class="mt-3 text-muted fs-5">Nessun annuncio in attesa</p>
+      </div>
+    }
+  }
+
+  <!-- UTENTI -->
+  <!-- UTENTI -->
+@if (sezione === 'utenti') {
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Ruolo</th>
+          <th>Email</th>
+          <th>Stato</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of utenti; track u.id) {
+          <tr [class.table-secondary]="!u.emailVerificata">
+            <td>{{ u.id }}</td>
+            <td>{{ u.nome }} {{ u.cognome }}</td>
+            <td>{{ u.email }}</td>
+            <td><span class="badge bg-secondary">{{ u.ruolo }}</span></td>
+            <td>
+              @if (u.emailVerificata) {
+                <span class="badge bg-success">
+                  <i class="bi bi-check-circle"></i> Verificata
+                </span>
+              } @else {
+                <span class="badge bg-warning text-dark">
+                  <i class="bi bi-clock"></i> Non verificata
+                </span>
+              }
+            </td>
+            <td>
+              @if (u.bannato) {
+                <span class="badge bg-danger">Bannato</span>
+              } @else {
+                <span class="badge bg-success">Attivo</span>
+              }
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                @if (!u.bannato) {
+                  <button class="btn btn-danger btn-sm" (click)="banna(u.id)">
+                    <i class="bi bi-ban"></i> Banna
+                  </button>
+                }
+                @if (u.ruolo !== 'AMMINISTRATORE') {
+                  <button class="btn btn-warning btn-sm" (click)="promuovi(u.id)">
+                    <i class="bi bi-arrow-up-circle"></i> Diventa admin
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+       
+      
+
+  <!-- ANNUNCI -->
+  @if (sezione === 'annunci') {
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Titolo</th>
+            <th>Prezzo</th>
+            <th>Tipo</th>
+            <th>Stato</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of annunci; track a.id) {
+            <tr>
+              <td>{{ a.id }}</td>
+              <td>{{ a.titolo }}</td>
+              <td>€ {{ a.prezzo | number }}</td>
+              <td><span class="badge bg-dark">{{ a.tipoOperazione }}</span></td>
+              <td>
+                @if (a.stato === 'APPROVATO') {
+                  <span class="badge bg-success">Approvato</span>
+                } @else if (a.stato === 'RIFIUTATO') {
+                  <span class="badge bg-danger">Rifiutato</span>
+                } @else {
+                  <span class="badge bg-warning text-dark">In attesa</span>
+                }
+              </td>
+              <td>
+                <button class="btn btn-danger btn-sm" (click)="eliminaAnnuncio(a.id)">
+                  <i class="bi bi-trash"></i> Elimina
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</div>

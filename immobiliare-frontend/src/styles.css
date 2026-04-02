@@ -1,0 +1,283 @@
+@import 'leaflet/dist/leaflet.css';
+
+/* ===== VARIABILI GLOBALI ===== */
+:root {
+  --red: #c0001a;
+  --red-dark: #8b0013;
+  --dark: #1a1a1a;
+}
+
+/* ===== BODY ===== */
+body {
+  background-color: #f7f7f7;
+  color: #1a1a1a;
+}
+
+body.ha-banner {
+  padding-bottom: 60px;
+}
+
+.navbar-brand {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.barra-accesso-testo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.barra-lucchetto {
+  color: #8b1a2b;
+  font-size: 16px;
+}
+
+/* ===== CARDS GLOBALI ===== */
+.card {
+  border-radius: 10px !important;
+  border: 1px solid #e8e8e8 !important;
+  box-shadow: none !important;
+}
+
+/* ===== PULSANTI GLOBALI ===== */
+.btn-dark {
+  background: #1a1a1a;
+  border: none;
+  border-radius: 6px;
+}
+
+.btn-dark:hover {
+  background: #333;
+}
+
+.btn-outline-dark {
+  border-color: #1a1a1a;
+  color: #1a1a1a;
+  border-radius: 6px;
+}
+
+.btn-outline-dark:hover {
+  background: #1a1a1a;
+  color: white;
+}
+
+.btn-danger, .btn-outline-danger {
+  border-radius: 6px;
+}
+
+.btn-warning {
+  border-radius: 6px;
+}
+
+/* ===== BADGE ===== */
+.badge {
+  border-radius: 4px;
+}
+
+/* ===== FORM ===== */
+.form-control, .form-select {
+  border-radius: 6px;
+  border-color: #ddd;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 0.2rem rgba(192,0,26,0.15);
+}
+
+/* ===== TABELLE ===== */
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table thead th {
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+}
+
+/* ===== NAV TABS ===== */
+.nav-tabs .nav-link {
+  border-radius: 6px 6px 0 0;
+  color: #666;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--red);
+  border-bottom-color: white;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--red);
+}
+
+/* ===== ALERT ===== */
+.alert {
+  border-radius: 8px;
+}
+
+/* ===== PAGINA STATISTICHE ===== */
+.kpi-card {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
+}
+
+.kpi-icon { font-size: 2rem; margin-bottom: 8px; }
+
+.kpi-number {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--red);
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
+}
+
+/* ===== PROFILO ===== */
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.benvenuto-card {
+  background: #fff5f5;
+  border: 1px solid #ffd6d6 !important;
+  border-left: 4px solid var(--red) !important;
+}
+
+/* ===== DETTAGLIO ANNUNCIO ===== */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.92);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  font-size: 3rem;
+  padding: 0 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lightbox-nav:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.lightbox-prev { left: -60px; }
+.lightbox-next { right: -60px; }
+
+/* ===== FACEBOOK BTN ===== */
+.btn-facebook {
+  background: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.btn-facebook:hover {
+  background: #1664d8;
+  color: white;
+}
+
+/* ===== MAPPA ===== */
+#mappa {
+  height: 300px;
+  width: 100%;
+  z-index: 1;
+  border-radius: 8px;
+}
+
+/* ===== TOAST ===== */
+.toast-container {
+  position: fixed;
+  bottom: 80px;
+  right: 30px;
+  z-index: 9999;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toast-msg {
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  min-width: 250px;
+}
+
+.toast-success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.toast-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.toast-warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.toast-info { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+
+/* ===== ADMIN ===== */
+.table-dark th {
+  background: #1a1a1a !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+}

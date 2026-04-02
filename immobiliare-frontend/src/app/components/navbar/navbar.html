@@ -1,0 +1,110 @@
+<nav class="navbar-custom">
+  <div class="navbar-inner">
+<a class="brand" routerLink="/">
+  <div class="brand-icon-container">
+    <svg class="brand-icon-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="5,50 47,50 47,10" fill="#1a1a1a"/>
+      <polygon points="95,50 53,50 53,10" fill="#1a1a1a"/>
+      
+      <rect x="47" y="10" width="6" height="40" fill="#c0c0c0"/>
+      
+      <rect x="5" y="50" width="14" height="45" fill="#8b1a2b"/>
+      <rect x="23" y="50" width="14" height="45" fill="#8b1a2b"/>
+      <rect x="41" y="50" width="14" height="45" fill="#8b1a2b"/>
+      <rect x="59" y="50" width="14" height="45" fill="#8b1a2b"/>
+      <rect x="77" y="50" width="14" height="45" fill="#8b1a2b"/>
+    </svg>
+  </div>
+  <span class="brand-name">Domus</span>
+</a>
+      
+
+
+    <!-- Menu desktop -->
+    <div class="nav-links">
+      <a class="nav-link" routerLink="/statistiche">
+        <i class="bi bi-bar-chart-line"></i>
+        <span>Statistiche</span>
+      </a>
+
+      @if (utente) {
+        @if (utente.ruolo === 'VENDITORE') {
+          <a class="nav-link" routerLink="/crea-annuncio">
+            <i class="bi bi-plus-circle"></i>
+            <span>Nuovo annuncio</span>
+          </a>
+        }
+        @if (utente.ruolo === 'AMMINISTRATORE') {
+          <a class="nav-link" routerLink="/admin">
+            <i class="bi bi-shield-lock"></i>
+            <span>Admin</span>
+          </a>
+        }
+
+        <!-- Profilo -->
+        <a class="nav-profilo" routerLink="/profilo">
+          <div class="profilo-avatar">
+            @if (utente.fotoProfilo) {
+              <img [src]="utente.fotoProfilo" alt="foto" />
+            } @else {
+              <i class="bi bi-person-fill"></i>
+            }
+            @if (messaggiCount > 0) {
+              <span class="badge-msg">{{ messaggiCount }}</span>
+            }
+          </div>
+          <div class="profilo-info">
+            <span class="profilo-nome">{{ utente.nome }}</span>
+            <span class="profilo-ruolo">{{ utente.ruolo | lowercase }}</span>
+          </div>
+        </a>
+
+        <button class="btn-logout" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+
+      } @else {
+        <a class="nav-link" routerLink="/login">Accedi</a>
+        <a class="btn-registrati" routerLink="/registrazione">Registrati</a>
+      }
+    </div>
+
+    <!-- Mobile toggle -->
+    <button class="mobile-toggle" (click)="mobileOpen = !mobileOpen">
+      <i [class]="mobileOpen ? 'bi bi-x-lg' : 'bi bi-list'"></i>
+    </button>
+  </div>
+
+  <!-- Menu mobile -->
+  @if (mobileOpen) {
+    <div class="mobile-menu">
+      <a class="mobile-link" routerLink="/statistiche" (click)="mobileOpen = false">
+        <i class="bi bi-bar-chart-line"></i> Statistiche
+      </a>
+      @if (utente) {
+        @if (utente.ruolo === 'VENDITORE') {
+          <a class="mobile-link" routerLink="/crea-annuncio" (click)="mobileOpen = false">
+            <i class="bi bi-plus-circle"></i> Nuovo annuncio
+          </a>
+        }
+        @if (utente.ruolo === 'AMMINISTRATORE') {
+          <a class="mobile-link" routerLink="/admin" (click)="mobileOpen = false">
+            <i class="bi bi-shield-lock"></i> Admin
+          </a>
+        }
+        <a class="mobile-link" routerLink="/profilo" (click)="mobileOpen = false">
+          <i class="bi bi-person-circle"></i> {{ utente.nome }}
+          @if (messaggiCount > 0) {
+            <span class="badge-mobile">{{ messaggiCount }}</span>
+          }
+        </a>
+        <button class="mobile-logout" (click)="logout(); mobileOpen = false">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+      } @else {
+        <a class="mobile-link" routerLink="/login" (click)="mobileOpen = false">Accedi</a>
+        <a class="mobile-link" routerLink="/registrazione" (click)="mobileOpen = false">Registrati</a>
+      }
+    </div>
+  }
+</nav>

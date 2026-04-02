@@ -1,0 +1,21 @@
+<app-navbar></app-navbar>
+@if (showSplash) {
+  <div class="splash-screen">
+    <div class="splash-content">
+      <div class="door-container">
+        <div class="door-frame">
+          <div class="door-left"></div>
+          <div class="door-right"></div>
+          <div class="door-handle-left"></div>
+          <div class="door-handle-right"></div>
+        </div>
+        <div class="splash-logo">
+          <i class="bi bi-house-heart-fill"></i>
+          <span>Immobiliare</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+<router-outlet></router-outlet>
+<app-chatbot></app-chatbot>

@@ -1,0 +1,549 @@
+/* ===== HERO ===== */
+.hero-section {
+  background-image: url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+}
+
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.55);
+  width: 100%;
+  padding: 80px 0;
+}
+
+.hero-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: white;
+  animation: fadeInUp 0.5s ease;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.85);
+  animation: fadeInUp 0.5s ease 0.1s both;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.search-bar {
+  border-radius: 10px !important;
+  border: none !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3) !important;
+}
+
+.btn-search {
+  background: #c0001a;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.btn-search:hover {
+  background: #8b0013;
+  color: white;
+}
+
+/* ===== STATS ===== */
+.stats-section {
+  background: #f7f7f7;
+  border-bottom: 1px solid #eee;
+  border-top: 1px solid #eee;
+  padding: 18px 0;
+}
+
+.stat-number {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #c0001a;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* ===== SECTION TITLES ===== */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: left;
+}
+
+.section-subtitle {
+  color: #888;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.section-line {
+  width: 40px;
+  height: 3px;
+  background: #c0001a;
+  border-radius: 2px;
+  margin: 8px 0;
+}
+
+/* ===== WHY CARDS ===== */
+.why-card {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  border-top: 3px solid #c0001a;
+  transition: all 0.2s ease;
+  height: 100%;
+  padding: 24px;
+}
+
+.why-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+}
+
+.why-icon {
+  width: 44px;
+  height: 44px;
+  background: #fff0f2;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.why-icon i {
+  color: #c0001a;
+  font-size: 1.3rem;
+}
+
+/* ===== CATEGORIE ===== */
+.categoria-card {
+  border-radius: 10px !important;
+  border: 1px solid #eee !important;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: white;
+}
+
+.categoria-card:hover {
+  border-color: #c0001a !important;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(192,0,26,0.08) !important;
+}
+
+.categoria-icon {
+  width: 46px;
+  height: 46px;
+  background: #f7f7f7;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+
+.categoria-icon i {
+  font-size: 1.4rem;
+  color: #1a1a1a;
+}
+
+/* ===== ANNUNCIO CARDS ===== */
+.annuncio-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border-radius: 10px !important;
+  border: 1px solid #e8e8e8 !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  background: white;
+}
+
+.annuncio-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+  border-color: #ccc !important;
+}
+
+.annuncio-card .card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.annuncio-card:hover .card-img-top {
+  transform: scale(1.03);
+}
+
+.img-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.price-tag {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.price-old {
+  font-size: 0.85rem;
+  text-decoration: line-through;
+  color: #bbb;
+}
+
+.price-new {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #c0001a;
+}
+
+.floating-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.floating-badge-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* ===== FEATURED ===== */
+.featured-card {
+  border: 2px solid #c0001a !important;
+}
+
+.badge-nuovo {
+  background: #c0001a;
+  color: white;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* ===== BANNER VENDITORE ===== */
+.banner-venditore {
+  background: #1a1a1a;
+  border-radius: 10px;
+}
+
+/* ===== BTN ===== */
+.btn-dark-custom {
+  background: #1a1a1a;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.btn-dark-custom:hover {
+  background: #333;
+  color: white;
+}
+
+.btn-red {
+  background: #c0001a;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  transition: background 0.2s ease;
+}
+
+.btn-red:hover {
+  background: #8b0013;
+  color: white;
+}
+
+/* ===== FILTRI BAR ===== */
+.filtri-bar {
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 12px 16px;
+  border: 1px solid #eee;
+}
+
+/* ===== SKELETON ===== */
+.skeleton-card {
+  border-radius: 10px !important;
+  border: 1px solid #eee !important;
+  overflow: hidden;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f5f5f5 25%, #ebebeb 50%, #f5f5f5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-img { height: 220px; border-radius: 0; }
+.skeleton-title { height: 16px; width: 75%; }
+.skeleton-text { height: 12px; width: 55%; }
+.skeleton-text-sm { height: 12px; width: 35%; }
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: #1a1a1a;
+  color: #aaa;
+}
+
+.footer-brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white;
+}
+
+.footer-title {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 6px;
+  transition: color 0.2s;
+}
+
+.footer-link:hover { color: #c0001a; }
+
+/* ===== DASHBOARD ===== */
+.dashboard-utente {
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  border-left: 4px solid #c0001a;
+}
+/* ===== ANIMAZIONI HOME ===== */
+
+/* Categorie appaiono una alla volta */
+.categoria-card {
+  animation: fadeInUp 0.4s ease both;
+}
+
+.categoria-card:nth-child(1) { animation-delay: 0.05s; }
+.categoria-card:nth-child(2) { animation-delay: 0.1s; }
+.categoria-card:nth-child(3) { animation-delay: 0.15s; }
+.categoria-card:nth-child(4) { animation-delay: 0.2s; }
+.categoria-card:nth-child(5) { animation-delay: 0.25s; }
+.categoria-card:nth-child(6) { animation-delay: 0.3s; }
+
+/* Annunci appaiono dal basso */
+.annuncio-card {
+  animation: fadeInUp 0.5s ease both;
+}
+
+/* Cards why appaiono */
+.why-card {
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* Pulsante cerca pulsa */
+.btn-search {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-search::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+}
+
+.btn-search:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Pulsanti "Vedi annuncio" con freccia animata */
+.btn-dark-custom {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.btn-dark-custom::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.1);
+  transition: left 0.3s ease;
+}
+
+.btn-dark-custom:hover::before {
+  left: 100%;
+}
+
+.btn-dark-custom:hover {
+  background: #c0001a;
+  transform: translateY(-1px);
+}
+
+/* Pulsante rosso */
+.btn-red {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.btn-red:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(192,0,26,0.3);
+}
+
+/* Stats contatore */
+.stat-number {
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover .stat-number {
+  transform: scale(1.1);
+  display: inline-block;
+}
+
+/* Hero search inputs focus */
+.search-bar .form-select:focus,
+.search-bar .form-control:focus {
+  border-color: #c0001a !important;
+  box-shadow: none !important;
+  background: white !important;
+}
+
+/* Badge hover */
+.floating-badge {
+  transition: transform 0.2s ease;
+}
+
+.img-wrapper:hover .floating-badge {
+  transform: scale(1.05);
+}
+
+/* Featured card glow */
+.featured-card:hover {
+  box-shadow: 0 8px 30px rgba(192,0,26,0.15) !important;
+}
+
+/* Footer links */
+.footer-link {
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.footer-link:hover {
+  padding-left: 6px;
+}
+
+/* Dashboard card */
+.dashboard-utente {
+  transition: box-shadow 0.2s ease;
+}
+
+.dashboard-utente:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
+}
+
+/* Why card icon bounce */
+.why-card:hover .why-icon {
+  animation: bounce 0.4s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Categoria icon rotate */
+.categoria-card:hover .categoria-icon i {
+  animation: wiggle 0.4s ease;
+  color: #c0001a;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+/* Scroll reveal */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.autocomplete-item:hover {
+  background: #f7f7f7;
+  color: #c0001a;
+}
+.autocomplete-selected {
+  background: #f0f0f0;
+  color: #c0001a;
+  font-weight: 600;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero-title { font-size: 1.8rem; }
+  .section-title { font-size: 1.3rem; }
+}

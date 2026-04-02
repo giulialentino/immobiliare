@@ -1,0 +1,7 @@
+@if (toast) {
+  <div class="toast-container">
+    <div class="toast-msg" [class]="'toast-' + toast.tipo">
+      {{ toast.messaggio }}
+    </div>
+  </div>
+}
