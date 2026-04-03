@@ -162,7 +162,9 @@ export class Home implements OnInit, AfterViewInit {
     this.annuncioService.getAll(this.tipoOperazione || undefined, this.idCategoria || undefined).subscribe({
       next: (data: any) => {
         this.annunci = data;
-        this.ultimiAnnunci = [...data].slice(0, 3);
+        this.ultimiAnnunci = [...data].sort((a, b) => 
+  new Date(b.dataInserimento).getTime() - new Date(a.dataInserimento).getTime()
+).slice(0, 3);
         this.applicaFiltri();
         this.loading = false;
         this.cdr.detectChanges();

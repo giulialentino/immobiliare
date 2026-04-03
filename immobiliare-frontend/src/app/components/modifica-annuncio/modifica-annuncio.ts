@@ -201,6 +201,7 @@ export class ModificaAnnuncio implements OnInit {
     this.fotoEsistenti = this.fotoEsistenti.filter(f => f !== url);
   }
 
+  
   salva() {
     this.errore = '';
     if (!this.annuncio.titolo || !this.annuncio.prezzo || !this.annuncio.idCategoria) {
@@ -256,7 +257,14 @@ export class ModificaAnnuncio implements OnInit {
           dopoFoto();
         }
       },
-      error: () => this.errore = 'Errore durante il salvataggio'
+      error: (err: any) => {
+        if (err.error === 'LIMITE_MODIFICHE') {
+          this.errore = 'Hai raggiunto il limite massimo di 10 modifiche per questo annuncio.';
+        } else {
+          this.errore = 'Errore durante il salvataggio';
+        }
+        this.cdr.detectChanges();
+      }
     });
   }
 

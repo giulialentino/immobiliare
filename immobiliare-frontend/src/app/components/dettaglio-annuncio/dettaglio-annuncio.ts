@@ -281,11 +281,18 @@ export class DettaglioAnnuncio implements OnInit {
   }
 
   promuoviSuFacebook() {
-    const url = `http://localhost:4200/annuncio/${this.annuncio.id}`;
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(this.annuncio.titolo + ' - €' + this.annuncio.prezzo)}`;
-    window.open(facebookUrl, '_blank', 'width=600,height=400');
-  }
+  const url = window.location.href;
+  const titolo = this.annuncio.titolo;
+  const prezzo = this.annuncio.prezzo;
+  const indirizzo = this.annuncio.indirizzo;
+  const quote = ` ${titolo} - €${prezzo?.toLocaleString('it-IT')} - ${indirizzo}\nScopri questo annuncio su Domus Italia!`;
   
+  window.open(
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(quote)}`,
+    '_blank',
+    'width=600,height=400'
+  );
+}
 
   
 

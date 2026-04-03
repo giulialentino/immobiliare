@@ -129,13 +129,30 @@ public class AnnuncioController {
                     !esistente.getIdVenditore().equals(utente.getId())) {
                 return ResponseEntity.status(403).body("Non autorizzato");
             }
+
+            // Controllo limite modifiche (solo per venditore, non admin)
+            // Controllo limite modifiche (solo venditore)
+            if (!utente.getRuolo().equals("AMMINISTRATORE") &&
+                    esistente.getNumeroModifiche() != null &&
+                    esistente.getNumeroModifiche() >= 10) {
+                return ResponseEntity.badRequest().body("LIMITE_MODIFICHE");
+            }
+
             annuncio.setId(id);
+            annuncio.setNumeroModifiche(
+                    esistente.getNumeroModifiche() != null ? esistente.getNumeroModifiche() + 1 : 1
+            );
+            annuncio.setIndirizzo(esistente.getIndirizzo());
+            annuncio.setLatitudine(esistente.getLatitudine());
+            annuncio.setLongitudine(esistente.getLongitudine());
+            annuncio.setStato("IN_ATTESA");
             annuncioDao.update(annuncio);
             return ResponseEntity.ok(annuncio);
         } catch (SQLException e) {
             return ResponseEntity.status(500).body("Errore server");
         }
     }
+
 
     // Elimina annuncio
     @DeleteMapping("/{id}")

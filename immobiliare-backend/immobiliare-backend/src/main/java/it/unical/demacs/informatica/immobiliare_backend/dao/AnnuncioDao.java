@@ -43,9 +43,11 @@ public class AnnuncioDao {
         String stato = rs.getString("stato");
         a.setStato(stato);
         if (ts != null) a.setDataInserimento(ts.toLocalDateTime());
+        try { a.setNumeroModifiche(rs.getObject("numero_modifiche") != null ? rs.getInt("numero_modifiche") : 0); } catch (Exception ignored) {}
         try { a.setNumLocali(rs.getObject("num_locali") != null ? rs.getInt("num_locali") : null); } catch (Exception ignored) {}
         try { a.setNumBagni(rs.getObject("num_bagni") != null ? rs.getInt("num_bagni") : null); } catch (Exception ignored) {}
         return a;
+
     }
 
 
@@ -145,7 +147,7 @@ public class AnnuncioDao {
         String sql = "UPDATE annuncio SET titolo=?, descrizione=?, prezzo=?, " +
                 "prezzo_ribassato=?, metri_quadri=?, tipo_operazione=?, " +
                 "indirizzo=?, latitudine=?, longitudine=?, in_asta=?, id_categoria=?, " +
-                "num_locali=?, num_bagni=? WHERE id=?";
+                "num_locali=?, num_bagni=?, numero_modifiche=? WHERE id=?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, a.getTitolo());
@@ -169,10 +171,12 @@ public class AnnuncioDao {
             ps.setLong(11, a.getIdCategoria());
             ps.setObject(12, a.getNumLocali());
             ps.setObject(13, a.getNumBagni());
-            ps.setLong(14, a.getId());
+            ps.setObject(14, a.getNumeroModifiche()); // ← NUOVO
+            ps.setLong(15, a.getId());                // ← era 14, ora 15
             ps.executeUpdate();
         }
     }
+
 
     public void delete(Long id) throws SQLException {
         String sql = "DELETE FROM annuncio WHERE id = ?";

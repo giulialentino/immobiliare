@@ -22,7 +22,10 @@ public class Annuncio {
     private java.time.LocalDateTime dataInserimento;
     private Integer numLocali;
     private Integer numBagni;
+    private Integer numeroModifiche = 0;
 
+    public Integer getNumeroModifiche() { return numeroModifiche; }
+    public void setNumeroModifiche(Integer n) { this.numeroModifiche = n; }
     public Integer getNumLocali() { return numLocali; }
     public void setNumLocali(Integer n) { this.numLocali = n; }
     public Integer getNumBagni() { return numBagni; }
