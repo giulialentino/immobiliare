@@ -46,7 +46,7 @@ export class Home implements OnInit, AfterViewInit {
     private authService: AuthService,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    public modal: ModalService // PUBLIC per l'accesso dall'HTML
+    public modal: ModalService
   ) {}
 
   @HostListener('window:scroll')
@@ -70,7 +70,6 @@ export class Home implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    // Sottoscrizione reattiva: si aggiorna non appena l'utente logga dalla modale
     this.authService.utente$.subscribe({
       next: (u: any) => {
         this.utente = u;
@@ -112,6 +111,7 @@ export class Home implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.forzaVideoPlay();
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -123,6 +123,27 @@ export class Home implements OnInit, AfterViewInit {
     setTimeout(() => {
       document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     }, 300);
+  }
+
+  forzaVideoPlay() {
+    const tentativi = [0, 500, 1000, 2000, 3000];
+    tentativi.forEach(delay => {
+      setTimeout(() => {
+        const video = document.getElementById('heroVideo') as HTMLVideoElement;
+        if (video && video.paused) {
+          video.muted = true;
+          video.play().catch(() => {});
+        }
+      }, delay);
+    });
+  }
+
+  onVideoCanPlay() {
+    const video = document.getElementById('heroVideo') as HTMLVideoElement;
+    if (video) {
+      video.muted = true;
+      video.play().catch(() => {});
+    }
   }
 
   caricaCategorie() {
@@ -167,25 +188,67 @@ export class Home implements OnInit, AfterViewInit {
     this.cdr.detectChanges();
   }
 
+  // ── AUTOCOMPLETE FIX ──
   filtraComuni() {
-    if (this.citta.length < 2) { this.comuniFiltrati = []; return; }
-    this.comuniFiltrati = this.comuni.filter(c => c.toLowerCase().startsWith(this.citta.toLowerCase())).slice(0, 8);
+    if (this.citta.length < 2) {
+      this.comuniFiltrati = [];
+      this.indiceSelezionato = -1;
+      this.cdr.detectChanges();
+      return;
+    }
+    this.comuniFiltrati = this.comuni
+      .filter(c => c.toLowerCase().startsWith(this.citta.toLowerCase()))
+      .slice(0, 8);
+    this.indiceSelezionato = -1;
+    this.cdr.detectChanges();
   }
 
   selezionaComune(c: string) {
     this.citta = c;
     this.comuniFiltrati = [];
+    this.indiceSelezionato = -1;
+    this.cdr.detectChanges();
     this.caricaAnnunci();
   }
 
+  scrollToSelected() {
+    setTimeout(() => {
+      const lista = document.querySelector('.autocomplete-list') as HTMLElement;
+      if (!lista || this.indiceSelezionato < 0) return;
+      const items = lista.querySelectorAll('.autocomplete-item');
+      if (!items || items.length === 0) return;
+      const item = items[this.indiceSelezionato] as HTMLElement;
+      if (!item) return;
+      item.scrollIntoView({ block: 'nearest' });
+    }, 50);
+  }
+
   gestisciTasto(event: KeyboardEvent) {
+    if (this.comuniFiltrati.length === 0) {
+      if (event.key === 'Enter') this.filtra();
+      return;
+    }
     if (event.key === 'ArrowDown') {
+      event.preventDefault();
       this.indiceSelezionato = Math.min(this.indiceSelezionato + 1, this.comuniFiltrati.length - 1);
+      this.cdr.detectChanges();
+      this.scrollToSelected();
     } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
       this.indiceSelezionato = Math.max(this.indiceSelezionato - 1, -1);
+      this.cdr.detectChanges();
+      this.scrollToSelected();
     } else if (event.key === 'Enter') {
-      if (this.indiceSelezionato >= 0) this.citta = this.comuniFiltrati[this.indiceSelezionato];
+      if (this.indiceSelezionato >= 0) {
+        this.citta = this.comuniFiltrati[this.indiceSelezionato];
+        this.comuniFiltrati = [];
+        this.indiceSelezionato = -1;
+      }
       this.filtra();
+    } else if (event.key === 'Escape') {
+      this.comuniFiltrati = [];
+      this.indiceSelezionato = -1;
+      this.cdr.detectChanges();
     }
   }
 

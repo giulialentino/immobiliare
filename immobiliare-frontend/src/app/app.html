@@ -1,21 +1,87 @@
 <app-navbar></app-navbar>
+
 @if (showSplash) {
-  <div class="splash-screen">
+  <div class="splash-screen" [class.splash-exit]="splashExit">
     <div class="splash-content">
-      <div class="door-container">
-        <div class="door-frame">
-          <div class="door-left"></div>
-          <div class="door-right"></div>
-          <div class="door-handle-left"></div>
-          <div class="door-handle-right"></div>
+      <div class="splash-logo-wrapper" [class.ruota]="logoRuota">
+        <svg width="260" height="260" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="circleGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="100%" stop-color="#f4f7f9" />
+            </radialGradient>
+          </defs>
+          <circle cx="150" cy="150" r="140" fill="url(#circleGrad)" />
+          <g id="main-group" transform="translate(150, 150) scale(0.7)">
+            <rect id="b1" x="-85" y="-55" width="120" height="18" fill="#b5001a"/>
+            <rect id="b2" x="-85" y="-33" width="120" height="18" fill="#b5001a"/>
+            <rect id="b3" x="-85" y="-11" width="120" height="18" fill="#b5001a"/>
+            <rect id="b4" x="-85" y="11"  width="120" height="18" fill="#b5001a"/>
+            <rect id="b5" x="-85" y="33"  width="120" height="18" fill="#b5001a"/>
+            <rect id="porta" x="0" y="0" width="0" height="0" fill="#b5001a" stroke="#d1d1d1" stroke-width="0" style="opacity: 0;"/>
+            <g id="finestra" style="opacity: 0;">
+              <rect x="0" y="0" width="26" height="26" fill="#e0e0e0"/>
+              <line x1="13" y1="0" x2="13" y2="26" stroke="#ffffff" stroke-width="1.5"/>
+              <line x1="0" y1="13" x2="26" y2="13" stroke="#ffffff" stroke-width="1.5"/>
+            </g>
+            <rect id="gray1" x="40" y="-33" width="75" height="18" fill="#d1d1d1"/>
+            <rect id="gray2" x="40" y="-11" width="75" height="18" fill="#d1d1d1"/>
+            <polygon id="tri1" points="40,11 80,11 40,55" fill="#111318"/>
+            <polygon id="tri3" points="40,-52 40,-14 80,-14" fill="#111318" style="opacity:0; transform: translateX(-25px);"/>
+          </g>
+        </svg>
+      </div>
+      <div class="splash-title-wrapper" [class.visible]="logoVisible">
+        <h1 class="splash-title">Domus<span>Italia</span></h1>
+        <div class="splash-line"></div>
+        <p class="splash-tagline">Eccellenza Immobiliare</p>
+      </div>
+      <div class="splash-progress-wrapper" [class.visible]="progressVisible">
+        <div class="splash-progress-info">
+          <span>{{ fraseCorrente }}</span>
+          <span>{{ progressione }}%</span>
         </div>
-        <div class="splash-logo">
-          <i class="bi bi-house-heart-fill"></i>
-          <span>Immobiliare</span>
+        <div class="splash-progress-track">
+          <div class="splash-progress-fill" [style.width]="progressione + '%'"></div>
         </div>
       </div>
     </div>
   </div>
 }
-<router-outlet></router-outlet>
-<app-chatbot></app-chatbot>
+
+@if (!showSplash) {
+  <router-outlet></router-outlet>
+  <app-chatbot></app-chatbot>
+
+  @if (!utente) {
+    <div class="barra-accesso-glass">
+      <div class="barra-accesso-testo">
+        <div class="icon-circle">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <span>Accedi per sbloccare tutte le funzionalità</span>
+      </div>
+      <div class="barra-accesso-btn">
+        <button class="btn-glass-accedi" (click)="modal.apriLogin()">Accedi</button>
+        <button class="btn-glass-registrati" (click)="modal.apriRegistrazione()">Registrati</button>
+      </div>
+    </div>
+  }
+}
+
+@if (modal.mostraLogin() || modal.mostraRegistrazione()) {
+  <div class="modal-overlay" (click)="chiudiSuOverlay($event)">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="modal.chiudi()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      @if (modal.mostraLogin()) {
+        <app-login (loginRiuscito)="modal.chiudi()"></app-login>
+      } @else {
+        <app-registrazione (registrazioneRiuscita)="modal.chiudi()"></app-registrazione>
+      }
+    </div>
+  </div>
+}
+
+<app-toast></app-toast>

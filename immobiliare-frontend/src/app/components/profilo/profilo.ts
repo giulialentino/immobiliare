@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth';
 import { AnnuncioService } from '../../services/annuncio';
 import { PreferitoService } from '../../services/preferito';
 import { BadgeService } from '../../services/badge';
+import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-profilo',
@@ -17,6 +18,7 @@ import { BadgeService } from '../../services/badge';
 export class Profilo implements OnInit {
 
   utente: any = null;
+  utenteLoggato: any = null;
   annunci: any[] = [];
   annunciInAttesa: any[] = [];
   annunciRifiutati: any[] = [];
@@ -49,12 +51,14 @@ export class Profilo implements OnInit {
     private router: Router,
     private preferitoService: PreferitoService,
     private cdr: ChangeDetectorRef,
-    private badgeService: BadgeService
+    private badgeService: BadgeService,
+    public modal: ModalService
   ) {}
 
   ngOnInit() {
     this.authService.getUtenteLoggato().subscribe({
       next: (u: any) => {
+        this.utenteLoggato = u;
         this.utente = u;
         this.fotoProfilo = u.fotoProfilo || null;
         const id = this.route.snapshot.paramMap.get('id');
@@ -101,7 +105,7 @@ export class Profilo implements OnInit {
         }
         this.cdr.detectChanges();
       },
-      error: () => { this.utente = null; this.cdr.detectChanges(); }
+      error: () => { this.utenteLoggato = null; this.utente = null; this.cdr.detectChanges(); }
     });
   }
 
@@ -304,6 +308,9 @@ export class Profilo implements OnInit {
       error: (err: any) => console.error(err)
     });
   }
+
+  apriLogin() { this.modal.apriLogin(); }
+  apriRegistrazione() { this.modal.apriRegistrazione(); }
 
   rimuoviFotoProfilo() {
     if (!confirm('Rimuovere la foto profilo?')) return;

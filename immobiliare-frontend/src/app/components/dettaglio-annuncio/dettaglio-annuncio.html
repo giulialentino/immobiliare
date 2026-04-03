@@ -284,13 +284,26 @@
         </div>
 
         <div class="card mb-4">
-          <div class="card-body">
-            <h5><i class="bi bi-person-circle"></i> Il venditore</h5>
-            <a [routerLink]="['/profilo', annuncio.idVenditore]" class="btn btn-outline-dark btn-sm">
-              <i class="bi bi-eye"></i> Vedi profilo venditore
-            </a>
+  <div class="card-body">
+    <h5><i class="bi bi-person-circle"></i> Il venditore</h5>
+    @if (utente) {
+      <a [routerLink]="['/profilo', annuncio.idVenditore]" class="btn btn-outline-dark btn-sm">
+        <i class="bi bi-eye"></i> Vedi profilo venditore
+      </a>
+    } @else {
+      <div class="alert alert-warning d-flex align-items-center gap-3">
+        <i class="bi bi-lock-fill fs-4"></i>
+        <div>
+          <strong>Accedi per visualizzare il profilo del venditore</strong>
+          <div class="mt-2">
+            <button (click)="modal.apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
+            <button (click)="modal.apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
           </div>
         </div>
+      </div>
+    }
+  </div>
+</div>
 
         <div class="card mb-4">
           <div class="card-body">

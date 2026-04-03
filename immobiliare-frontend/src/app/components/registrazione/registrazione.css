@@ -21,44 +21,43 @@
   padding: 48px 40px !important;
 }
 
-
 .reg-title {
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 700;
   color: #111318;
   text-align: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .reg-subtitle {
-  font-size: 14px;
+  font-size: 12px;
   color: #8a919e;
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 }
 
 .reg-divider {
   height: 3px;
-  width: 40px;
+  width: 36px;
   background: #b5001a;
   border-radius: 2px;
-  margin: 0 auto 28px;
+  margin: 0 auto 16px;
 }
 
 .form-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #4a5260;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .form-control, .form-select {
   border-radius: 10px;
   border: 1.5px solid #e8eaed;
-  padding: 11px 16px;
-  font-size: 14px;
+  padding: 8px 14px;
+  font-size: 13px;
   transition: all 0.2s;
   background: #f8f9fb;
 }
@@ -90,17 +89,17 @@
 .requisiti-box {
   background: #f8f9fb;
   border: 1px solid #e8eaed;
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-top: 10px;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 6px;
 }
 
 .requisito {
-  font-size: 12px;
-  padding: 4px 0;
+  font-size: 11px;
+  padding: 2px 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: #8a919e;
   transition: color 0.2s;
 }
@@ -108,18 +107,21 @@
 .requisito.ok { color: #198754; }
 .requisito.no { color: #dc3545; }
 
+.mb-3 { margin-bottom: 0.6rem !important; }
+.mb-4 { margin-bottom: 0.7rem !important; }
+
 .btn-registra {
   background: #111318;
   border: none;
   border-radius: 10px;
-  padding: 14px;
-  font-size: 15px;
+  padding: 11px;
+  font-size: 14px;
   font-weight: 600;
   color: white;
   width: 100%;
   transition: all 0.2s;
   letter-spacing: 0.01em;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .btn-registra:hover:not(:disabled) {
@@ -142,10 +144,10 @@
 .link-login:hover { text-decoration: underline; }
 
 .testo-login {
-  font-size: 14px;
+  font-size: 13px;
   color: #8a919e;
   text-align: center;
-  margin-top: 24px;
+  margin-top: 14px;
   margin-bottom: 0;
 }
 
@@ -163,6 +165,7 @@
   color: #198754;
   margin-bottom: 20px;
 }
+
 /* Reset per uso in modal */
 .login-page, .registrazione-page {
   min-height: unset !important;

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, ApplicationRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ModalService } from '../../services/modal.service';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
@@ -26,7 +26,6 @@ export class Navbar implements OnInit, OnDestroy {
     private annuncioService: AnnuncioService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private appRef: ApplicationRef,
     public modal: ModalService,
     private toast: ToastService,
     private badgeService: BadgeService
@@ -41,12 +40,10 @@ export class Navbar implements OnInit, OnDestroy {
           if (u) {
             this.aggiornaBadge();
           } else {
-            this.utente = null;
             this.messaggiCount = 0;
             this.badgeService.reset();
           }
           this.cdr.detectChanges();
-          this.appRef.tick();
         }
       })
     );
@@ -75,11 +72,10 @@ export class Navbar implements OnInit, OnDestroy {
               this.utente = u;
               if (u) this.aggiornaBadge();
               this.cdr.detectChanges();
-              this.appRef.tick();
             },
             error: () => {}
           });
-        }, 200);
+        }, 300);
       })
     );
   }
