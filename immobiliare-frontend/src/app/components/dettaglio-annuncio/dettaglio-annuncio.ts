@@ -1,9 +1,10 @@
-import { ModalService } from '../../services/modal.service'; // Assicurati che il percorso sia giusto
+import { ModalService } from '../../services/modal.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { AnnuncioService } from '../../services/annuncio';
 import { AuthService } from '../../services/auth';
 import { AstaService } from '../../services/asta';
@@ -39,6 +40,12 @@ export class DettaglioAnnuncio implements OnInit {
   isPreferito = false;
   oggi = new Date();
 
+  // Segnalazione
+  mostraSegnalazione = false;
+  segnalazioneInviata = false;
+  giaSegnalato = false;
+  segnalazione = { categoria: '', motivo: '' };
+
   constructor(
     private route: ActivatedRoute,
     private annuncioService: AnnuncioService,
@@ -49,6 +56,7 @@ export class DettaglioAnnuncio implements OnInit {
     private router: Router,
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
+    private http: HttpClient,
     public modal: ModalService
   ) {}
 
@@ -106,18 +114,18 @@ export class DettaglioAnnuncio implements OnInit {
   }
 
   selezionaFoto(i: number) {
-  this.fotoSelezionata = i;
-  setTimeout(() => {
-    const carousel = document.getElementById('caroselloFoto');
-    if (carousel) {
-      let bootstrapCarousel = (window as any).bootstrap?.Carousel?.getInstance(carousel);
-      if (!bootstrapCarousel) {
-        bootstrapCarousel = new (window as any).bootstrap.Carousel(carousel);
+    this.fotoSelezionata = i;
+    setTimeout(() => {
+      const carousel = document.getElementById('caroselloFoto');
+      if (carousel) {
+        let bootstrapCarousel = (window as any).bootstrap?.Carousel?.getInstance(carousel);
+        if (!bootstrapCarousel) {
+          bootstrapCarousel = new (window as any).bootstrap.Carousel(carousel);
+        }
+        bootstrapCarousel.to(i);
       }
-      bootstrapCarousel.to(i);
-    }
-  }, 50);
-}
+    }, 50);
+  }
 
   eliminaFoto(foto: string, index: number) {
     if (confirm('Eliminare questa foto?')) {
@@ -211,8 +219,6 @@ export class DettaglioAnnuncio implements OnInit {
     });
   }
 
-  
-
   ribassaPrezzo() {
     if (!this.nuovoPrezzo || !this.annuncio) return;
     this.annuncioService.ribassaPrezzo(this.annuncio.id, this.nuovoPrezzo).subscribe({
@@ -280,38 +286,60 @@ export class DettaglioAnnuncio implements OnInit {
     });
   }
 
-  promuoviSuFacebook() {
-  const url = window.location.href;
-  const titolo = this.annuncio.titolo;
-  const prezzo = this.annuncio.prezzo;
-  const indirizzo = this.annuncio.indirizzo;
-  const quote = ` ${titolo} - €${prezzo?.toLocaleString('it-IT')} - ${indirizzo}\nScopri questo annuncio su Domus Italia!`;
-  
-  window.open(
-    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(quote)}`,
-    '_blank',
-    'width=600,height=400'
-  );
-}
-
-  
-
-chiudiAsta() {
-  if (!this.asta) return;
-  if (!confirm('Sei sicuro di voler chiudere l\'asta?')) return;
-  this.astaService.chiudi(this.asta.id).subscribe({
-    next: () => {
-      // Ricarica annuncio e asta completamente
-      this.annuncioService.getById(this.annuncio.id).subscribe({
-        next: (data: any) => {
-          this.annuncio = data;
-          this.asta = null;
-          this.offerte = [];
-          this.cdr.detectChanges();
+  inviaSegnalazione() {
+    if (!this.segnalazione.categoria || !this.segnalazione.motivo) return;
+    const payload = {
+      idAnnuncio: this.annuncio.id,
+      categoria: this.segnalazione.categoria,
+      motivo: this.segnalazione.motivo
+    };
+    this.http.post('http://localhost:8080/api/segnalazioni', payload, {
+      withCredentials: true,
+      responseType: 'text'
+    }).subscribe({
+      next: () => {
+        this.segnalazioneInviata = true;
+        this.mostraSegnalazione = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        if (err.error === 'GIA_SEGNALATO') {
+          this.giaSegnalato = true;
+          this.mostraSegnalazione = false;
         }
-      });
-    },
-    error: (err: any) => console.error(err)
-  });
-}
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  promuoviSuFacebook() {
+    const url = window.location.href;
+    const titolo = this.annuncio.titolo;
+    const prezzo = this.annuncio.prezzo;
+    const indirizzo = this.annuncio.indirizzo;
+    const quote = `${titolo} - €${prezzo?.toLocaleString('it-IT')} - ${indirizzo}\nScopri questo annuncio su Domus Italia!`;
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(quote)}`,
+      '_blank',
+      'width=600,height=400'
+    );
+  }
+
+  chiudiAsta() {
+    if (!this.asta) return;
+    if (!confirm('Sei sicuro di voler chiudere l\'asta?')) return;
+    this.astaService.chiudi(this.asta.id).subscribe({
+      next: () => {
+        this.annuncioService.getById(this.annuncio.id).subscribe({
+          next: (data: any) => {
+            this.annuncio = data;
+            this.asta = null;
+            this.offerte = [];
+            this.cdr.detectChanges();
+          }
+        });
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
 }

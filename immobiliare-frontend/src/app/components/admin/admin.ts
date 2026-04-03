@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { AnnuncioService } from '../../services/annuncio';
 import { BadgeService } from '../../services/badge';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-admin',
@@ -22,13 +23,16 @@ export class Admin implements OnInit {
   messaggioAdminAperto: any = null;
   sezione = 'messaggi';
   approvazioniCount = 0;
+  segnalazioni: any[] = [];
+  segnalazioniInAttesa: any[] = [];
 
   constructor(
     private authService: AuthService,
     private annuncioService: AnnuncioService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private badgeService: BadgeService
+    private badgeService: BadgeService,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -41,6 +45,7 @@ export class Admin implements OnInit {
           this.caricaAnnunci();
           this.caricaInAttesa();
           this.caricaMessaggiAdmin();
+          this.caricaSegnalazioni();
         }
       },
       error: () => this.router.navigate(['/login'])
@@ -130,7 +135,6 @@ export class Admin implements OnInit {
     });
   }
 
-
   banna(id: number) {
     this.authService.banna(id).subscribe({
       next: () => { this.caricaUtenti(); this.cdr.detectChanges(); },
@@ -153,35 +157,59 @@ export class Admin implements OnInit {
     });
   }
 
-approvaPromozione(idUtente: number) {
-  if (!confirm('Sei sicuro di voler promuovere questo utente a venditore?')) return;
-  this.annuncioService.approvaPromozione(idUtente).subscribe({
-    next: () => {
-      const u = this.utenti.find(ut => ut.id === idUtente);
-      if (u) u.ruolo = 'VENDITORE';
-      const m = this.messaggiAdmin.find(msg =>
-        msg.idMittente === idUtente && msg.oggetto.includes('promozione')
-      );
-      if (m) m.statoPromozione = 'APPROVATO';
-      this.messaggioAdminAperto = null;
-      this.cdr.detectChanges();
-    },
-    error: (err: any) => console.error(err)
-  });
-}
+  caricaSegnalazioni() {
+    this.http.get<any[]>('http://localhost:8080/api/segnalazioni', { withCredentials: true }).subscribe({
+      next: (data) => {
+        this.segnalazioni = data;
+        this.segnalazioniInAttesa = data.filter((s: any) => s.stato === 'IN_ATTESA');
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
 
-rifiutaPromozione(idUtente: number) {
-  if (!confirm('Sei sicuro di voler rifiutare questa richiesta?')) return;
-  this.annuncioService.rifiutaPromozione(idUtente).subscribe({
-    next: () => {
-      const m = this.messaggiAdmin.find(msg =>
-        msg.idMittente === idUtente && msg.oggetto.includes('promozione')
-      );
-      if (m) m.statoPromozione = 'RIFIUTATO';
-      this.messaggioAdminAperto = null;
-      this.cdr.detectChanges();
-    },
-    error: (err: any) => console.error(err)
-  });
-}
+  segnaGestita(id: number) {
+    this.http.patch(`http://localhost:8080/api/segnalazioni/${id}/gestita`, {}, { withCredentials: true }).subscribe({
+      next: () => {
+        this.segnalazioni = this.segnalazioni.map(seg =>
+          seg.id === id ? { ...seg, stato: 'GESTITA' } : seg
+        );
+        this.segnalazioniInAttesa = this.segnalazioni.filter((seg: any) => seg.stato === 'IN_ATTESA');
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
+
+  approvaPromozione(idUtente: number) {
+    if (!confirm('Sei sicuro di voler promuovere questo utente a venditore?')) return;
+    this.annuncioService.approvaPromozione(idUtente).subscribe({
+      next: () => {
+        const u = this.utenti.find(ut => ut.id === idUtente);
+        if (u) u.ruolo = 'VENDITORE';
+        const m = this.messaggiAdmin.find(msg =>
+          msg.idMittente === idUtente && msg.oggetto.includes('promozione')
+        );
+        if (m) m.statoPromozione = 'APPROVATO';
+        this.messaggioAdminAperto = null;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
+
+  rifiutaPromozione(idUtente: number) {
+    if (!confirm('Sei sicuro di voler rifiutare questa richiesta?')) return;
+    this.annuncioService.rifiutaPromozione(idUtente).subscribe({
+      next: () => {
+        const m = this.messaggiAdmin.find(msg =>
+          msg.idMittente === idUtente && msg.oggetto.includes('promozione')
+        );
+        if (m) m.statoPromozione = 'RIFIUTATO';
+        this.messaggioAdminAperto = null;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
 }

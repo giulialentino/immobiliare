@@ -86,9 +86,9 @@
               <img [src]="annuncio.foto[fotoSelezionata]" class="lightbox-img" [alt]="annuncio.titolo">
               @if (annuncio.foto.length > 1) {
                 <button class="lightbox-nav lightbox-prev"
-                        (click)="fotoSelezionata = (fotoSelezionata - 1 + annuncio.foto.length) % annuncio.foto.length">‹</button>
+                        (click)="fotoSelezionata = (fotoSelezionata - 1 + annuncio.foto.length) % annuncio.foto.length">&#8249;</button>
                 <button class="lightbox-nav lightbox-next"
-                        (click)="fotoSelezionata = (fotoSelezionata + 1) % annuncio.foto.length">›</button>
+                        (click)="fotoSelezionata = (fotoSelezionata + 1) % annuncio.foto.length">&#8250;</button>
               }
             </div>
           </div>
@@ -139,6 +139,7 @@
           </div>
         }
 
+        <!-- ASTA IN CORSO -->
         @if (asta && asta.attiva) {
           <div class="card mb-4 border-warning">
             <div class="card-body">
@@ -167,8 +168,8 @@
                   <div>
                     <strong>Accedi per partecipare all'asta</strong>
                     <div class="mt-2">
-                      <button (click)="modal.apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
-                      <button (click)="modal.apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
+                      <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
+                      <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
                     </div>
                   </div>
                 </div>
@@ -195,6 +196,7 @@
           </div>
         }
 
+        <!-- CREA ASTA -->
         @if (utente && ((utente.ruolo === 'VENDITORE' && utente.id === annuncio.idVenditore) || utente.ruolo === 'AMMINISTRATORE') && !asta) {
           <div class="card mb-4">
             <div class="card-body">
@@ -252,8 +254,8 @@
                 <div>
                   <strong>Accedi per scrivere una recensione</strong>
                   <div class="mt-2">
-                    <button (click)="modal.apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
-                    <button (click)="modal.apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
+                    <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
+                    <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
                   </div>
                 </div>
               </div>
@@ -284,26 +286,13 @@
         </div>
 
         <div class="card mb-4">
-  <div class="card-body">
-    <h5><i class="bi bi-person-circle"></i> Il venditore</h5>
-    @if (utente) {
-      <a [routerLink]="['/profilo', annuncio.idVenditore]" class="btn btn-outline-dark btn-sm">
-        <i class="bi bi-eye"></i> Vedi profilo venditore
-      </a>
-    } @else {
-      <div class="alert alert-warning d-flex align-items-center gap-3">
-        <i class="bi bi-lock-fill fs-4"></i>
-        <div>
-          <strong>Accedi per visualizzare il profilo del venditore</strong>
-          <div class="mt-2">
-            <button (click)="modal.apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
-            <button (click)="modal.apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
+          <div class="card-body">
+            <h5><i class="bi bi-person-circle"></i> Il venditore</h5>
+            <a [routerLink]="['/profilo', annuncio.idVenditore]" class="btn btn-outline-dark btn-sm">
+              <i class="bi bi-eye"></i> Vedi profilo venditore
+            </a>
           </div>
         </div>
-      </div>
-    }
-  </div>
-</div>
 
         <div class="card mb-4">
           <div class="card-body">
@@ -330,14 +319,64 @@
                 <div>
                   <strong>Accedi per contattare il venditore</strong>
                   <div class="mt-2">
-                    <button (click)="modal.apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
-                    <button (click)="modal.apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
+                    <a routerLink="/login" class="btn btn-dark btn-sm me-2">Accedi</a>
+                    <a routerLink="/registrazione" class="btn btn-outline-dark btn-sm">Registrati</a>
                   </div>
                 </div>
               </div>
             }
           </div>
         </div>
+
+        <!-- SEGNALA ANNUNCIO -->
+@if (utente && (utente.ruolo === 'ACQUIRENTE' || (utente.ruolo === 'VENDITORE' && utente.id !== annuncio.idVenditore))) {          <div class="card mb-4">
+            <div class="card-body">
+              <h5><i class="bi bi-flag"></i> Segnala annuncio</h5>
+              @if (segnalazioneInviata) {
+                <div class="alert alert-success py-2">
+                  <i class="bi bi-check-circle"></i> Segnalazione inviata! L'admin la esaminerà presto.
+                </div>
+              } @else if (giaSegnalato) {
+                <div class="alert alert-warning py-2">
+                  <i class="bi bi-exclamation-triangle"></i> Hai già segnalato questo annuncio.
+                </div>
+              } @else {
+                @if (!mostraSegnalazione) {
+                  <button class="btn btn-outline-danger btn-sm" (click)="mostraSegnalazione = true">
+                    <i class="bi bi-flag"></i> Segnala questo annuncio
+                  </button>
+                } @else {
+                  <div class="mb-2">
+                    <label class="form-label">Categoria</label>
+                    <select class="form-select form-select-sm" [(ngModel)]="segnalazione.categoria">
+                      <option value="">Seleziona...</option>
+                      <option value="CONTENUTO_FALSO">Contenuto falso</option>
+                      <option value="TRUFFA">Possibile truffa</option>
+                      <option value="FOTO_NON_REALI">Foto non reali</option>
+                      <option value="PREZZO_ERRATO">Prezzo errato</option>
+                      <option value="ALTRO">Altro</option>
+                    </select>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label">Motivo</label>
+                    <textarea class="form-control form-control-sm" [(ngModel)]="segnalazione.motivo"
+                              rows="2" placeholder="Descrivi il problema..."></textarea>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-danger btn-sm"
+                            [disabled]="!segnalazione.categoria || !segnalazione.motivo"
+                            (click)="inviaSegnalazione()">
+                      <i class="bi bi-send"></i> Invia segnalazione
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" (click)="mostraSegnalazione = false">
+                      Annulla
+                    </button>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        }
 
         <div class="card mb-4">
           <div class="card-body">
