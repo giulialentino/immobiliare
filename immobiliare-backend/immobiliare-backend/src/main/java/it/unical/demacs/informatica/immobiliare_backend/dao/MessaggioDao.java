@@ -17,7 +17,6 @@ public class MessaggioDao {
     private boolean perAdmin;
     public boolean isPerAdmin() { return perAdmin; }
     public void setPerAdmin(boolean b) { this.perAdmin = b; }
-    // già presente — verifica che ci sia
     private Long idMittente;
     public Long getIdMittente() { return idMittente; }
     public void setIdMittente(Long idMittente) { this.idMittente = idMittente; }
@@ -25,7 +24,7 @@ public class MessaggioDao {
     private Messaggio mapRow(ResultSet rs) throws SQLException {
         Messaggio m = new Messaggio();
         m.setId(rs.getLong("id"));
-        m.setIdAnnuncio(rs.getLong("id_annuncio"));
+        try { m.setIdAnnuncio(rs.getLong("id_annuncio")); } catch (Exception ignored) {}
         m.setIdMittente(rs.getLong("id_mittente"));
         m.setOggetto(rs.getString("oggetto"));
         m.setTesto(rs.getString("testo"));
@@ -118,7 +117,11 @@ public class MessaggioDao {
         String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo) VALUES (?, ?, ?, ?) RETURNING id";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, m.getIdAnnuncio());
+            if (m.getIdAnnuncio() == null || m.getIdAnnuncio() == 0) {
+                ps.setNull(1, java.sql.Types.BIGINT);
+            } else {
+                ps.setLong(1, m.getIdAnnuncio());
+            }
             ps.setLong(2, m.getIdMittente());
             ps.setString(3, m.getOggetto());
             ps.setString(4, m.getTesto());
@@ -144,6 +147,8 @@ public class MessaggioDao {
             ps.executeUpdate();
         }
     }
+
+
 
     public int countMessaggi(Long idVenditore) throws SQLException {
         String sql = "SELECT COUNT(*) FROM messaggio m " +
@@ -216,21 +221,23 @@ public class MessaggioDao {
             ps.executeUpdate();
         }
     }
+
     public void savePerVenditore(Messaggio m, Long idVenditore) throws SQLException {
-            String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo) VALUES (?, ?, ?, ?)";
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-                if (m.getIdAnnuncio() == null || m.getIdAnnuncio() == 0) {
-                    ps.setNull(1, java.sql.Types.BIGINT);
-                } else {
-                    ps.setLong(1, m.getIdAnnuncio());
-                }
-                ps.setLong(2, m.getIdMittente());
-                ps.setString(3, m.getOggetto());
-                ps.setString(4, m.getTesto());
-                ps.executeUpdate();
+        String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo) VALUES (?, ?, ?, ?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (m.getIdAnnuncio() == null || m.getIdAnnuncio() == 0) {
+                ps.setNull(1, java.sql.Types.BIGINT);
+            } else {
+                ps.setLong(1, m.getIdAnnuncio());
             }
+            ps.setLong(2, m.getIdMittente());
+            ps.setString(3, m.getOggetto());
+            ps.setString(4, m.getTesto());
+            ps.executeUpdate();
         }
+    }
+
     public void saveNotificaUtente(Messaggio m, Long idDestinatario) throws SQLException {
         String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo) VALUES (?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();

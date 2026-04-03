@@ -184,4 +184,19 @@ getStatoPromozione(): Observable<string> {
     { withCredentials: true, responseType: 'text' }
   );
 }
+
+segnaGestita(id: number): Observable<any> {
+  return this.http.patch(
+    `http://localhost:8080/api/segnalazioni/${id}/gestita`,
+    {},
+    { withCredentials: true, responseType: 'text' }
+  );
+}
+
+getSegnalazioni(): Observable<any[]> {
+  return this.http.get<any[]>(
+    'http://localhost:8080/api/segnalazioni',
+    { withCredentials: true }
+  );
+}
 }

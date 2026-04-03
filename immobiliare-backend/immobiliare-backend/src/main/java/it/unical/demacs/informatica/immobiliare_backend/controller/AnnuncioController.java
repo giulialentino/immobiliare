@@ -132,7 +132,9 @@ public class AnnuncioController {
 
             // Controllo limite modifiche (solo per venditore, non admin)
             // Controllo limite modifiche (solo venditore)
+            // Controllo limite modifiche (solo per venditore, non admin, solo se APPROVATO)
             if (!utente.getRuolo().equals("AMMINISTRATORE") &&
+                    "APPROVATO".equals(esistente.getStato()) &&
                     esistente.getNumeroModifiche() != null &&
                     esistente.getNumeroModifiche() >= 10) {
                 return ResponseEntity.badRequest().body("LIMITE_MODIFICHE");

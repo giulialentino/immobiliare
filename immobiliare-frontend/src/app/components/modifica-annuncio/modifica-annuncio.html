@@ -7,8 +7,6 @@
             <i class="bi bi-pencil"></i> Modifica annuncio
           </h3>
 
-
-
           @if (annuncio.dataInserimento) {
             <div class="alert alert-light border mb-3 py-2">
               <i class="bi bi-calendar"></i> Pubblicato il:
@@ -16,13 +14,21 @@
             </div>
           }
 
-          <!-- TITOLO -->
+          @if (annuncio.stato === 'APPROVATO' && annuncio.numeroModifiche >= 8) {
+            <div class="alert alert-warning py-2 mb-3">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              Hai usato <strong>{{ annuncio.numeroModifiche }}/10</strong> modifiche disponibili.
+              @if (annuncio.numeroModifiche >= 10) {
+                <strong class="text-danger"> — Limite raggiunto!</strong>
+              }
+            </div>
+          }
+
           <div class="mb-3">
             <label class="form-label">Titolo *</label>
             <input type="text" class="form-control" [(ngModel)]="annuncio.titolo">
           </div>
 
-          <!-- DESCRIZIONE -->
           <div class="mb-3">
             <label class="form-label">Descrizione</label>
             <textarea class="form-control" [(ngModel)]="annuncio.descrizione" rows="4"
@@ -38,7 +44,6 @@
             </button>
           </div>
 
-          <!-- PREZZO E MQ -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label class="form-label">Prezzo (€) *</label>
@@ -50,7 +55,6 @@
             </div>
           </div>
 
-          <!-- LOCALI E BAGNI -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label class="form-label">Numero locali</label>
@@ -64,7 +68,6 @@
             </div>
           </div>
 
-          <!-- TIPO OPERAZIONE E CATEGORIA -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label class="form-label">Tipo operazione</label>
@@ -84,80 +87,137 @@
             </div>
           </div>
 
-          <!-- CITTÀ - BLOCCATA -->
+          <!-- CITTÀ -->
           <div class="mb-3 autocomplete-wrapper" style="position: relative;">
             <label class="form-label d-flex align-items-center gap-2">
               Città *
-              <span class="badge bg-danger text-white" style="font-size:10px;">
-                <i class="bi bi-lock-fill"></i> Bloccato
-              </span>
+              @if (annuncio.stato === 'APPROVATO') {
+                <span class="badge bg-danger text-white" style="font-size:10px;">
+                  <i class="bi bi-lock-fill"></i> Bloccato
+                </span>
+              }
             </label>
-            <input type="text" class="form-control"
-                   [(ngModel)]="cittaInput"
-                   autocomplete="off"
-                   disabled
-                   style="background:#fff5f5; border-color:#dc3545; cursor:not-allowed;">
-            <div class="form-text text-danger">
-              <i class="bi bi-exclamation-triangle-fill"></i> Questo campo non può essere modificato dopo la pubblicazione
+            <div class="input-group">
+              <input type="text" class="form-control"
+                     [(ngModel)]="cittaInput"
+                     placeholder="Scrivi il nome del comune..."
+                     [disabled]="annuncio.stato === 'APPROVATO'"
+                     [style.background]="annuncio.stato === 'APPROVATO' ? '#fff5f5' : ''"
+                     [style.border-color]="annuncio.stato === 'APPROVATO' ? '#dc3545' : ''"
+                     [style.cursor]="annuncio.stato === 'APPROVATO' ? 'not-allowed' : 'auto'"
+                     (input)="filtraComuni()"
+                     (keydown)="gestisciTasto($event)"
+                     autocomplete="off">
+              @if (cittaInput && annuncio.stato !== 'APPROVATO') {
+                <button class="btn btn-outline-secondary" type="button"
+                        (click)="cittaInput = ''; comuniFiltrati = []; via = ''">
+                  <i class="bi bi-x"></i>
+                </button>
+              }
             </div>
+            @if (comuniFiltrati.length > 0 && cittaInput.length > 1) {
+              <div class="autocomplete-list">
+                @for (c of comuniFiltrati; track c; let i = $index) {
+                  <div class="autocomplete-item"
+                       [class.autocomplete-selected]="i === indiceSelezionato"
+                       (click)="selezionaComune(c)">{{ c }}</div>
+                }
+              </div>
+            }
+            @if (annuncio.stato === 'APPROVATO') {
+              <div class="form-text text-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i> Questo campo non può essere modificato dopo la pubblicazione
+              </div>
+            }
           </div>
 
-          <!-- VIA - BLOCCATA -->
+          <!-- VIA -->
           <div class="mb-3">
             <label class="form-label d-flex align-items-center gap-2">
               Via / Indirizzo
-              <span class="badge bg-danger text-white" style="font-size:10px;">
-                <i class="bi bi-lock-fill"></i> Bloccato
-              </span>
+              @if (annuncio.stato === 'APPROVATO') {
+                <span class="badge bg-danger text-white" style="font-size:10px;">
+                  <i class="bi bi-lock-fill"></i> Bloccato
+                </span>
+              }
             </label>
             <div class="input-group">
               @if (cittaInput) {
                 <span class="input-group-text fw-bold text-dark"
-                      style="background:#fff5f5; border-color:#dc3545;">
+                      [style.background]="annuncio.stato === 'APPROVATO' ? '#fff5f5' : '#f8f9fa'"
+                      [style.border-color]="annuncio.stato === 'APPROVATO' ? '#dc3545' : ''">
                   {{ cittaInput }},
                 </span>
               }
               <input type="text" class="form-control"
                      [(ngModel)]="via"
-                     disabled
-                     style="background:#fff5f5; border-color:#dc3545; cursor:not-allowed;">
+                     placeholder="Via Roma 5"
+                     [disabled]="annuncio.stato === 'APPROVATO'"
+                     [style.background]="annuncio.stato === 'APPROVATO' ? '#fff5f5' : ''"
+                     [style.border-color]="annuncio.stato === 'APPROVATO' ? '#dc3545' : ''"
+                     [style.cursor]="annuncio.stato === 'APPROVATO' ? 'not-allowed' : 'auto'">
             </div>
-            <div class="form-text text-danger">
-              <i class="bi bi-exclamation-triangle-fill"></i> Questo campo non può essere modificato dopo la pubblicazione
-            </div>
+            @if (annuncio.stato === 'APPROVATO') {
+              <div class="form-text text-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i> Questo campo non può essere modificato dopo la pubblicazione
+              </div>
+            } @else if (cittaInput && via) {
+              <div class="form-text text-success mt-1">
+                <i class="bi bi-check-circle"></i> Indirizzo completo:
+                <strong>{{ cittaInput }}, {{ via }}</strong>
+              </div>
+            } @else if (cittaInput) {
+              <div class="form-text text-muted">
+                Aggiungi via e numero civico (opzionale)
+              </div>
+            }
           </div>
 
-          <!-- LATITUDINE E LONGITUDINE - BLOCCATE -->
+          <!-- LATITUDINE E LONGITUDINE -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label class="form-label d-flex align-items-center gap-2">
                 Latitudine
-                <span class="badge bg-danger text-white" style="font-size:10px;">
-                  <i class="bi bi-lock-fill"></i> Bloccato
-                </span>
+                @if (annuncio.stato === 'APPROVATO') {
+                  <span class="badge bg-danger text-white" style="font-size:10px;">
+                    <i class="bi bi-lock-fill"></i> Bloccato
+                  </span>
+                }
               </label>
               <input type="number" class="form-control"
                      [(ngModel)]="annuncio.latitudine"
-                     step="0.0001" disabled
-                     style="background:#fff5f5; border-color:#dc3545; cursor:not-allowed;">
-              <div class="form-text text-danger">
-                <i class="bi bi-exclamation-triangle-fill"></i> Non modificabile dopo la pubblicazione
-              </div>
+                     step="0.0001"
+                     [disabled]="annuncio.stato === 'APPROVATO'"
+                     [style.background]="annuncio.stato === 'APPROVATO' ? '#fff5f5' : ''"
+                     [style.border-color]="annuncio.stato === 'APPROVATO' ? '#dc3545' : ''"
+                     [style.cursor]="annuncio.stato === 'APPROVATO' ? 'not-allowed' : 'auto'">
+              @if (annuncio.stato === 'APPROVATO') {
+                <div class="form-text text-danger">
+                  <i class="bi bi-exclamation-triangle-fill"></i> Non modificabile dopo la pubblicazione
+                </div>
+              }
             </div>
             <div class="col-md-6">
               <label class="form-label d-flex align-items-center gap-2">
                 Longitudine
-                <span class="badge bg-danger text-white" style="font-size:10px;">
-                  <i class="bi bi-lock-fill"></i> Bloccato
-                </span>
+                @if (annuncio.stato === 'APPROVATO') {
+                  <span class="badge bg-danger text-white" style="font-size:10px;">
+                    <i class="bi bi-lock-fill"></i> Bloccato
+                  </span>
+                }
               </label>
               <input type="number" class="form-control"
                      [(ngModel)]="annuncio.longitudine"
-                     step="0.0001" disabled
-                     style="background:#fff5f5; border-color:#dc3545; cursor:not-allowed;">
-              <div class="form-text text-danger">
-                <i class="bi bi-exclamation-triangle-fill"></i> Non modificabile dopo la pubblicazione
-              </div>
+                     step="0.0001"
+                     [disabled]="annuncio.stato === 'APPROVATO'"
+                     [style.background]="annuncio.stato === 'APPROVATO' ? '#fff5f5' : ''"
+                     [style.border-color]="annuncio.stato === 'APPROVATO' ? '#dc3545' : ''"
+                     [style.cursor]="annuncio.stato === 'APPROVATO' ? 'not-allowed' : 'auto'">
+              @if (annuncio.stato === 'APPROVATO') {
+                <div class="form-text text-danger">
+                  <i class="bi bi-exclamation-triangle-fill"></i> Non modificabile dopo la pubblicazione
+                </div>
+              }
             </div>
           </div>
 

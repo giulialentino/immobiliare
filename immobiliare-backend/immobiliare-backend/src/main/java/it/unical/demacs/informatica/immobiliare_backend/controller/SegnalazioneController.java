@@ -28,7 +28,18 @@ public class SegnalazioneController {
     @Autowired
     private AnnuncioDao annuncioDao;
 
-    // Invia una segnalazione
+    @GetMapping("/check/{idAnnuncio}")
+    public ResponseEntity<?> check(@PathVariable Long idAnnuncio, HttpSession session) {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null) return ResponseEntity.ok("false");
+        try {
+            boolean esiste = segnalazioneDao.esisteSegnalazione(idAnnuncio, utente.getId());
+            return ResponseEntity.ok(String.valueOf(esiste));
+        } catch (SQLException e) {
+            return ResponseEntity.ok("false");
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> segnala(@RequestBody Segnalazione segnalazione,
                                      HttpSession session) {
@@ -36,7 +47,6 @@ public class SegnalazioneController {
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
 
         try {
-            // Controlla se ha già segnalato questo annuncio
             if (segnalazioneDao.esisteSegnalazione(segnalazione.getIdAnnuncio(), utente.getId())) {
                 return ResponseEntity.badRequest().body("GIA_SEGNALATO");
             }
@@ -44,29 +54,18 @@ public class SegnalazioneController {
             segnalazione.setIdSegnalante(utente.getId());
             segnalazioneDao.save(segnalazione);
 
-            // Invia notifica all'admin come messaggio (stesso meccanismo degli annunci)
             Annuncio annuncio = annuncioDao.findById(segnalazione.getIdAnnuncio());
-            Messaggio msg = new Messaggio();
-            msg.setIdAnnuncio(segnalazione.getIdAnnuncio());
-            msg.setIdMittente(utente.getId());
-            msg.setOggetto("⚠️ Segnalazione annuncio");
-            msg.setTesto("L'utente " + utente.getNome() + " " + utente.getCognome() +
+
+            // Solo messaggio all'admin, nessuna conferma all'acquirente
+            Messaggio msgAdmin = new Messaggio();
+            msgAdmin.setIdAnnuncio(segnalazione.getIdAnnuncio());
+            msgAdmin.setIdMittente(utente.getId());
+            msgAdmin.setOggetto("⚠️ Segnalazione annuncio");
+            msgAdmin.setTesto("L'utente " + utente.getNome() + " " + utente.getCognome() +
                     " ha segnalato l'annuncio: \"" + (annuncio != null ? annuncio.getTitolo() : "#" + segnalazione.getIdAnnuncio()) + "\"." +
                     "\n\nCategoria: " + segnalazione.getCategoria() +
                     "\nMotivo: " + segnalazione.getMotivo());
-            messaggioDao.savePerAdmin(msg);
-
-            // Manda conferma all'acquirente nei suoi messaggi inviati
-            Messaggio conferma = new Messaggio();
-            conferma.setIdAnnuncio(segnalazione.getIdAnnuncio());
-            conferma.setIdMittente(utente.getId());
-            conferma.setOggetto("✅ Segnalazione inviata");
-            conferma.setTesto("Hai segnalato l'annuncio: \"" +
-                    (annuncio != null ? annuncio.getTitolo() : "#" + segnalazione.getIdAnnuncio()) + "\"." +
-                    "\nCategoria: " + segnalazione.getCategoria() +
-                    "\nMotivo: " + segnalazione.getMotivo() +
-                    "\n\nL'amministratore esaminerà la segnalazione al più presto.");
-            messaggioDao.savePerVenditore(conferma, utente.getId());
+            messaggioDao.savePerAdmin(msgAdmin);
 
             return ResponseEntity.ok("Segnalazione inviata");
         } catch (SQLException e) {
@@ -74,7 +73,6 @@ public class SegnalazioneController {
         }
     }
 
-    // Lista segnalazioni (solo admin)
     @GetMapping
     public ResponseEntity<?> getAll(HttpSession session) {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
@@ -87,7 +85,6 @@ public class SegnalazioneController {
         }
     }
 
-    // Segna come gestita (solo admin)
     @PatchMapping("/{id}/gestita")
     public ResponseEntity<?> segnaGestita(@PathVariable Long id, HttpSession session) {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");

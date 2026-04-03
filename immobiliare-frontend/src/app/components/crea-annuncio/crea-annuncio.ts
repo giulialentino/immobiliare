@@ -158,20 +158,30 @@ export class CreaAnnuncio implements OnInit {
   }
 
   onFileSelected(event: any) {
-    const files: File[] = Array.from(event.target.files);
-    const nonValidi = files.filter(f => {
-      const ext = f.name.toLowerCase().split('.').pop();
-      return !['jpg', 'jpeg', 'png'].includes(ext || '');
-    });
-    if (nonValidi.length > 0) {
-      this.errore = 'Sono accettati solo file JPG, PNG, JPEG';
-      event.target.value = '';
-      this.fileFoto = [];
-      return;
-    }
-    this.errore = '';
-    this.fileFoto = files;
+  const files: File[] = Array.from(event.target.files);
+  
+  const nonValidi = files.filter(f => {
+    const ext = f.name.toLowerCase().split('.').pop();
+    return !['jpg', 'jpeg', 'png'].includes(ext || '');
+  });
+  if (nonValidi.length > 0) {
+    this.errore = 'Sono accettati solo file JPG, PNG, JPEG';
+    event.target.value = '';
+    this.fileFoto = [];
+    return;
   }
+
+  const troppoGrosse = files.filter(f => f.size > 5 * 1024 * 1024);
+  if (troppoGrosse.length > 0) {
+    this.errore = `Alcune foto superano il limite di 5MB: ${troppoGrosse.map(f => f.name).join(', ')}`;
+    event.target.value = '';
+    this.fileFoto = [];
+    return;
+  }
+
+  this.errore = '';
+  this.fileFoto = files;
+}
 
   salva() {
     this.errore = '';

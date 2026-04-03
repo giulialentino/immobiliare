@@ -61,15 +61,24 @@ export class DettaglioAnnuncio implements OnInit {
   ) {}
 
   ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+
     this.authService.getUtenteLoggato().subscribe({
       next: (u: any) => {
         this.utente = u;
+        if (u && id) {
+          this.http.get(`http://localhost:8080/api/segnalazioni/check/${id}`,
+            { withCredentials: true, responseType: 'text' }
+          ).subscribe({
+            next: (res) => { this.giaSegnalato = res === 'true'; this.cdr.detectChanges(); },
+            error: () => this.giaSegnalato = false
+          });
+        }
         this.cdr.detectChanges();
       },
       error: () => this.utente = null
     });
 
-    const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.annuncioService.getById(+id).subscribe({
         next: (data: any) => {
@@ -299,8 +308,10 @@ export class DettaglioAnnuncio implements OnInit {
     }).subscribe({
       next: () => {
         this.segnalazioneInviata = true;
+        this.giaSegnalato = true;        // ← blocca subito eventuali re-invii
         this.mostraSegnalazione = false;
         this.cdr.detectChanges();
+        // rimosso il setTimeout — il messaggio verde rimane visibile
       },
       error: (err: any) => {
         if (err.error === 'GIA_SEGNALATO') {
@@ -311,13 +322,12 @@ export class DettaglioAnnuncio implements OnInit {
       }
     });
   }
+      
+    
 
   promuoviSuFacebook() {
     const url = window.location.href;
-    const titolo = this.annuncio.titolo;
-    const prezzo = this.annuncio.prezzo;
-    const indirizzo = this.annuncio.indirizzo;
-    const quote = `${titolo} - €${prezzo?.toLocaleString('it-IT')} - ${indirizzo}\nScopri questo annuncio su Domus Italia!`;
+    const quote = `${this.annuncio.titolo} - €${this.annuncio.prezzo?.toLocaleString('it-IT')} - ${this.annuncio.indirizzo}\nScopri questo annuncio su Domus Italia!`;
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(quote)}`,
       '_blank',

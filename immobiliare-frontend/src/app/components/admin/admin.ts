@@ -1,16 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { AnnuncioService } from '../../services/annuncio';
 import { BadgeService } from '../../services/badge';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })
@@ -30,9 +29,9 @@ export class Admin implements OnInit {
     private authService: AuthService,
     private annuncioService: AnnuncioService,
     private router: Router,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private badgeService: BadgeService,
-    private http: HttpClient
+    private badgeService: BadgeService
   ) {}
 
   ngOnInit() {
@@ -46,6 +45,9 @@ export class Admin implements OnInit {
           this.caricaInAttesa();
           this.caricaMessaggiAdmin();
           this.caricaSegnalazioni();
+          this.route.queryParams.subscribe(params => {
+            if (params['sezione']) this.sezione = params['sezione'];
+          });
         }
       },
       error: () => this.router.navigate(['/login'])
@@ -85,6 +87,17 @@ export class Admin implements OnInit {
     });
   }
 
+  caricaSegnalazioni() {
+    this.annuncioService.getSegnalazioni().subscribe({
+      next: (data) => {
+        this.segnalazioni = data;
+        this.segnalazioniInAttesa = data.filter((s: any) => s.stato === 'IN_ATTESA');
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
+
   apriMessaggioAdmin(m: any) {
     this.messaggioAdminAperto = this.messaggioAdminAperto?.id === m.id ? null : m;
     if (!m.letto) {
@@ -105,6 +118,13 @@ export class Admin implements OnInit {
     const tuttiAnnunci = [...this.annunci, ...this.annunciInAttesa];
     const a = tuttiAnnunci.find(ann => ann.id === idAnnuncio);
     return a ? a.stato : 'IN_ATTESA';
+  }
+
+  getStatoSegnalazione(idAnnuncio: number, idMittente: number): string {
+    const s = this.segnalazioni.find(seg =>
+      seg.idAnnuncio === idAnnuncio && seg.idSegnalante === idMittente
+    );
+    return s ? s.stato : 'IN_ATTESA';
   }
 
   approva(idAnnuncio: number) {
@@ -135,6 +155,25 @@ export class Admin implements OnInit {
     });
   }
 
+  segnaGestita(id: number) {
+    this.annuncioService.segnaGestita(id).subscribe({
+      next: () => {
+        this.segnalazioniInAttesa = this.segnalazioniInAttesa.filter(s => s.id !== id);
+        const s = this.segnalazioni.find(seg => seg.id === id);
+        if (s) s.stato = 'GESTITA';
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
+
+  segnaGestitaDaMessaggio(idAnnuncio: number, idMittente: number) {
+    const s = this.segnalazioni.find(seg =>
+      seg.idAnnuncio === idAnnuncio && seg.idSegnalante === idMittente
+    );
+    if (s) this.segnaGestita(s.id);
+  }
+
   banna(id: number) {
     this.authService.banna(id).subscribe({
       next: () => { this.caricaUtenti(); this.cdr.detectChanges(); },
@@ -152,29 +191,10 @@ export class Admin implements OnInit {
   eliminaAnnuncio(id: number) {
     if (!confirm('Eliminare questo annuncio?')) return;
     this.annuncioService.elimina(id).subscribe({
-      next: () => { this.caricaAnnunci(); this.cdr.detectChanges(); },
-      error: (err: any) => console.error(err)
-    });
-  }
-
-  caricaSegnalazioni() {
-    this.http.get<any[]>('http://localhost:8080/api/segnalazioni', { withCredentials: true }).subscribe({
-      next: (data) => {
-        this.segnalazioni = data;
-        this.segnalazioniInAttesa = data.filter((s: any) => s.stato === 'IN_ATTESA');
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => console.error(err)
-    });
-  }
-
-  segnaGestita(id: number) {
-    this.http.patch(`http://localhost:8080/api/segnalazioni/${id}/gestita`, {}, { withCredentials: true }).subscribe({
       next: () => {
-        this.segnalazioni = this.segnalazioni.map(seg =>
-          seg.id === id ? { ...seg, stato: 'GESTITA' } : seg
-        );
-        this.segnalazioniInAttesa = this.segnalazioni.filter((seg: any) => seg.stato === 'IN_ATTESA');
+        this.annunci = this.annunci.filter((a: any) => a.id !== id);
+        this.annunciInAttesa = this.annunciInAttesa.filter((a: any) => a.id !== id);
+        this.caricaSegnalazioni();
         this.cdr.detectChanges();
       },
       error: (err: any) => console.error(err)

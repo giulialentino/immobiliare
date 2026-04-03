@@ -110,16 +110,19 @@ export class Profilo implements OnInit {
   }
 
   caricaAnnunci(idVenditore: number) {
-    this.annuncioService.getTuttiAnnunciVenditore(idVenditore).subscribe({
-      next: (tutti: any) => {
-        this.annunci = tutti.filter((a: any) => a.stato === 'APPROVATO');
-        this.annunciInAttesa = tutti.filter((a: any) => a.stato === 'IN_ATTESA');
-        this.annunciRifiutati = tutti.filter((a: any) => a.stato === 'RIFIUTATO');
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => console.error(err)
-    });
-  }
+  this.annuncioService.getTuttiAnnunciVenditore(idVenditore).subscribe({
+    next: (tutti: any) => {
+      const sorted = [...tutti].sort((a: any, b: any) =>
+        new Date(b.dataInserimento).getTime() - new Date(a.dataInserimento).getTime()
+      );
+      this.annunci = sorted.filter((a: any) => a.stato === 'APPROVATO');
+      this.annunciInAttesa = sorted.filter((a: any) => a.stato === 'IN_ATTESA');
+      this.annunciRifiutati = sorted.filter((a: any) => a.stato === 'RIFIUTATO');
+      this.cdr.detectChanges();
+    },
+    error: (err: any) => console.error(err)
+  });
+}
 
   caricaMessaggi(idVenditore: number) {
     this.annuncioService.getMessaggiVenditore(idVenditore).subscribe({

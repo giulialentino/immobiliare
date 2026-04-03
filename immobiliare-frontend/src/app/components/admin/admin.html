@@ -76,32 +76,45 @@
 
                   <!-- RICHIESTA PROMOZIONE -->
                   @if (m.oggetto.includes('promozione')) {
-  @if (m.statoPromozione === 'APPROVATO') {
+                    @if (m.statoPromozione === 'APPROVATO') {
+                      <span class="badge bg-success p-2">
+                        <i class="bi bi-check-circle"></i> Utente già promosso a venditore
+                      </span>
+                    } @else if (m.statoPromozione === 'RIFIUTATO') {
+                      <span class="badge bg-danger p-2">
+                        <i class="bi bi-x-circle"></i> Richiesta rifiutata
+                      </span>
+                    } @else {
+                      <div class="d-flex gap-2">
+                        <button class="btn btn-success btn-sm" (click)="approvaPromozione(m.idMittente)">
+                          <i class="bi bi-person-check"></i> Approva — diventa venditore
+                        </button>
+                        <button class="btn btn-danger btn-sm" (click)="rifiutaPromozione(m.idMittente)">
+                          <i class="bi bi-x-circle"></i> Rifiuta
+                        </button>
+                      </div>
+                    }
+                  }
+
+                <!-- SEGNALAZIONE -->
+@else if (m.oggetto.includes('Segnalazione')) {
+  @if (getStatoSegnalazione(m.idAnnuncio, m.idMittente) === 'GESTITA') {
     <span class="badge bg-success p-2">
-      <i class="bi bi-check-circle"></i> Utente già promosso a venditore
-    </span>
-  } @else if (m.statoPromozione === 'RIFIUTATO') {
-    <span class="badge bg-danger p-2">
-      <i class="bi bi-x-circle"></i> Richiesta rifiutata
+      <i class="bi bi-check-circle"></i> Segnalazione già gestita
     </span>
   } @else {
     <div class="d-flex gap-2">
-      <button class="btn btn-success btn-sm" (click)="approvaPromozione(m.idMittente)">
-        <i class="bi bi-person-check"></i> Approva — diventa venditore
+      <button class="btn btn-success btn-sm"
+              (click)="segnaGestitaDaMessaggio(m.idAnnuncio, m.idMittente)">
+        <i class="bi bi-check-circle"></i> Segna gestita
       </button>
-      <button class="btn btn-danger btn-sm" (click)="rifiutaPromozione(m.idMittente)">
-        <i class="bi bi-x-circle"></i> Rifiuta
-      </button>
+      <a [routerLink]="['/annuncio', m.idAnnuncio]" class="btn btn-dark btn-sm">
+        <i class="bi bi-eye"></i> Vedi annuncio
+      </a>
     </div>
   }
 }
-
-                  <!-- SEGNALAZIONE -->
-                  @else if (m.oggetto.includes('Segnalazione')) {
-                    <button class="btn btn-warning btn-sm" (click)="sezione = 'segnalazioni'">
-                      <i class="bi bi-flag"></i> Vai alle segnalazioni
-                    </button>
-                  }
+                  
 
                   <!-- RICHIESTA APPROVAZIONE ANNUNCIO -->
                   @else if (m.idAnnuncio && m.idAnnuncio > 0) {
@@ -179,68 +192,65 @@
   }
 
   <!-- UTENTI -->
-  <!-- UTENTI -->
-@if (sezione === 'utenti') {
-  <div class="table-responsive">
-    <table class="table table-hover">
-      <thead class="table-dark">
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Email</th>
-          <th>Ruolo</th>
-          <th>Email</th>
-          <th>Stato</th>
-          <th>Azioni</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (u of utenti; track u.id) {
-          <tr [class.table-secondary]="!u.emailVerificata">
-            <td>{{ u.id }}</td>
-            <td>{{ u.nome }} {{ u.cognome }}</td>
-            <td>{{ u.email }}</td>
-            <td><span class="badge bg-secondary">{{ u.ruolo }}</span></td>
-            <td>
-              @if (u.emailVerificata) {
-                <span class="badge bg-success">
-                  <i class="bi bi-check-circle"></i> Verificata
-                </span>
-              } @else {
-                <span class="badge bg-warning text-dark">
-                  <i class="bi bi-clock"></i> Non verificata
-                </span>
-              }
-            </td>
-            <td>
-              @if (u.bannato) {
-                <span class="badge bg-danger">Bannato</span>
-              } @else {
-                <span class="badge bg-success">Attivo</span>
-              }
-            </td>
-            <td>
-              <div class="d-flex gap-2">
-                @if (!u.bannato) {
-                  <button class="btn btn-danger btn-sm" (click)="banna(u.id)">
-                    <i class="bi bi-ban"></i> Banna
-                  </button>
-                }
-                @if (u.ruolo !== 'AMMINISTRATORE') {
-                  <button class="btn btn-warning btn-sm" (click)="promuovi(u.id)">
-                    <i class="bi bi-arrow-up-circle"></i> Diventa admin
-                  </button>
-                }
-              </div>
-            </td>
+  @if (sezione === 'utenti') {
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Ruolo</th>
+            <th>Email verificata</th>
+            <th>Stato</th>
+            <th>Azioni</th>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-}
-       
-      
+        </thead>
+        <tbody>
+          @for (u of utenti; track u.id) {
+            <tr [class.table-secondary]="!u.emailVerificata">
+              <td>{{ u.id }}</td>
+              <td>{{ u.nome }} {{ u.cognome }}</td>
+              <td>{{ u.email }}</td>
+              <td><span class="badge bg-secondary">{{ u.ruolo }}</span></td>
+              <td>
+                @if (u.emailVerificata) {
+                  <span class="badge bg-success">
+                    <i class="bi bi-check-circle"></i> Verificata
+                  </span>
+                } @else {
+                  <span class="badge bg-warning text-dark">
+                    <i class="bi bi-clock"></i> Non verificata
+                  </span>
+                }
+              </td>
+              <td>
+                @if (u.bannato) {
+                  <span class="badge bg-danger">Bannato</span>
+                } @else {
+                  <span class="badge bg-success">Attivo</span>
+                }
+              </td>
+              <td>
+                <div class="d-flex gap-2">
+                  @if (!u.bannato) {
+                    <button class="btn btn-danger btn-sm" (click)="banna(u.id)">
+                      <i class="bi bi-ban"></i> Banna
+                    </button>
+                  }
+                  @if (u.ruolo !== 'AMMINISTRATORE') {
+                    <button class="btn btn-warning btn-sm" (click)="promuovi(u.id)">
+                      <i class="bi bi-arrow-up-circle"></i> Diventa admin
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 
   <!-- ANNUNCI -->
   @if (sezione === 'annunci') {
@@ -284,53 +294,44 @@
     </div>
   }
 
-
   <!-- SEGNALAZIONI -->
-  @if (sezione === 'segnalazioni') {
-    <div class="card shadow-sm p-4">
-      <h5 class="fw-bold mb-3">
-        Segnalazioni ricevute
-        @if (segnalazioniInAttesa.length > 0) {
-          <span class="badge bg-danger ms-2">{{ segnalazioniInAttesa.length }} in attesa</span>
-        }
-      </h5>
-      @if (segnalazioni.length > 0) {
-        <div class="d-flex flex-column gap-2">
-          @for (s of segnalazioni; track s.id) {
-            <div class="rounded-3 overflow-hidden"
-                 style="border: 1px solid #eee;"
-                 [style.border-left]="s.stato === 'IN_ATTESA' ? '4px solid #dc3545' : '4px solid #28a745'">
-              <div class="p-3 d-flex justify-content-between align-items-center"
-                   [style.background]="s.stato === 'GESTITA' ? '#f8f8f8' : 'white'">
-                <div>
-                  @if (s.stato === 'IN_ATTESA') {
-                    <span class="badge bg-danger me-2" style="font-size:0.65rem;">Nuova</span>
-                  } @else {
-                    <span class="badge bg-success me-2" style="font-size:0.65rem;">Gestita</span>
-                  }
-                  <span class="fw-bold small">{{ s.nomeSegnalante }} {{ s.cognomeSegnalante }}</span>
-                  <span class="badge bg-warning text-dark ms-2" style="font-size:0.65rem;">{{ s.categoria }}</span>
-                  <p class="text-muted small mb-0 mt-1">
-                    Annuncio: <strong>{{ s.titoloAnnuncio }}</strong>
-                  </p>
-                  <p class="small mb-0 mt-1">{{ s.motivo }}</p>
-                </div>
-                @if (s.stato === 'IN_ATTESA') {
-                  <button class="btn btn-success btn-sm" (click)="segnaGestita(s.id)">
-                    <i class="bi bi-check-circle"></i> Segna gestita
-                  </button>
-                }
-              </div>
+  <!-- SEGNALAZIONI -->
+@if (sezione === 'segnalazioni') {
+  @if (segnalazioniInAttesa.length > 0) {
+    <div class="d-flex flex-column gap-3">
+      @for (s of segnalazioniInAttesa; track s.id) {
+        <div class="card shadow-sm p-4">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+              <h5 class="fw-bold mb-1">{{ s.titoloAnnuncio }}</h5>
+              <p class="text-muted small mb-1">
+                <i class="bi bi-person"></i> {{ s.nomeSegnalante }} {{ s.cognomeSegnalante }}
+                &nbsp;·&nbsp;
+                <span class="badge bg-warning text-dark">{{ s.categoria }}</span>
+              </p>
+              <p class="small mb-0">{{ s.motivo }}</p>
+              <span class="badge bg-danger mt-1">In attesa</span>
             </div>
-          }
-        </div>
-      } @else {
-        <div class="text-center py-4">
-          <i class="bi bi-flag display-4 text-muted"></i>
-          <p class="text-muted mt-2">Nessuna segnalazione ricevuta</p>
+            <div class="d-flex gap-2">
+              <button class="btn btn-success btn-sm" (click)="segnaGestita(s.id)">
+                <i class="bi bi-check-circle"></i> Segna gestita
+              </button>
+              <a [routerLink]="['/annuncio', s.idAnnuncio]" class="btn btn-dark btn-sm">
+                <i class="bi bi-eye"></i> Vedi annuncio
+              </a>
+            </div>
+          </div>
         </div>
       }
     </div>
+  } @else {
+    <div class="text-center py-5">
+      <i class="bi bi-flag display-1 text-muted"></i>
+      <p class="mt-3 text-muted fs-5">Nessuna segnalazione in attesa</p>
+    </div>
   }
+}
+    
+ 
 
 </div>

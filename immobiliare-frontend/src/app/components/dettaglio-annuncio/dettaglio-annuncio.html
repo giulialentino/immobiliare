@@ -329,7 +329,8 @@
         </div>
 
         <!-- SEGNALA ANNUNCIO -->
-@if (utente && (utente.ruolo === 'ACQUIRENTE' || (utente.ruolo === 'VENDITORE' && utente.id !== annuncio.idVenditore))) {          <div class="card mb-4">
+        @if (utente && (utente.ruolo === 'ACQUIRENTE' || (utente.ruolo === 'VENDITORE' && utente.id !== annuncio.idVenditore))) {
+          <div class="card mb-4">
             <div class="card-body">
               <h5><i class="bi bi-flag"></i> Segnala annuncio</h5>
               @if (segnalazioneInviata) {
@@ -340,39 +341,37 @@
                 <div class="alert alert-warning py-2">
                   <i class="bi bi-exclamation-triangle"></i> Hai già segnalato questo annuncio.
                 </div>
+              } @else if (!mostraSegnalazione) {
+                <button class="btn btn-outline-danger btn-sm" (click)="mostraSegnalazione = true">
+                  <i class="bi bi-flag"></i> Segnala questo annuncio
+                </button>
               } @else {
-                @if (!mostraSegnalazione) {
-                  <button class="btn btn-outline-danger btn-sm" (click)="mostraSegnalazione = true">
-                    <i class="bi bi-flag"></i> Segnala questo annuncio
+                <div class="mb-2">
+                  <label class="form-label">Categoria</label>
+                  <select class="form-select form-select-sm" [(ngModel)]="segnalazione.categoria">
+                    <option value="">Seleziona...</option>
+                    <option value="CONTENUTO_FALSO">Contenuto falso</option>
+                    <option value="TRUFFA">Possibile truffa</option>
+                    <option value="FOTO_NON_REALI">Foto non reali</option>
+                    <option value="PREZZO_ERRATO">Prezzo errato</option>
+                    <option value="ALTRO">Altro</option>
+                  </select>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">Motivo</label>
+                  <textarea class="form-control form-control-sm" [(ngModel)]="segnalazione.motivo"
+                            rows="2" placeholder="Descrivi il problema..."></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-danger btn-sm"
+                          [disabled]="!segnalazione.categoria || !segnalazione.motivo"
+                          (click)="inviaSegnalazione()">
+                    <i class="bi bi-send"></i> Invia segnalazione
                   </button>
-                } @else {
-                  <div class="mb-2">
-                    <label class="form-label">Categoria</label>
-                    <select class="form-select form-select-sm" [(ngModel)]="segnalazione.categoria">
-                      <option value="">Seleziona...</option>
-                      <option value="CONTENUTO_FALSO">Contenuto falso</option>
-                      <option value="TRUFFA">Possibile truffa</option>
-                      <option value="FOTO_NON_REALI">Foto non reali</option>
-                      <option value="PREZZO_ERRATO">Prezzo errato</option>
-                      <option value="ALTRO">Altro</option>
-                    </select>
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label">Motivo</label>
-                    <textarea class="form-control form-control-sm" [(ngModel)]="segnalazione.motivo"
-                              rows="2" placeholder="Descrivi il problema..."></textarea>
-                  </div>
-                  <div class="d-flex gap-2">
-                    <button class="btn btn-danger btn-sm"
-                            [disabled]="!segnalazione.categoria || !segnalazione.motivo"
-                            (click)="inviaSegnalazione()">
-                      <i class="bi bi-send"></i> Invia segnalazione
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" (click)="mostraSegnalazione = false">
-                      Annulla
-                    </button>
-                  </div>
-                }
+                  <button class="btn btn-outline-secondary btn-sm" (click)="mostraSegnalazione = false">
+                    Annulla
+                  </button>
+                </div>
               }
             </div>
           </div>
