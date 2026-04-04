@@ -1,25 +1,11 @@
 <div class="container mt-4">
-
-  @if (!utenteLoggato) {
-    <div class="alert alert-warning d-flex align-items-center gap-3 mt-4">
-      <i class="bi bi-lock-fill fs-4"></i>
-      <div>
-        <strong>Accedi per vedere il profilo del venditore</strong>
-        <div class="mt-2">
-          <button (click)="apriLogin()" class="btn btn-dark btn-sm me-2">Accedi</button>
-          <button (click)="apriRegistrazione()" class="btn btn-outline-dark btn-sm">Registrati</button>
-        </div>
-      </div>
-    </div>
-  }
-
-  @if (utenteLoggato && !utente) {
+  @if (!utente) {
     <div class="text-center mt-5">
       <div class="spinner-border" role="status"></div>
     </div>
   }
 
-  @if (utenteLoggato && utente) {
+  @if (utente) {
     <div class="row g-4">
 
       <div class="col-md-4">
@@ -188,6 +174,13 @@
                 <span class="badge bg-secondary ms-1">{{ annunci.length }}</span>
               </button>
             </li>
+            <li class="nav-item">
+              <button class="nav-link" [class.active]="sezioneAttiva === 'preferiti'"
+                      (click)="sezioneAttiva = 'preferiti'">
+                <i class="bi bi-heart"></i> Preferiti
+                <span class="badge bg-secondary ms-1">{{ preferiti.length }}</span>
+              </button>
+            </li>
           </ul>
 
           @if (sezioneAttiva === 'messaggi_admin') {
@@ -223,7 +216,7 @@
                         <div class="p-3 bg-light border-top">
                           <p class="small mb-3">{{ m.testo }}</p>
                           <button class="btn btn-dark btn-sm" (click)="vaiAdApprovazioni()">
-                            <i class="bi bi-arrow-right-circle"></i> Vai al menù
+                            <i class="bi bi-arrow-right-circle"></i> Vai alle approvazioni
                           </button>
                         </div>
                       }
@@ -265,6 +258,37 @@
                 <div class="text-center py-4">
                   <i class="bi bi-house-x display-4 text-muted"></i>
                   <p class="text-muted mt-2">Nessun annuncio pubblicato</p>
+                </div>
+              }
+            </div>
+          }
+          @if (sezioneAttiva === 'preferiti') {
+            <div class="card shadow-sm p-4">
+              <h5 class="fw-bold mb-3">Annunci salvati</h5>
+              @if (preferiti.length > 0) {
+                <div class="d-flex flex-column gap-3">
+                  @for (a of preferiti; track a.id) {
+                    <div class="card border-0 bg-light p-3 rounded-3">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h6 class="fw-bold mb-1">{{ a.titolo }}</h6>
+                          <p class="text-muted small mb-0">
+                            <i class="bi bi-geo-alt"></i> {{ a.indirizzo }}
+                            &nbsp;·&nbsp; € {{ a.prezzo | number }}
+                          </p>
+                        </div>
+                        <a [routerLink]="['/annuncio', a.id]" class="btn btn-outline-dark btn-sm">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-4">
+                  <i class="bi bi-heart display-4 text-muted"></i>
+                  <p class="text-muted mt-2">Nessun annuncio salvato</p>
+                  <a routerLink="/" class="btn btn-dark btn-sm">Esplora annunci</a>
                 </div>
               }
             </div>

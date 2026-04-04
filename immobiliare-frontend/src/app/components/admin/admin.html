@@ -283,10 +283,15 @@
                 }
               </td>
               <td>
-                <button class="btn btn-danger btn-sm" (click)="eliminaAnnuncio(a.id)">
-                  <i class="bi bi-trash"></i> Elimina
-                </button>
-              </td>
+  <div class="d-flex gap-2">
+    <a [routerLink]="['/annuncio', a.id]" class="btn btn-outline-dark btn-sm">
+      <i class="bi bi-eye"></i>
+    </a>
+    <button class="btn btn-danger btn-sm" (click)="eliminaAnnuncio(a.id)">
+      <i class="bi bi-trash"></i> Elimina
+    </button>
+  </div>
+</td>
             </tr>
           }
         </tbody>

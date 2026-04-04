@@ -182,13 +182,16 @@ export class Home implements OnInit, AfterViewInit {
   }
 
   appliedOrdinamento() {
-    let lista = [...this.annunciFiltrati];
-    if (this.ordinamento === 'prezzo_asc') lista.sort((a, b) => a.prezzo - b.prezzo);
-    else if (this.ordinamento === 'prezzo_desc') lista.sort((a, b) => b.prezzo - a.prezzo);
-    else if (this.ordinamento === 'data_desc') lista.sort((a, b) => new Date(b.dataInserimento).getTime() - new Date(a.dataInserimento).getTime());
-    this.annunciFiltrati = lista;
-    this.cdr.detectChanges();
-  }
+  let lista = [...this.annunciFiltrati];
+  if (this.ordinamento === 'prezzo_asc') lista.sort((a, b) => a.prezzo - b.prezzo);
+  else if (this.ordinamento === 'prezzo_desc') lista.sort((a, b) => b.prezzo - a.prezzo);
+  else if (this.ordinamento === 'data_desc') lista.sort((a, b) => new Date(b.dataInserimento).getTime() - new Date(a.dataInserimento).getTime());
+  else if (this.ordinamento === 'data_asc') lista.sort((a, b) => new Date(a.dataInserimento).getTime() - new Date(b.dataInserimento).getTime());
+  else if (this.ordinamento === 'mq_asc') lista.sort((a, b) => (a.metriQuadri || 0) - (b.metriQuadri || 0));
+  else if (this.ordinamento === 'mq_desc') lista.sort((a, b) => (b.metriQuadri || 0) - (a.metriQuadri || 0));
+  this.annunciFiltrati = lista;
+  this.cdr.detectChanges();
+}
 
   // ── AUTOCOMPLETE FIX ──
   filtraComuni() {
