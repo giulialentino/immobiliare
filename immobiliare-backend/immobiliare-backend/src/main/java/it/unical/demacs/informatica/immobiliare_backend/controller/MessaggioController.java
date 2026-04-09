@@ -1,153 +1,102 @@
 package it.unical.demacs.informatica.immobiliare_backend.controller;
 
-import it.unical.demacs.informatica.immobiliare_backend.dao.MessaggioDao;
 import it.unical.demacs.informatica.immobiliare_backend.model.Messaggio;
 import it.unical.demacs.informatica.immobiliare_backend.model.Utente;
+import it.unical.demacs.informatica.immobiliare_backend.service.MessaggioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/messaggi")
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class MessaggioController {
 
     @Autowired
-    private MessaggioDao messaggioDao;
+    private MessaggioService messaggioService;
 
     @GetMapping("/venditore/{idVenditore}")
-    public ResponseEntity<?> getByVenditore(@PathVariable Long idVenditore, HttpSession session) {
+    public ResponseEntity<?> getByVenditore(@PathVariable Long idVenditore, HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            return ResponseEntity.ok(messaggioDao.findByVenditore(idVenditore));
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        return ResponseEntity.ok(messaggioService.getByVenditore(idVenditore));
     }
 
     @GetMapping("/inviati")
-    public ResponseEntity<?> getInviati(HttpSession session) {
+    public ResponseEntity<?> getInviati(HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            return ResponseEntity.ok(messaggioDao.findByMittente(utente.getId()));
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        return ResponseEntity.ok(messaggioService.getInviati(utente.getId()));
     }
 
     @GetMapping("/annuncio/{idAnnuncio}")
-    public ResponseEntity<?> getByAnnuncio(@PathVariable Long idAnnuncio, HttpSession session) {
+    public ResponseEntity<?> getByAnnuncio(@PathVariable Long idAnnuncio, HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            return ResponseEntity.ok(messaggioDao.findByAnnuncio(idAnnuncio));
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        return ResponseEntity.ok(messaggioService.getByAnnuncio(idAnnuncio));
     }
 
     @GetMapping("/count/{idVenditore}")
-    public ResponseEntity<?> count(@PathVariable Long idVenditore, HttpSession session) {
+    public ResponseEntity<?> count(@PathVariable Long idVenditore, HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            return ResponseEntity.ok(messaggioDao.countMessaggi(idVenditore));
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        return ResponseEntity.ok(messaggioService.countMessaggi(idVenditore));
     }
 
     @PostMapping
-    public ResponseEntity<?> invia(@RequestBody Messaggio messaggio, HttpSession session) {
+    public ResponseEntity<?> invia(@RequestBody Messaggio messaggio, HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            messaggio.setIdMittente(utente.getId());
-            return ResponseEntity.ok(messaggioDao.save(messaggio));
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        return ResponseEntity.ok(messaggioService.invia(messaggio, utente));
     }
 
     @PatchMapping("/{id}/letto")
-    public ResponseEntity<?> segnaLetto(@PathVariable Long id, HttpSession session) {
+    public ResponseEntity<?> segnaLetto(@PathVariable Long id, HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            messaggioDao.segnaComeLetto(id);
-            return ResponseEntity.ok("Letto");
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        messaggioService.segnaComeLetto(id);
+        return ResponseEntity.ok("Letto");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> elimina(@PathVariable Long id, HttpSession session) {
+    public ResponseEntity<?> elimina(@PathVariable Long id, HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            if (utente.getRuolo().equals("ACQUIRENTE")) {
-                messaggioDao.eliminaPerAcquirente(id);
-            } else {
-                messaggioDao.eliminaPerVenditore(id);
-            }
-            return ResponseEntity.ok("Eliminato");
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        messaggioService.elimina(id, utente);
+        return ResponseEntity.ok("Eliminato");
     }
 
     @DeleteMapping("/tutti/{idVenditore}")
-    public ResponseEntity<?> eliminaTutti(@PathVariable Long idVenditore, HttpSession session) {
+    public ResponseEntity<?> eliminaTutti(@PathVariable Long idVenditore, HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            messaggioDao.eliminaTuttiPerVenditore(idVenditore);
-            return ResponseEntity.ok("Eliminati");
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        messaggioService.eliminaTuttiPerVenditore(idVenditore);
+        return ResponseEntity.ok("Eliminati");
     }
 
     @DeleteMapping("/miei")
-    public ResponseEntity<?> eliminaMiei(HttpSession session) {
+    public ResponseEntity<?> eliminaMiei(HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
-        try {
-            messaggioDao.eliminaTuttiPerAcquirente(utente.getId());
-            return ResponseEntity.ok("Eliminati");
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        messaggioService.eliminaTuttiPerAcquirente(utente.getId());
+        return ResponseEntity.ok("Eliminati");
     }
+
     @GetMapping("/admin")
-    public ResponseEntity<?> getMessaggiAdmin(HttpSession session) {
+    public ResponseEntity<?> getMessaggiAdmin(HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null || !utente.getRuolo().equals("AMMINISTRATORE"))
             return ResponseEntity.status(403).body("Non autorizzato");
-        try {
-            return ResponseEntity.ok(messaggioDao.findPerAdmin());
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        return ResponseEntity.ok(messaggioService.getMessaggiAdmin());
     }
 
     @GetMapping("/count-admin")
-    public ResponseEntity<?> countAdmin(HttpSession session) {
+    public ResponseEntity<?> countAdmin(HttpSession session) throws SQLException {
         Utente utente = (Utente) session.getAttribute("utenteLoggato");
         if (utente == null || !utente.getRuolo().equals("AMMINISTRATORE"))
             return ResponseEntity.status(403).body("Non autorizzato");
-        try {
-            return ResponseEntity.ok(messaggioDao.countNonLettiAdmin());
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body("Errore server");
-        }
+        return ResponseEntity.ok(messaggioService.countNonLettiAdmin());
     }
-
 }
