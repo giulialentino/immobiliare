@@ -13,7 +13,6 @@ public class FotoDao {
 
     @Autowired
     private DataSource dataSource;
-    private FotoDao fotoDao;
 
     public List<String> findUrlsByAnnuncio(Long idAnnuncio) throws SQLException {
         List<String> urls = new ArrayList<>();

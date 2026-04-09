@@ -25,6 +25,6 @@ public class UtenteService {
     }
 
     public void promuoviAdAdmin(Long id) throws SQLException {
-        utenteDao.setRuolo(id, "AMMINISTRATORE");
+        utenteDao.aggiornaRuolo(id, "AMMINISTRATORE");
     }
 }

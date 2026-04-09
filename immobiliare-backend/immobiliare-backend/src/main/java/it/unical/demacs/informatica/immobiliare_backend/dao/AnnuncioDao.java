@@ -4,7 +4,7 @@ import it.unical.demacs.informatica.immobiliare_backend.config.DataSource;
 import it.unical.demacs.informatica.immobiliare_backend.model.Annuncio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 
 
 import java.sql.*;
@@ -13,7 +13,6 @@ import java.util.List;
 
 @Repository
 public class AnnuncioDao {
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private java.time.LocalDateTime dataInserimento;
 
 

@@ -58,7 +58,7 @@ public class RichiestaPromozioneService {
             msg.setOggetto("Sei diventato venditore!");
             msg.setTesto("Congratulazioni " + utente.getNome() + "! La tua richiesta è stata approvata. " +
                     "Ora puoi pubblicare annunci sulla piattaforma.");
-            messaggioDao.saveNotificaUtente(msg, idUtente);
+            messaggioDao.saveNotifica(msg);
         }
     }
 
@@ -73,7 +73,7 @@ public class RichiestaPromozioneService {
             msg.setOggetto("Richiesta rifiutata");
             msg.setTesto("La tua richiesta di diventare venditore è stata rifiutata. " +
                     "Contatta l'amministratore per maggiori informazioni.");
-            messaggioDao.saveNotificaUtente(msg, idUtente);
+            messaggioDao.saveNotifica(msg);
         }
     }
 }

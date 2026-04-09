@@ -75,15 +75,7 @@ public class UtenteDao {
         }
     }
 
-    public void setRuolo(Long id, String ruolo) throws SQLException {
-        String sql = "UPDATE utente SET ruolo = ? WHERE id = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, ruolo);
-            ps.setLong(2, id);
-            ps.executeUpdate();
-        }
-    }
+
 
     public void aggiornaRuolo(Long id, String ruolo) throws SQLException {
         String sql = "UPDATE utente SET ruolo = ? WHERE id = ?";

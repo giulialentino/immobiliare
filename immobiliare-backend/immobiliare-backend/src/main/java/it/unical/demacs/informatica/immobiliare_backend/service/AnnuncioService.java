@@ -161,7 +161,7 @@ public class AnnuncioService {
             msg.setTesto(stato.equals("APPROVATO") ?
                     "Il tuo annuncio \"" + annuncio.getTitolo() + "\" è stato approvato ed è ora visibile a tutti gli utenti." :
                     "Il tuo annuncio \"" + annuncio.getTitolo() + "\" è stato rifiutato. Puoi modificarlo e ripubblicarlo.");
-            messaggioDao.savePerVenditore(msg, annuncio.getIdVenditore());
+            messaggioDao.saveNotifica(msg);
         }
     }
 

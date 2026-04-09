@@ -14,12 +14,7 @@ public class MessaggioDao {
 
     @Autowired
     private DataSource dataSource;
-    private boolean perAdmin;
-    public boolean isPerAdmin() { return perAdmin; }
-    public void setPerAdmin(boolean b) { this.perAdmin = b; }
-    private Long idMittente;
-    public Long getIdMittente() { return idMittente; }
-    public void setIdMittente(Long idMittente) { this.idMittente = idMittente; }
+
 
     private Messaggio mapRow(ResultSet rs) throws SQLException {
         Messaggio m = new Messaggio();
@@ -222,7 +217,7 @@ public class MessaggioDao {
         }
     }
 
-    public void savePerVenditore(Messaggio m, Long idVenditore) throws SQLException {
+    public void saveNotifica(Messaggio m) throws SQLException {
         String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo) VALUES (?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -238,19 +233,5 @@ public class MessaggioDao {
         }
     }
 
-    public void saveNotificaUtente(Messaggio m, Long idDestinatario) throws SQLException {
-        String sql = "INSERT INTO messaggio (id_annuncio, id_mittente, oggetto, testo) VALUES (?, ?, ?, ?)";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            if (m.getIdAnnuncio() == null || m.getIdAnnuncio() == 0) {
-                ps.setNull(1, java.sql.Types.BIGINT);
-            } else {
-                ps.setLong(1, m.getIdAnnuncio());
-            }
-            ps.setLong(2, m.getIdMittente());
-            ps.setString(3, m.getOggetto());
-            ps.setString(4, m.getTesto());
-            ps.executeUpdate();
-        }
-    }
+
 }
