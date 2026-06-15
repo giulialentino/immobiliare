@@ -37,7 +37,7 @@ MVC (Model-View-Controller): Netta separazione tra dati, logica di business e in
 - **Categorie Immobili:** 6 categorie principali + categoria “Ultimi 3 annunci pubblicati”
 - **Filtri Annunci:** per tipo (vendita/affitto), tipologia immobile, città e range di prezzo
 - **Visualizzazione Annunci:** modalità **griglia** o **lista**
-- **Mappe:** visualizzazione della posizione dell’immobile tramite Google Maps
+- **Mappe:** visualizzazione della posizione dell’immobile
 - **Toast notifications:** gestione eventi e messaggi di conferma/errore
 
 ---
