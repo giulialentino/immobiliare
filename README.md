@@ -37,7 +37,7 @@ MVC (Model-View-Controller): Netta separazione tra dati, logica di business e in
 - **Categorie Immobili:** 6 categorie principali + categoria “Ultimi 3 annunci pubblicati”
 - **Filtri Annunci:** per tipo (vendita/affitto), tipologia immobile, città e range di prezzo
 - **Visualizzazione Annunci:** modalità **griglia** o **lista**
-- **Mappe:** visualizzazione della posizione dell’immobile
+- **Mappe:** visualizzazione della posizione dell’immobile in Google Maps
 - **Toast notifications:** gestione eventi e messaggi di conferma/errore
 
 ---
@@ -83,7 +83,7 @@ MVC (Model-View-Controller): Netta separazione tra dati, logica di business e in
 
 ### Limitazioni di Sicurezza e Controllo
 
-- Uso di Bicrypt per cifrare le password nel bd
+- Uso di Bicrypt per cifrare le password nel db
 - Massimo **10 foto per annuncio**
 - Massimo **50 annunci per venditore**
 - Massimo **5 MB caricabili per foto**
