@@ -1,128 +1,135 @@
 # Progetto Web Applications – Annunci Immobiliari
 
-**Corso:** Web Applications (A.A. 2025/26)  
-
-
----
-
-## Descrizione del Progetto
-
-Questo progetto è una **web application per annunci di affitto e vendita di immobili**. L’applicazione permette agli utenti di visualizzare, filtrare, contattare venditori e interagire con gli immobili tramite un’interfaccia moderna e responsive. 
-
-L’ispirazione grafica del progetto è stata presa dal logo e dai colori dell’**Università della Calabria (Unical)**, visibile nella **schermata di splash all’apertura dell’app**, creando un’esperienza coerente e riconoscibile.
+**Corso:** Web Applications (A.A. 2025/26)
+**Autore:** Giulia Lentino — Università della Calabria
 
 ---
 
-## Tecnologie Utilizzate
+## Descrizione
 
-- **Frontend:** Angular 17+(utilizzo di Standalone Components e Nuova Control Flow Syntax @if/@for), TypeScript, HTML5, CSS3(Custom Properties e Animazioni), Bootstrap 5 per il responsive, Bootstrap Icons per l'iconografia.
-- **Backend:** Java 21 con Spring Boot 3,JDBC Puro: Gestione della persistenza senza ORM (come richiesto da specifiche), REST Controllers, pattern DAO con PostgreSQL,HikariCP: Connection pooling per alte prestazioni,JavaMailSender: Invio email SMTP
-- **Database:** PostgreSQL,11 Tabelle relazionate (Utenti, Annunci, Categorie, Foto, Aste, Offerte, Messaggi, Recensioni, Preferiti, RichiestePromozione, StoricoPrezzi).
-- **Librerie Esterne e API:** Chart.js per statistiche e grafici sull'andamento dei prezzi, Google Maps API per la geolocalizzazione degli immobili,Facebook API per promozione degli annunci dai venditori
-- **Funzionalità interessanti:** chatbot con AI (UBI),descrizione annunci generata da AI, gestione toast, upload foto, autenticazione multi-ruolo(possibilità di cambiare ruolo una volta registrati)
-- **Design Pattern** DAO (Data Access Object): Isolamento totale della logica di persistenza SQL.
-Proxy Pattern: Implementato AnnuncioProxy per il Lazy Loading di foto e recensioni, ottimizzando le performance del database.
-Singleton: Utilizzato per la gestione della configurazione del DataSource.
-MVC (Model-View-Controller): Netta separazione tra dati, logica di business e interfaccia utente.
+Web application per la pubblicazione e la ricerca di annunci immobiliari (vendita, affitto, asta). Gli utenti possono registrarsi come acquirenti o venditori, contattare i proprietari, salvare annunci nei preferiti, lasciare recensioni e seguire lo stato di approvazione dei propri annunci. È presente un pannello di amministrazione per la moderazione di utenti e annunci, e un assistente conversazionale basato su AI che risponde a domande sul funzionamento della piattaforma e aiuta a generare le descrizioni degli annunci.
 
----
+## Stack tecnologico
 
-## Funzionalità Principali
+Frontend: Angular 21 (standalone components, control flow `@if`/`@for`), TypeScript, Bootstrap 5, Bootstrap Icons, Chart.js per i grafici statistici, Leaflet per la visualizzazione delle mappe.
 
-### Interfaccia Utente
+Backend: Java 21, Spring Boot 3.4, accesso al database tramite JDBC puro con pattern DAO (nessun ORM, per scelta progettuale), HikariCP per il connection pooling, Spring Mail per l'invio di email transazionali, Spring Security Crypto (BCrypt) per l'hashing delle password.
 
-- **Splash Screen:** logo animato ispirato all’Unical
-- **Barra di navigazione:** accesso a statistiche del sito, login, registrazione e profilazione utenti
-- **Hero:** video introduttivo nella home page
-- **Categorie Immobili:** 6 categorie principali + categoria “Ultimi 3 annunci pubblicati”
-- **Filtri Annunci:** per tipo (vendita/affitto), tipologia immobile, città e range di prezzo
-- **Visualizzazione Annunci:** modalità **griglia** o **lista**
-- **Mappe:** visualizzazione della posizione dell’immobile in Google Maps
-- **Toast notifications:** gestione eventi e messaggi di conferma/errore
+Database: PostgreSQL, schema relazionale con 11 tabelle (utente, annuncio, categoria, foto, asta, offerta, messaggio, recensione, preferito, richiesta_promozione, storico_prezzi).
 
----
+Servizi esterni: Google Gemini API per la chat assistita e la generazione di descrizioni.
 
-### Chatbot UBI
+## Struttura del repository
 
-- Accessibile a tutti
-- Chat guidata da intelligenza artificiale
-- Supporta messaggi automatici generati durante interazioni importanti (es. come si pubblica un annuncio)
+```
+immobiliare/
+├── immobiliare-backend/
+│   └── immobiliare-backend/      Progetto Maven Spring Boot
+│       ├── src/main/java/...     Controller, Service, DAO, Model
+│       └── src/main/resources/   application.properties
+├── immobiliare-frontend/         Progetto Angular (CLI)
+│   └── src/app/
+│       ├── components/           Un componente per ogni vista
+│       └── services/             Client HTTP verso il backend
+└── dump.sql                      Dump dello schema PostgreSQL con dati di esempio
+```
 
----
+## Requisiti
 
-### Ruoli Utente
+Java 21, Maven (o il wrapper `mvnw` incluso), Node.js 20+ e npm, PostgreSQL 14+.
 
-1. **Utente non autenticato**
-    - Può visualizzare: titolo, descrizione, prezzo e posizione degli immobili
-    - Funzionalità bloccate: recensioni, contatto venditore, profilo venditore
+## Setup del backend
 
-2. **Acquirente**
-    - Può: contattare venditori, scrivere recensioni, salvare annunci preferiti
-    - Profilo: modifica password, gestisce foto profilo, lista messaggi inviati (cancellabili dalla bacheca), lista preferiti
-    - Messaggi automatici generati quando contatta venditore
-    - Segnalazione annunci sospetti
-    - Può scegliere di inoltare una richiesta all'admin per diventare venditore usando le stesse coordinate
+Creare un database PostgreSQL e importare lo schema:
 
-3. **Venditore**
-    - Tutte le funzionalità dell’acquirente
-    - Pubblica, modifica e elimina propri annunci
-    - Generazione descrizioni degli annunci tramite AI
-    - Possibilità di ribassare il prezzo (vecchio prezzo barrato) e eventualmente annullare il ribasso
-    - Profilo: lista annunci pubblicati (stato annuncio in base all'approvazione dell'admin: in attesa, approvato, rifiutato)
-    - Notifiche e badge numerici quando riceve contatti da acquirenti
-    - Segnalazione annunci sospetti
-    - Richiesta publicazione degli annunci tramite admin
+```
+createdb immobiliare
+psql immobiliare < dump.sql
+```
 
-4. **Amministratore**
-    - Tutte le funzionalità dei venditori
-    - Gestione utenti: promuovere, bannare
-    - Gestione annunci: approvare, rifiutare, eliminare
-    - Pannello amministrativo per controllare approvazioni e segnalazioni
+Il file `application.properties` contiene valori segnaposto per i servizi esterni (credenziali email, chiave Gemini) e per la connessione al database. Prima di avviare il backend, copiarlo in `application-local.properties` (già escluso dal tracking) e impostare i valori reali:
 
----
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/immobiliare
+spring.datasource.username=...
+spring.datasource.password=...
 
-### Limitazioni di Sicurezza e Controllo
+spring.mail.username=...
+spring.mail.password=...        # App Password di Gmail, non la password dell'account
 
-- Uso di Bicrypt per cifrare le password nel db
-- Massimo **10 foto per annuncio**
-- Massimo **50 annunci per venditore**
-- Massimo **5 MB caricabili per foto**
-- Modifica di un annuncio già approvato, consentita massimo **10 volte** a differenza degli annunci non ancora approvati che non hanno limiti
-- Non è possibile modificare **coordinate, città e via** dopo che l'admin approva l'annuncio al venditore
-- Conferme richieste per azioni sensibili (es. eliminazione annuncio, logout)
+gemini.api.key=...
+gemini.api.url=...
+```
 
----
+Avviare il backend dalla cartella `immobiliare-backend/immobiliare-backend`:
 
-### Statistiche del Sito
+```
+./mvnw spring-boot:run
+```
 
-- Grafici con **Chart.js**:
-    - Annunci totali
-    - Prezzo medio degli immobili
-    - Annunci con asta
-    - Suddivisione per categoria e tipologia
-- Aggiornamento dinamico delle statistiche con animazioni
+Il server risponde su `http://localhost:8080`.
 
----
+## Setup del frontend
 
-### Funzionalità Extra
+Dalla cartella `immobiliare-frontend`:
 
-- **Recensioni:** solo per utenti che hanno visitato l’immobile
-- **Segnalazioni:** acquirenti e venditori possono segnalare un annuncio sospetto
-- **Chatbot AI (UBI)** guida e supporta utenti
-- **Descrizione annuncio generata con l'AI** solo per i venditori
-- **Interfaccia Responsive:** perfetta per desktop e mobile
-- **Gestione notifiche:** messaggi e azioni confermate tramite toast dinamici
+```
+npm install
+npm start
+```
 
----
+L'app è disponibile su `http://localhost:4200`.
 
-## Struttura del Progetto
+## Funzionalità
 
-- `frontend/` – Angular App
-- `backend/` – Spring Boot REST API
-- `database/` – dump PostgreSQL
-- `README.md` – documentazione del progetto
-- `src/` – componenti, servizi e moduli Angular
-- `assets/` – immagini, video, icone
-- `styles/` – CSS personalizzato (almeno 5 regole custom)
+### Autenticazione e gestione account
 
----
+Registrazione con verifica email obbligatoria prima del primo accesso, login basato su sessione server-side, recupero password via email con token e reset, cambio password da profilo, upload e rimozione della foto profilo. Le password sono salvate con hashing BCrypt.
+
+### Ruoli utente
+
+L'applicazione distingue quattro livelli di accesso, ciascuno cumulativo rispetto al precedente.
+
+Un visitatore non autenticato può sfogliare gli annunci approvati vedendo titolo, prezzo e posizione, ma non può contattare i venditori, scrivere recensioni o accedere al profilo venditore.
+
+Un acquirente registrato può contattare i venditori tramite messaggi, salvare annunci nei preferiti, scrivere recensioni sugli immobili visitati, segnalare annunci sospetti, fare offerte sugli annunci in asta, e richiedere all'amministratore la promozione a venditore. Dal proprio profilo può modificare la password, gestire la foto profilo, consultare e cancellare i messaggi inviati, e vedere la lista dei preferiti.
+
+Un venditore eredita tutte le funzionalità dell'acquirente. Può pubblicare, modificare ed eliminare i propri annunci (ogni nuovo annuncio o modifica resta in stato "in attesa" fino all'approvazione dell'amministratore), generare la descrizione dell'annuncio tramite AI, applicare un ribasso di prezzo mantenendo visibile il prezzo precedente barrato ed eventualmente annullarlo, e mettere un annuncio in asta. Riceve notifiche con badge numerico quando un acquirente lo contatta, e dal profilo può consultare lo stato di approvazione di ciascun annuncio pubblicato.
+
+Un amministratore eredita tutte le funzionalità del venditore. Dal pannello di amministrazione gestisce l'approvazione o il rifiuto degli annunci in attesa, la moderazione delle segnalazioni ricevute, l'approvazione o il rifiuto delle richieste di promozione ad venditore, e può promuovere o bannare un utente.
+
+### Annunci
+
+Pubblicazione di annunci di vendita, affitto o asta con titolo, descrizione, prezzo, categoria, città, indirizzo, coordinate geografiche, metri quadri, numero di locali e bagni. Caricamento di un massimo di 10 foto per annuncio (5 MB ciascuna). Visualizzazione degli annunci in modalità griglia o lista, con filtri per tipo di operazione, tipologia immobile, città e fascia di prezzo. Mappa di posizione dell'immobile tramite Leaflet. Limite di 50 annunci pubblicabili per venditore e di 10 modifiche consentite su un annuncio già approvato (nessun limite sulle modifiche prima dell'approvazione); indirizzo e coordinate non sono più modificabili dopo l'approvazione.
+
+### Asta
+
+Un venditore può mettere un proprio annuncio in asta impostando una data di scadenza. Gli acquirenti possono presentare offerte fino alla scadenza; lo storico delle offerte per ciascuna asta è consultabile, e l'asta può essere chiusa dal venditore.
+
+### Recensioni e segnalazioni
+
+Gli utenti che hanno contattato un venditore per un determinato annuncio possono lasciare una recensione su quell'immobile. Acquirenti e venditori possono segnalare un annuncio ritenuto sospetto; le segnalazioni sono gestite dall'amministratore, che può marcarle come gestite.
+
+### Messaggistica
+
+Gli acquirenti contattano i venditori tramite un sistema di messaggi associati a un annuncio. I venditori vedono il conteggio dei messaggi non letti, possono marcarli come letti ed eliminarli singolarmente o in blocco. Gli acquirenti possono eliminare i messaggi che hanno inviato.
+
+### Assistente AI
+
+Un chatbot (Ubi), accessibile da ogni pagina indipendentemente dal login, risponde a domande sul funzionamento della piattaforma usando l'API Gemini con un prompt di sistema dedicato e una cronologia di conversazione limitata agli ultimi messaggi. Per i venditori è inoltre disponibile la generazione automatica della descrizione di un annuncio a partire da un prompt testuale. Entrambe le funzionalità sono soggette a un rate limit per sessione (intervallo minimo tra le richieste e un tetto massimo di chiamate giornaliere).
+
+### Statistiche
+
+Una sezione dedicata mostra, tramite Chart.js, il numero totale di annunci, il prezzo medio degli immobili, il numero di annunci in asta, e la distribuzione degli annunci per categoria e per tipologia di operazione (grafici a torta e a barre), con aggiornamento dinamico dei dati.
+
+### Altro
+
+Sistema di notifiche toast per confermare azioni o segnalare errori, conferma richiesta prima di azioni distruttive come l'eliminazione di un annuncio o il logout, interfaccia interamente responsive.
+
+## Limiti applicativi
+
+Le regole di business implementate includono: massimo 10 foto per annuncio, massimo 5 MB per foto, massimo 50 annunci per venditore, massimo 10 modifiche consentite su un annuncio già approvato (nessun limite prima dell'approvazione), impossibilità di modificare indirizzo e coordinate dopo l'approvazione, hashing delle password con BCrypt, conferma richiesta per le azioni distruttive (eliminazione annuncio, logout).
+
+## Note
+
+Il file `dump.sql` contiene dati di esempio a scopo dimostrativo. Le credenziali in `application.properties` sono segnaposto: non committare mai credenziali reali nel file tracciato da Git.
