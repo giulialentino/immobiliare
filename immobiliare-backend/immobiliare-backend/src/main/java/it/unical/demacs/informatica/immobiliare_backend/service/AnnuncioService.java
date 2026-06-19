@@ -157,7 +157,7 @@ public class AnnuncioService {
             msg.setIdAnnuncio(id);
             msg.setIdMittente(admin.getId());
             msg.setOggetto(stato.equals("APPROVATO") ?
-                    "✅ Annuncio approvato!" : "❌ Annuncio rifiutato");
+                    "Annuncio approvato!" : "Annuncio rifiutato");
             msg.setTesto(stato.equals("APPROVATO") ?
                     "Il tuo annuncio \"" + annuncio.getTitolo() + "\" è stato approvato ed è ora visibile a tutti gli utenti." :
                     "Il tuo annuncio \"" + annuncio.getTitolo() + "\" è stato rifiutato. Puoi modificarlo e ripubblicarlo.");

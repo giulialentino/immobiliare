@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict S3JWmTikT0zGbhu67ltoLXLNNvVRO1WvcKbj7iNBIC5kQUqxvbo4t8Ip0KY7ZE3
+\restrict FV0uy2MSvP0LazEaJnHoRqHV2VbW0GIuYrIPd6hDoDnpYNSMOtVIuQ0s5J3aT05
 
 -- Dumped from database version 18.3
 -- Dumped by pg_dump version 18.3
 
--- Started on 2026-04-04 12:54:43
+-- Started on 2026-06-19 07:46:23
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -21,12 +21,29 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- TOC entry 2 (class 3079 OID 41265)
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- TOC entry 5198 (class 0 OID 0)
+-- Dependencies: 2
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- TOC entry 224 (class 1259 OID 24665)
+-- TOC entry 225 (class 1259 OID 24665)
 -- Name: annuncio; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -56,7 +73,7 @@ CREATE TABLE public.annuncio (
 ALTER TABLE public.annuncio OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 24664)
+-- TOC entry 224 (class 1259 OID 24664)
 -- Name: annuncio_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -72,8 +89,8 @@ CREATE SEQUENCE public.annuncio_id_seq
 ALTER SEQUENCE public.annuncio_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5160 (class 0 OID 0)
--- Dependencies: 223
+-- TOC entry 5199 (class 0 OID 0)
+-- Dependencies: 224
 -- Name: annuncio_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -81,7 +98,7 @@ ALTER SEQUENCE public.annuncio_id_seq OWNED BY public.annuncio.id;
 
 
 --
--- TOC entry 232 (class 1259 OID 24764)
+-- TOC entry 233 (class 1259 OID 24764)
 -- Name: asta; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -99,7 +116,7 @@ CREATE TABLE public.asta (
 ALTER TABLE public.asta OWNER TO postgres;
 
 --
--- TOC entry 231 (class 1259 OID 24763)
+-- TOC entry 232 (class 1259 OID 24763)
 -- Name: asta_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -115,8 +132,8 @@ CREATE SEQUENCE public.asta_id_seq
 ALTER SEQUENCE public.asta_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5161 (class 0 OID 0)
--- Dependencies: 231
+-- TOC entry 5200 (class 0 OID 0)
+-- Dependencies: 232
 -- Name: asta_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -124,7 +141,7 @@ ALTER SEQUENCE public.asta_id_seq OWNED BY public.asta.id;
 
 
 --
--- TOC entry 220 (class 1259 OID 24634)
+-- TOC entry 221 (class 1259 OID 24634)
 -- Name: categoria; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -138,7 +155,7 @@ CREATE TABLE public.categoria (
 ALTER TABLE public.categoria OWNER TO postgres;
 
 --
--- TOC entry 219 (class 1259 OID 24633)
+-- TOC entry 220 (class 1259 OID 24633)
 -- Name: categoria_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -154,8 +171,8 @@ CREATE SEQUENCE public.categoria_id_seq
 ALTER SEQUENCE public.categoria_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5162 (class 0 OID 0)
--- Dependencies: 219
+-- TOC entry 5201 (class 0 OID 0)
+-- Dependencies: 220
 -- Name: categoria_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -163,7 +180,7 @@ ALTER SEQUENCE public.categoria_id_seq OWNED BY public.categoria.id;
 
 
 --
--- TOC entry 226 (class 1259 OID 24695)
+-- TOC entry 227 (class 1259 OID 24695)
 -- Name: foto; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -177,7 +194,7 @@ CREATE TABLE public.foto (
 ALTER TABLE public.foto OWNER TO postgres;
 
 --
--- TOC entry 225 (class 1259 OID 24694)
+-- TOC entry 226 (class 1259 OID 24694)
 -- Name: foto_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -193,8 +210,8 @@ CREATE SEQUENCE public.foto_id_seq
 ALTER SEQUENCE public.foto_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5163 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 5202 (class 0 OID 0)
+-- Dependencies: 226
 -- Name: foto_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -202,7 +219,7 @@ ALTER SEQUENCE public.foto_id_seq OWNED BY public.foto.id;
 
 
 --
--- TOC entry 230 (class 1259 OID 24738)
+-- TOC entry 231 (class 1259 OID 24738)
 -- Name: messaggio; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -223,7 +240,7 @@ CREATE TABLE public.messaggio (
 ALTER TABLE public.messaggio OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 24737)
+-- TOC entry 230 (class 1259 OID 24737)
 -- Name: messaggio_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -239,8 +256,8 @@ CREATE SEQUENCE public.messaggio_id_seq
 ALTER SEQUENCE public.messaggio_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5164 (class 0 OID 0)
--- Dependencies: 229
+-- TOC entry 5203 (class 0 OID 0)
+-- Dependencies: 230
 -- Name: messaggio_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -248,7 +265,7 @@ ALTER SEQUENCE public.messaggio_id_seq OWNED BY public.messaggio.id;
 
 
 --
--- TOC entry 234 (class 1259 OID 24787)
+-- TOC entry 235 (class 1259 OID 24787)
 -- Name: offerta; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -264,7 +281,7 @@ CREATE TABLE public.offerta (
 ALTER TABLE public.offerta OWNER TO postgres;
 
 --
--- TOC entry 233 (class 1259 OID 24786)
+-- TOC entry 234 (class 1259 OID 24786)
 -- Name: offerta_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -280,8 +297,8 @@ CREATE SEQUENCE public.offerta_id_seq
 ALTER SEQUENCE public.offerta_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5165 (class 0 OID 0)
--- Dependencies: 233
+-- TOC entry 5204 (class 0 OID 0)
+-- Dependencies: 234
 -- Name: offerta_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -289,7 +306,7 @@ ALTER SEQUENCE public.offerta_id_seq OWNED BY public.offerta.id;
 
 
 --
--- TOC entry 236 (class 1259 OID 24810)
+-- TOC entry 237 (class 1259 OID 24810)
 -- Name: preferito; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -303,7 +320,7 @@ CREATE TABLE public.preferito (
 ALTER TABLE public.preferito OWNER TO postgres;
 
 --
--- TOC entry 235 (class 1259 OID 24809)
+-- TOC entry 236 (class 1259 OID 24809)
 -- Name: preferito_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -319,8 +336,8 @@ CREATE SEQUENCE public.preferito_id_seq
 ALTER SEQUENCE public.preferito_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5166 (class 0 OID 0)
--- Dependencies: 235
+-- TOC entry 5205 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: preferito_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -328,7 +345,7 @@ ALTER SEQUENCE public.preferito_id_seq OWNED BY public.preferito.id;
 
 
 --
--- TOC entry 228 (class 1259 OID 24712)
+-- TOC entry 229 (class 1259 OID 24712)
 -- Name: recensione; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -346,7 +363,7 @@ CREATE TABLE public.recensione (
 ALTER TABLE public.recensione OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 24711)
+-- TOC entry 228 (class 1259 OID 24711)
 -- Name: recensione_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -362,8 +379,8 @@ CREATE SEQUENCE public.recensione_id_seq
 ALTER SEQUENCE public.recensione_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5167 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 5206 (class 0 OID 0)
+-- Dependencies: 228
 -- Name: recensione_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -371,7 +388,7 @@ ALTER SEQUENCE public.recensione_id_seq OWNED BY public.recensione.id;
 
 
 --
--- TOC entry 238 (class 1259 OID 24844)
+-- TOC entry 239 (class 1259 OID 24844)
 -- Name: richiesta_promozione; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -386,7 +403,7 @@ CREATE TABLE public.richiesta_promozione (
 ALTER TABLE public.richiesta_promozione OWNER TO postgres;
 
 --
--- TOC entry 237 (class 1259 OID 24843)
+-- TOC entry 238 (class 1259 OID 24843)
 -- Name: richiesta_promozione_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -402,8 +419,8 @@ CREATE SEQUENCE public.richiesta_promozione_id_seq
 ALTER SEQUENCE public.richiesta_promozione_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5168 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 5207 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: richiesta_promozione_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -411,7 +428,7 @@ ALTER SEQUENCE public.richiesta_promozione_id_seq OWNED BY public.richiesta_prom
 
 
 --
--- TOC entry 240 (class 1259 OID 33037)
+-- TOC entry 241 (class 1259 OID 33037)
 -- Name: segnalazione; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -429,7 +446,7 @@ CREATE TABLE public.segnalazione (
 ALTER TABLE public.segnalazione OWNER TO postgres;
 
 --
--- TOC entry 239 (class 1259 OID 33036)
+-- TOC entry 240 (class 1259 OID 33036)
 -- Name: segnalazione_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -445,8 +462,8 @@ CREATE SEQUENCE public.segnalazione_id_seq
 ALTER SEQUENCE public.segnalazione_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5169 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 5208 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: segnalazione_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -454,7 +471,7 @@ ALTER SEQUENCE public.segnalazione_id_seq OWNED BY public.segnalazione.id;
 
 
 --
--- TOC entry 222 (class 1259 OID 24645)
+-- TOC entry 223 (class 1259 OID 24645)
 -- Name: utente; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -471,6 +488,7 @@ CREATE TABLE public.utente (
     token_verifica character varying(255),
     token_reset character varying(255),
     token_reset_scadenza timestamp without time zone,
+    descrizione text,
     CONSTRAINT utente_ruolo_check CHECK (((ruolo)::text = ANY ((ARRAY['AMMINISTRATORE'::character varying, 'VENDITORE'::character varying, 'ACQUIRENTE'::character varying])::text[])))
 );
 
@@ -478,7 +496,7 @@ CREATE TABLE public.utente (
 ALTER TABLE public.utente OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 24644)
+-- TOC entry 222 (class 1259 OID 24644)
 -- Name: utente_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -494,8 +512,8 @@ CREATE SEQUENCE public.utente_id_seq
 ALTER SEQUENCE public.utente_id_seq OWNER TO postgres;
 
 --
--- TOC entry 5170 (class 0 OID 0)
--- Dependencies: 221
+-- TOC entry 5209 (class 0 OID 0)
+-- Dependencies: 222
 -- Name: utente_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -503,7 +521,7 @@ ALTER SEQUENCE public.utente_id_seq OWNED BY public.utente.id;
 
 
 --
--- TOC entry 4911 (class 2604 OID 24668)
+-- TOC entry 4949 (class 2604 OID 24668)
 -- Name: annuncio id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -511,7 +529,7 @@ ALTER TABLE ONLY public.annuncio ALTER COLUMN id SET DEFAULT nextval('public.ann
 
 
 --
--- TOC entry 4925 (class 2604 OID 24767)
+-- TOC entry 4963 (class 2604 OID 24767)
 -- Name: asta id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -519,7 +537,7 @@ ALTER TABLE ONLY public.asta ALTER COLUMN id SET DEFAULT nextval('public.asta_id
 
 
 --
--- TOC entry 4906 (class 2604 OID 24637)
+-- TOC entry 4944 (class 2604 OID 24637)
 -- Name: categoria id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -527,7 +545,7 @@ ALTER TABLE ONLY public.categoria ALTER COLUMN id SET DEFAULT nextval('public.ca
 
 
 --
--- TOC entry 4916 (class 2604 OID 24698)
+-- TOC entry 4954 (class 2604 OID 24698)
 -- Name: foto id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -535,7 +553,7 @@ ALTER TABLE ONLY public.foto ALTER COLUMN id SET DEFAULT nextval('public.foto_id
 
 
 --
--- TOC entry 4919 (class 2604 OID 24741)
+-- TOC entry 4957 (class 2604 OID 24741)
 -- Name: messaggio id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -543,7 +561,7 @@ ALTER TABLE ONLY public.messaggio ALTER COLUMN id SET DEFAULT nextval('public.me
 
 
 --
--- TOC entry 4927 (class 2604 OID 24790)
+-- TOC entry 4965 (class 2604 OID 24790)
 -- Name: offerta id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -551,7 +569,7 @@ ALTER TABLE ONLY public.offerta ALTER COLUMN id SET DEFAULT nextval('public.offe
 
 
 --
--- TOC entry 4929 (class 2604 OID 24813)
+-- TOC entry 4967 (class 2604 OID 24813)
 -- Name: preferito id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -559,7 +577,7 @@ ALTER TABLE ONLY public.preferito ALTER COLUMN id SET DEFAULT nextval('public.pr
 
 
 --
--- TOC entry 4917 (class 2604 OID 24715)
+-- TOC entry 4955 (class 2604 OID 24715)
 -- Name: recensione id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -567,7 +585,7 @@ ALTER TABLE ONLY public.recensione ALTER COLUMN id SET DEFAULT nextval('public.r
 
 
 --
--- TOC entry 4930 (class 2604 OID 24847)
+-- TOC entry 4968 (class 2604 OID 24847)
 -- Name: richiesta_promozione id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -575,7 +593,7 @@ ALTER TABLE ONLY public.richiesta_promozione ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- TOC entry 4933 (class 2604 OID 33040)
+-- TOC entry 4971 (class 2604 OID 33040)
 -- Name: segnalazione id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -583,7 +601,7 @@ ALTER TABLE ONLY public.segnalazione ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 4908 (class 2604 OID 24648)
+-- TOC entry 4946 (class 2604 OID 24648)
 -- Name: utente id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -591,14 +609,15 @@ ALTER TABLE ONLY public.utente ALTER COLUMN id SET DEFAULT nextval('public.utent
 
 
 --
--- TOC entry 5138 (class 0 OID 24665)
--- Dependencies: 224
+-- TOC entry 5176 (class 0 OID 24665)
+-- Dependencies: 225
 -- Data for Name: annuncio; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.annuncio (id, titolo, descrizione, prezzo, prezzo_ribassato, metri_quadri, tipo_operazione, indirizzo, latitudine, longitudine, in_asta, id_venditore, id_categoria, data_inserimento, stato, num_bagni, num_locali, numero_modifiche) FROM stdin;
 87	Chalet in montagna	Splendida villa di 200 mq immersa nel verde e nella quiete di Trento, ideale per chi cerca il perfetto connubio tra natura e comfort, offrendo ben 8 locali luminosi e 2 bagni per accogliere la vostra famiglia e i vostri ospiti. Questa proprietà rappresenta un'opportunità unica per vivere la montagna in ogni stagione, godendo di ampi spazi e di una posizione invidiabile. Perfetta sia come residenza principale che come rifugio d'eccezione, è pronta ad accogliere i vostri sogni.	500000.00	\N	200	VENDITA	Trento, Via Vallelaghi	46.113053	11.071277	f	3	2	2026-04-04 12:20:19.226934	APPROVATO	\N	\N	1
 11	Appartamento per studenti	Appartamento in zona centrale,vicino alla stazione e alla fermata dei pullman per l'Università	300.00	\N	75	AFFITTO	Via Marconi 2	39.3312	16.1805	f	2	1	2026-03-27 23:10:09.509248	RIFIUTATO	\N	\N	0
+89	Casa al mare 		50000.00	\N	70	VENDITA	Scalea, Corso Mediterraneo	\N	\N	f	15	1	2026-06-18 15:37:10.819235	RIFIUTATO	2	5	0
 26	terreno	terreno edificabile	30000.00	\N	300000	VENDITA	Via Alberto Savino	39.354762	16.228587	f	2	4	2026-03-28 00:39:50.574092	RIFIUTATO	\N	\N	0
 14	villa 		200000.00	\N	200000	VENDITA	Corso Mazzini	39.298065	16.253706	f	2	2	2026-03-27 23:47:54.187339	RIFIUTATO	\N	\N	0
 10	Villa con piscina e giardino	Confortevole villa,spaziosa e dotata di tutti i confort. 	600000.00	\N	350	VENDITA	Cosenza, Via Domenico Morelli	39.2936	16.2259	f	2	2	2026-03-24 10:41:09.656099	APPROVATO	\N	\N	0
@@ -625,10 +644,10 @@ COPY public.annuncio (id, titolo, descrizione, prezzo, prezzo_ribassato, metri_q
 2	Villa con piscina	Splendida villa con piscina e giardino	850000.00	\N	300	VENDITA	Cosenza, Via Nazionale 45	39.3012	16.258	f	2	2	2026-03-21 21:49:19.992217	APPROVATO	\N	\N	0
 9	Ufficio commerciale	Ufficio al secondo piano con parcheggio	1200.00	\N	80	AFFITTO	Cosenza, Corso Mazzini 12	39.2995	16.256	f	2	5	2026-03-21 21:50:19.569501	APPROVATO	\N	\N	0
 88	Casa in affitto	Splendido appartamento di 50 mq completamente ristrutturato, ideale per single o coppie, situato nel cuore di Genova, offre 3 locali luminosi e accoglienti, con un bagno moderno e funzionale. Questa soluzione abitativa rappresenta un'opportunità imperdibile per vivere in una delle città più affascinanti d'Italia, combinando comfort, stile e una posizione invidiabile. Non lasciatevi sfuggire questa chicca genovese, perfetta per chi cerca un nido elegante e pratico.	400.00	\N	50	AFFITTO	Genova, Sestri Ponente	44.432005	8.872861	f	2	1	2026-04-04 12:36:44.142171	APPROVATO	\N	\N	1
-51	Box auto coperto garage	Box auto singolo in condominio sicuro con cancello automatico, vicino al centro città.	18000.00	\N	15	VENDITA	Cosenza, Via Trieste 7	39.3021	16.2587	f	15	5	2026-04-04 00:13:06.007623	APPROVATO	0	1	0
+51	Box auto coperto garage	Box auto singolo in condominio sicuro con cancello automatico, vicino al centro città.	17000.00	\N	15	VENDITA	Cosenza, Via Trieste 7	39.3021	16.2587	f	15	5	2026-04-04 00:13:06.007623	APPROVATO	\N	\N	1
+30	Appartamento in riva al mare	Adatto ai periodi estivi	50000.00	\N	45	VENDITA	Scalea, Corso Mediterraneo 5	39.80459	15.791	f	2	1	2026-03-28 11:26:45.181499	APPROVATO	\N	\N	1
 5	Ufficio commerciale	Ufficio al secondo piano con parcheggio	1200.00	\N	80	AFFITTO	Cosenza, Corso Mazzini 12	39.2995	16.256	f	2	5	2026-03-21 21:49:19.992217	APPROVATO	\N	\N	0
 12	Appaartamento per studenti	Appartamento centrale 	300.00	\N	50	AFFITTO	Rende, Via Marconi 23	39.352756	16.239155	f	2	1	2026-03-27 23:12:28.442523	APPROVATO	\N	\N	0
-30	Appartamento in riva al mare	Adatto ai periodi estivi	50000.00	\N	45	VENDITA	Scalea, Corso Mediterraneo 5	39.80459	15.791	t	2	1	2026-03-28 11:26:45.181499	APPROVATO	\N	\N	1
 47	Appartamento luminoso centro storico	Bellissimo appartamento al terzo piano con vista panoramica, recentemente ristrutturato con finiture di pregio.	185000.00	\N	85	VENDITA	Cosenza, Via Roma 12	39.2984	16.2542	f	15	1	2026-04-04 00:13:06.007623	APPROVATO	1	3	0
 48	Villa con piscina collina	Splendida villa su due livelli con ampio giardino, piscina e garage doppio. Posizione tranquilla e panoramica.	520000.00	\N	280	VENDITA	Rende, Via Panoramica 5	39.3317	16.1814	f	15	2	2026-04-04 00:13:06.007623	APPROVATO	3	7	0
 49	Ufficio moderno zona business	Ufficio open space al secondo piano con reception, sala riunioni e parcheggio riservato.	1200.00	\N	120	AFFITTO	Cosenza, Viale della Repubblica 33	39.3012	16.2498	f	15	3	2026-04-04 00:13:06.007623	APPROVATO	2	4	0
@@ -672,8 +691,8 @@ COPY public.annuncio (id, titolo, descrizione, prezzo, prezzo_ribassato, metri_q
 
 
 --
--- TOC entry 5146 (class 0 OID 24764)
--- Dependencies: 232
+-- TOC entry 5184 (class 0 OID 24764)
+-- Dependencies: 233
 -- Data for Name: asta; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -685,19 +704,28 @@ COPY public.asta (id, id_annuncio, prezzo_base, offerta_max, id_offerente, data_
 5	30	45000.00	\N	\N	2026-03-28 15:25:00	f
 6	30	40000.00	\N	\N	2026-03-19 17:52:00	f
 7	30	40000.00	\N	\N	2026-03-28 15:52:00	f
-8	30	40000.00	\N	\N	2026-03-13 13:53:00	t
 9	1	200000.00	\N	\N	2026-03-28 14:17:00	f
 10	1	200000.00	\N	\N	2026-03-28 17:21:00	f
 11	1	200000.00	\N	\N	2026-03-28 17:23:00	f
 12	1	200000.00	\N	\N	2026-03-28 16:23:00	f
 13	1	200000.00	\N	\N	2026-03-28 17:34:00	f
-14	30	40000.00	\N	\N	2026-04-11 17:10:00	t
+15	51	15000.00	\N	\N	2026-06-26 12:09:00	f
+8	30	40000.00	\N	\N	2026-03-13 13:53:00	f
+14	30	40000.00	\N	\N	2026-04-11 17:10:00	f
+17	51	14000.00	\N	\N	2026-06-19 06:08:00	f
+19	51	13000.00	\N	\N	2026-06-19 06:24:00	f
+20	51	13000.00	\N	\N	2026-06-19 06:26:00	f
+21	51	15000.00	\N	\N	2026-06-19 06:29:00	f
+22	51	13000.00	\N	\N	2026-06-19 06:30:00	f
+23	51	13000.00	\N	\N	2026-06-19 06:34:00	f
+24	51	13000.00	\N	\N	2026-06-19 06:43:00	f
+26	51	15000.00	\N	\N	2026-06-19 07:21:00	f
 \.
 
 
 --
--- TOC entry 5134 (class 0 OID 24634)
--- Dependencies: 220
+-- TOC entry 5172 (class 0 OID 24634)
+-- Dependencies: 221
 -- Data for Name: categoria; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -712,8 +740,8 @@ COPY public.categoria (id, nome, ordine) FROM stdin;
 
 
 --
--- TOC entry 5140 (class 0 OID 24695)
--- Dependencies: 226
+-- TOC entry 5178 (class 0 OID 24695)
+-- Dependencies: 227
 -- Data for Name: foto; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -851,8 +879,8 @@ COPY public.foto (id, id_annuncio, url) FROM stdin;
 
 
 --
--- TOC entry 5144 (class 0 OID 24738)
--- Dependencies: 230
+-- TOC entry 5182 (class 0 OID 24738)
+-- Dependencies: 231
 -- Data for Name: messaggio; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -902,6 +930,7 @@ COPY public.messaggio (id, id_annuncio, id_mittente, oggetto, testo, data_invio,
 152	32	3	⚠️ Segnalazione annuncio	L'utente Giulia Bianchi ha segnalato l'annuncio: "casa vancanze".\n\nCategoria: CONTENUTO_FALSO\nMotivo: .	2026-04-03 23:59:51.001542	t	f	f	t
 155	67	6	Interesse per: Appartamento vista Colosseo	Salve, sono interessato/a all'annuncio "Appartamento vista Colosseo". Contattatemi via email (bobalice@email.it) per ulteriori informazioni. Grazie.	2026-04-04 12:30:40.224373	t	f	f	f
 158	88	6	⚠️ Segnalazione annuncio	L'utente bob alice ha segnalato l'annuncio: "Casa in affitto".\n\nCategoria: TRUFFA\nMotivo: possibile truffa	2026-04-04 12:45:12.612847	t	f	f	t
+159	89	15	Nuova richiesta di approvazione	Il venditore Giulia Lentino ha richiesto l'approvazione dell'annuncio: "Casa al mare ".	2026-06-18 15:37:10.918783	t	f	f	t
 93	\N	6	Richiesta promozione a venditore	L'utente bob alice (bobalice@email.it) ha richiesto di diventare venditore.	2026-04-02 22:02:31.181377	t	f	f	t
 94	\N	1	Richiesta rifiutata	La tua richiesta di diventare venditore è stata rifiutata. Contatta l'amministratore per maggiori informazioni.	2026-04-02 22:03:09.590296	f	f	f	f
 95	10	6	⚠️ Segnalazione annuncio	L'utente bob alice ha segnalato l'annuncio: "Villa con piscina e giardino".\n\nCategoria: CONTENUTO_FALSO\nMotivo: Non esiste	2026-04-03 16:54:09.662325	t	f	f	t
@@ -930,6 +959,7 @@ COPY public.messaggio (id, id_annuncio, id_mittente, oggetto, testo, data_invio,
 126	10	5	Segnalazione inviata	Hai segnalato l'annuncio: "Villa con piscina e giardino".\nCategoria: TRUFFA\nMotivo: .\n\nL'amministratore esaminerà la segnalazione al più presto.	2026-04-03 22:10:59.234213	t	t	f	f
 156	88	2	Nuova richiesta di approvazione	Il venditore Mario Rossi ha richiesto l'approvazione dell'annuncio: "Casa in affitto".	2026-04-04 12:36:44.160195	t	f	f	t
 157	88	1	✅ Annuncio approvato!	Il tuo annuncio "Casa in affitto" è stato approvato ed è ora visibile a tutti gli utenti.	2026-04-04 12:37:47.254886	t	f	f	f
+160	89	1	❌ Annuncio rifiutato	Il tuo annuncio "Casa al mare " è stato rifiutato. Puoi modificarlo e ripubblicarlo.	2026-06-18 15:37:51.04911	t	f	f	f
 137	4	5	⚠️ Segnalazione annuncio	L'utente giulia lentino ha segnalato l'annuncio: "Appartamento in affitto".\n\nCategoria: CONTENUTO_FALSO\nMotivo: .	2026-04-03 22:46:45.079163	t	f	f	t
 138	5	5	⚠️ Segnalazione annuncio	L'utente giulia lentino ha segnalato l'annuncio: "Ufficio commerciale".\n\nCategoria: TRUFFA\nMotivo: .	2026-04-03 22:46:57.959392	t	f	f	t
 143	\N	3	✅ Segnalazione inviata	Hai segnalato l'annuncio: "Casa in affitto a Trieste".\nCategoria: CONTENUTO_FALSO\nMotivo: .\n\nL'amministratore esaminerà la segnalazione al più presto.	2026-04-03 23:19:47.239574	f	f	f	f
@@ -937,8 +967,8 @@ COPY public.messaggio (id, id_annuncio, id_mittente, oggetto, testo, data_invio,
 
 
 --
--- TOC entry 5148 (class 0 OID 24787)
--- Dependencies: 234
+-- TOC entry 5186 (class 0 OID 24787)
+-- Dependencies: 235
 -- Data for Name: offerta; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -947,8 +977,8 @@ COPY public.offerta (id, id_asta, id_utente, importo, data_offerta) FROM stdin;
 
 
 --
--- TOC entry 5150 (class 0 OID 24810)
--- Dependencies: 236
+-- TOC entry 5188 (class 0 OID 24810)
+-- Dependencies: 237
 -- Data for Name: preferito; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -957,8 +987,8 @@ COPY public.preferito (id, id_utente, id_annuncio) FROM stdin;
 
 
 --
--- TOC entry 5142 (class 0 OID 24712)
--- Dependencies: 228
+-- TOC entry 5180 (class 0 OID 24712)
+-- Dependencies: 229
 -- Data for Name: recensione; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -968,8 +998,8 @@ COPY public.recensione (id, id_annuncio, id_utente, punteggio, commento, data_re
 
 
 --
--- TOC entry 5152 (class 0 OID 24844)
--- Dependencies: 238
+-- TOC entry 5190 (class 0 OID 24844)
+-- Dependencies: 239
 -- Data for Name: richiesta_promozione; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -981,8 +1011,8 @@ COPY public.richiesta_promozione (id, id_utente, stato, data_richiesta) FROM std
 
 
 --
--- TOC entry 5154 (class 0 OID 33037)
--- Dependencies: 240
+-- TOC entry 5192 (class 0 OID 33037)
+-- Dependencies: 241
 -- Data for Name: segnalazione; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1007,44 +1037,44 @@ COPY public.segnalazione (id, id_annuncio, id_segnalante, motivo, categoria, sta
 
 
 --
--- TOC entry 5136 (class 0 OID 24645)
--- Dependencies: 222
+-- TOC entry 5174 (class 0 OID 24645)
+-- Dependencies: 223
 -- Data for Name: utente; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.utente (id, nome, cognome, email, password, ruolo, bannato, foto_profilo, email_verificata, token_verifica, token_reset, token_reset_scadenza) FROM stdin;
-1	Admin	Sistema	immobiliareunical@gmail.com	$2a$04$y2A9gIzs9hCkUFbqLnzf7OGMMfyo/G2/uv4pxrXNYj.pi/6x0hgre	AMMINISTRATORE	f	http://localhost:8080/uploads/profilo_1_18f3c3f6-20e7-4231-a4bb-7c7b057bff24.jpg	t	\N	\N	\N
-15	Giulia	Lentino	lentinogiulia@gmail.com	$2a$04$BIhWJUdijLfAZgapjVYjBusUM0sVzDyuMQv31UvEWHEymvu421noi	VENDITORE	f	http://localhost:8080/uploads/profilo_15_f78b52a4-3f62-4e49-81ff-1504ca4a6b1b.jpg	t	\N	e4a2e967-bde5-41b3-8b7e-9116d9ef980a	2026-03-31 16:08:58.981635
-2	Mario	Rossi	mario.rossi@email.it	$2a$04$Q1Jn7smCMeZT./ZOp77dGOv04hkMHRQGzXjBWlj16bW.HpsQkUUmK	VENDITORE	f	http://localhost:8080/uploads/profilo_2_a6122249-b6c3-421f-a50b-09034ab84578.jpg	t	\N	\N	\N
-6	bob	alice	bobalice@email.it	$2a$04$uSMMJaMcNfl1iS5WAy9oI.DR9cQUVLjAE4Gl82jTYNKakuQtjTDP6	ACQUIRENTE	f	http://localhost:8080/uploads/profilo_6_92f20043-19d7-4f9d-a9f4-d4da197ba8df.jpg	t	\N	\N	\N
-3	Giulia	Bianchi	giulia.bianchi@email.it	$2a$04$dXsOQIuY6maHewBIvrrI6u0MqZZ4fOlllVQRbq9KoQV0e.rdlM21W	VENDITORE	f	\N	t	\N	\N	\N
-4	Test	Utente	test@test.it	$2a$04$CJM42wzeGI/21c8nDBSoGOWDzP/v2O6ASdUNB67ssTDQY6gZqQIpG	AMMINISTRATORE	t	\N	t	\N	\N	\N
-7	ciao	ciao	giulia.lentino@email.it	$2a$04$Xfx2d1rmCNDV8wsuIU166O5TM4WiJvkccbIasHEY3US0E9MN5WYQO	ACQUIRENTE	f	\N	t	\N	\N	\N
-5	giulia	lentino	giulia.lentino@gmail.com	$2a$04$C1Qf3S/7MqACSOVijiX/4uTDcsWioUynH4GtRvVJB6FnHDADqqRBO	VENDITORE	f	\N	t	\N	\N	\N
+COPY public.utente (id, nome, cognome, email, password, ruolo, bannato, foto_profilo, email_verificata, token_verifica, token_reset, token_reset_scadenza, descrizione) FROM stdin;
+5	giulia	lentino	giulia.lentino@gmail.com	$2a$10$DRmt6paKa4OjsNtUWGQ2wei77spei1cLPBpe/BMsCoxWqAoyUJYo2	VENDITORE	f	\N	t	\N	\N	\N	\N
+1	Admin	Sistema	immobiliareunical@gmail.com	$2a$10$g4wftNLKm0WQmR/COz0zHOtdZeXFQb8VUBvXLPH1Wj.4n7tAzu.2.	AMMINISTRATORE	f	http://localhost:8080/uploads/profilo_1_18f3c3f6-20e7-4231-a4bb-7c7b057bff24.jpg	t	\N	\N	\N	\N
+6	bob	alice	bobalice@email.it	$2a$10$VUtnKc4mInqDkdoZrL3SQ..Km1bRr9zrFTMY5iJAEQ383zWPbEnNS	ACQUIRENTE	f	http://localhost:8080/uploads/profilo_6_92f20043-19d7-4f9d-a9f4-d4da197ba8df.jpg	t	\N	\N	\N	\N
+7	ciao	ciao	giulia.lentino@email.it	$2a$10$sNEdPhGSKlvJj3kmP5scXuonO8kyb8Hk9.Dzrj3g6JTaxT8Scxuwa	ACQUIRENTE	f	\N	t	\N	\N	\N	\N
+3	Giulia	Bianchi	giulia.bianchi@email.it	$2a$10$nz8bk.334coIqxq8c4TFlObW77nWOwSYB8ShvN34EJyInCzpI49g.	VENDITORE	f	\N	t	\N	\N	\N	Salve!
+2	Mario	Rossi	mario.rossi@email.it	$2a$10$gpIEW/mByf3tbu1ZOyhnlO5QbOUi31KsGBKjBAnIOmD/eXljY9pnu	VENDITORE	f	http://localhost:8080/uploads/profilo_2_a6122249-b6c3-421f-a50b-09034ab84578.jpg	t	\N	\N	\N	\N
+4	Test	Utente	test@test.it	$2a$04$CJM42wzeGI/21c8nDBSoGOWDzP/v2O6ASdUNB67ssTDQY6gZqQIpG	AMMINISTRATORE	t	\N	t	\N	\N	\N	\N
+15	Giulia	Lentino	lentinogiulia@gmail.com	$2a$10$H5bskiTLZ7LTbw.z11yZUOR0VqGUM2eORN6ytEq4A1orxd5giqI1m	VENDITORE	f	http://localhost:8080/uploads/profilo_15_f78b52a4-3f62-4e49-81ff-1504ca4a6b1b.jpg	t	\N	e4a2e967-bde5-41b3-8b7e-9116d9ef980a	2026-03-31 16:08:58.981635	Sono un agente immobiliare
 \.
 
 
 --
--- TOC entry 5171 (class 0 OID 0)
--- Dependencies: 223
+-- TOC entry 5210 (class 0 OID 0)
+-- Dependencies: 224
 -- Name: annuncio_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.annuncio_id_seq', 88, true);
+SELECT pg_catalog.setval('public.annuncio_id_seq', 90, true);
 
 
 --
--- TOC entry 5172 (class 0 OID 0)
--- Dependencies: 231
+-- TOC entry 5211 (class 0 OID 0)
+-- Dependencies: 232
 -- Name: asta_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.asta_id_seq', 14, true);
+SELECT pg_catalog.setval('public.asta_id_seq', 26, true);
 
 
 --
--- TOC entry 5173 (class 0 OID 0)
--- Dependencies: 219
+-- TOC entry 5212 (class 0 OID 0)
+-- Dependencies: 220
 -- Name: categoria_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1052,53 +1082,53 @@ SELECT pg_catalog.setval('public.categoria_id_seq', 6, true);
 
 
 --
--- TOC entry 5174 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 5213 (class 0 OID 0)
+-- Dependencies: 226
 -- Name: foto_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.foto_id_seq', 172, true);
+SELECT pg_catalog.setval('public.foto_id_seq', 174, true);
 
 
 --
--- TOC entry 5175 (class 0 OID 0)
--- Dependencies: 229
+-- TOC entry 5214 (class 0 OID 0)
+-- Dependencies: 230
 -- Name: messaggio_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.messaggio_id_seq', 158, true);
+SELECT pg_catalog.setval('public.messaggio_id_seq', 164, true);
 
 
 --
--- TOC entry 5176 (class 0 OID 0)
--- Dependencies: 233
+-- TOC entry 5215 (class 0 OID 0)
+-- Dependencies: 234
 -- Name: offerta_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.offerta_id_seq', 1, false);
+SELECT pg_catalog.setval('public.offerta_id_seq', 6, true);
 
 
 --
--- TOC entry 5177 (class 0 OID 0)
--- Dependencies: 235
+-- TOC entry 5216 (class 0 OID 0)
+-- Dependencies: 236
 -- Name: preferito_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.preferito_id_seq', 5, true);
+SELECT pg_catalog.setval('public.preferito_id_seq', 6, true);
 
 
 --
--- TOC entry 5178 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 5217 (class 0 OID 0)
+-- Dependencies: 228
 -- Name: recensione_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.recensione_id_seq', 1, true);
+SELECT pg_catalog.setval('public.recensione_id_seq', 2, true);
 
 
 --
--- TOC entry 5179 (class 0 OID 0)
--- Dependencies: 237
+-- TOC entry 5218 (class 0 OID 0)
+-- Dependencies: 238
 -- Name: richiesta_promozione_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1106,25 +1136,25 @@ SELECT pg_catalog.setval('public.richiesta_promozione_id_seq', 14, true);
 
 
 --
--- TOC entry 5180 (class 0 OID 0)
--- Dependencies: 239
+-- TOC entry 5219 (class 0 OID 0)
+-- Dependencies: 240
 -- Name: segnalazione_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.segnalazione_id_seq', 30, true);
+SELECT pg_catalog.setval('public.segnalazione_id_seq', 31, true);
 
 
 --
--- TOC entry 5181 (class 0 OID 0)
--- Dependencies: 221
+-- TOC entry 5220 (class 0 OID 0)
+-- Dependencies: 222
 -- Name: utente_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.utente_id_seq', 15, true);
+SELECT pg_catalog.setval('public.utente_id_seq', 18, true);
 
 
 --
--- TOC entry 4949 (class 2606 OID 24683)
+-- TOC entry 4987 (class 2606 OID 24683)
 -- Name: annuncio annuncio_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1133,7 +1163,7 @@ ALTER TABLE ONLY public.annuncio
 
 
 --
--- TOC entry 4957 (class 2606 OID 24775)
+-- TOC entry 4995 (class 2606 OID 24775)
 -- Name: asta asta_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1142,7 +1172,7 @@ ALTER TABLE ONLY public.asta
 
 
 --
--- TOC entry 4940 (class 2606 OID 24643)
+-- TOC entry 4978 (class 2606 OID 24643)
 -- Name: categoria categoria_nome_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1151,7 +1181,7 @@ ALTER TABLE ONLY public.categoria
 
 
 --
--- TOC entry 4942 (class 2606 OID 24641)
+-- TOC entry 4980 (class 2606 OID 24641)
 -- Name: categoria categoria_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1160,7 +1190,7 @@ ALTER TABLE ONLY public.categoria
 
 
 --
--- TOC entry 4951 (class 2606 OID 24705)
+-- TOC entry 4989 (class 2606 OID 24705)
 -- Name: foto foto_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1169,7 +1199,7 @@ ALTER TABLE ONLY public.foto
 
 
 --
--- TOC entry 4955 (class 2606 OID 24752)
+-- TOC entry 4993 (class 2606 OID 24752)
 -- Name: messaggio messaggio_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1178,7 +1208,7 @@ ALTER TABLE ONLY public.messaggio
 
 
 --
--- TOC entry 4959 (class 2606 OID 24798)
+-- TOC entry 4997 (class 2606 OID 24798)
 -- Name: offerta offerta_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1187,7 +1217,7 @@ ALTER TABLE ONLY public.offerta
 
 
 --
--- TOC entry 4961 (class 2606 OID 24820)
+-- TOC entry 4999 (class 2606 OID 24820)
 -- Name: preferito preferito_id_utente_id_annuncio_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1196,7 +1226,7 @@ ALTER TABLE ONLY public.preferito
 
 
 --
--- TOC entry 4963 (class 2606 OID 24818)
+-- TOC entry 5001 (class 2606 OID 24818)
 -- Name: preferito preferito_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1205,7 +1235,7 @@ ALTER TABLE ONLY public.preferito
 
 
 --
--- TOC entry 4953 (class 2606 OID 24726)
+-- TOC entry 4991 (class 2606 OID 24726)
 -- Name: recensione recensione_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1214,7 +1244,7 @@ ALTER TABLE ONLY public.recensione
 
 
 --
--- TOC entry 4965 (class 2606 OID 24854)
+-- TOC entry 5003 (class 2606 OID 24854)
 -- Name: richiesta_promozione richiesta_promozione_id_utente_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1223,7 +1253,7 @@ ALTER TABLE ONLY public.richiesta_promozione
 
 
 --
--- TOC entry 4967 (class 2606 OID 24852)
+-- TOC entry 5005 (class 2606 OID 24852)
 -- Name: richiesta_promozione richiesta_promozione_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1232,7 +1262,7 @@ ALTER TABLE ONLY public.richiesta_promozione
 
 
 --
--- TOC entry 4969 (class 2606 OID 33049)
+-- TOC entry 5007 (class 2606 OID 33049)
 -- Name: segnalazione segnalazione_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1241,7 +1271,7 @@ ALTER TABLE ONLY public.segnalazione
 
 
 --
--- TOC entry 4945 (class 2606 OID 24663)
+-- TOC entry 4983 (class 2606 OID 24663)
 -- Name: utente utente_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1250,7 +1280,7 @@ ALTER TABLE ONLY public.utente
 
 
 --
--- TOC entry 4947 (class 2606 OID 24661)
+-- TOC entry 4985 (class 2606 OID 24661)
 -- Name: utente utente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1259,7 +1289,7 @@ ALTER TABLE ONLY public.utente
 
 
 --
--- TOC entry 4943 (class 1259 OID 24860)
+-- TOC entry 4981 (class 1259 OID 24860)
 -- Name: idx_utente_email; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1267,7 +1297,7 @@ CREATE INDEX idx_utente_email ON public.utente USING btree (email);
 
 
 --
--- TOC entry 4970 (class 2606 OID 24689)
+-- TOC entry 5008 (class 2606 OID 24689)
 -- Name: annuncio annuncio_id_categoria_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1276,7 +1306,7 @@ ALTER TABLE ONLY public.annuncio
 
 
 --
--- TOC entry 4971 (class 2606 OID 24684)
+-- TOC entry 5009 (class 2606 OID 24684)
 -- Name: annuncio annuncio_id_venditore_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1285,7 +1315,7 @@ ALTER TABLE ONLY public.annuncio
 
 
 --
--- TOC entry 4977 (class 2606 OID 24776)
+-- TOC entry 5015 (class 2606 OID 24776)
 -- Name: asta asta_id_annuncio_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1294,7 +1324,7 @@ ALTER TABLE ONLY public.asta
 
 
 --
--- TOC entry 4978 (class 2606 OID 24781)
+-- TOC entry 5016 (class 2606 OID 24781)
 -- Name: asta asta_id_offerente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1303,7 +1333,7 @@ ALTER TABLE ONLY public.asta
 
 
 --
--- TOC entry 4972 (class 2606 OID 24706)
+-- TOC entry 5010 (class 2606 OID 24706)
 -- Name: foto foto_id_annuncio_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1312,7 +1342,7 @@ ALTER TABLE ONLY public.foto
 
 
 --
--- TOC entry 4975 (class 2606 OID 24753)
+-- TOC entry 5013 (class 2606 OID 24753)
 -- Name: messaggio messaggio_id_annuncio_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1321,7 +1351,7 @@ ALTER TABLE ONLY public.messaggio
 
 
 --
--- TOC entry 4976 (class 2606 OID 24758)
+-- TOC entry 5014 (class 2606 OID 24758)
 -- Name: messaggio messaggio_id_mittente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1330,7 +1360,7 @@ ALTER TABLE ONLY public.messaggio
 
 
 --
--- TOC entry 4979 (class 2606 OID 24799)
+-- TOC entry 5017 (class 2606 OID 24799)
 -- Name: offerta offerta_id_asta_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1339,7 +1369,7 @@ ALTER TABLE ONLY public.offerta
 
 
 --
--- TOC entry 4980 (class 2606 OID 24804)
+-- TOC entry 5018 (class 2606 OID 24804)
 -- Name: offerta offerta_id_utente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1348,7 +1378,7 @@ ALTER TABLE ONLY public.offerta
 
 
 --
--- TOC entry 4981 (class 2606 OID 24826)
+-- TOC entry 5019 (class 2606 OID 24826)
 -- Name: preferito preferito_id_annuncio_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1357,7 +1387,7 @@ ALTER TABLE ONLY public.preferito
 
 
 --
--- TOC entry 4982 (class 2606 OID 24821)
+-- TOC entry 5020 (class 2606 OID 24821)
 -- Name: preferito preferito_id_utente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1366,7 +1396,7 @@ ALTER TABLE ONLY public.preferito
 
 
 --
--- TOC entry 4973 (class 2606 OID 24727)
+-- TOC entry 5011 (class 2606 OID 24727)
 -- Name: recensione recensione_id_annuncio_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1375,7 +1405,7 @@ ALTER TABLE ONLY public.recensione
 
 
 --
--- TOC entry 4974 (class 2606 OID 24732)
+-- TOC entry 5012 (class 2606 OID 24732)
 -- Name: recensione recensione_id_utente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1384,7 +1414,7 @@ ALTER TABLE ONLY public.recensione
 
 
 --
--- TOC entry 4983 (class 2606 OID 24855)
+-- TOC entry 5021 (class 2606 OID 24855)
 -- Name: richiesta_promozione richiesta_promozione_id_utente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1393,7 +1423,7 @@ ALTER TABLE ONLY public.richiesta_promozione
 
 
 --
--- TOC entry 4984 (class 2606 OID 33050)
+-- TOC entry 5022 (class 2606 OID 33050)
 -- Name: segnalazione segnalazione_id_annuncio_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1402,7 +1432,7 @@ ALTER TABLE ONLY public.segnalazione
 
 
 --
--- TOC entry 4985 (class 2606 OID 33055)
+-- TOC entry 5023 (class 2606 OID 33055)
 -- Name: segnalazione segnalazione_id_segnalante_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1410,11 +1440,11 @@ ALTER TABLE ONLY public.segnalazione
     ADD CONSTRAINT segnalazione_id_segnalante_fkey FOREIGN KEY (id_segnalante) REFERENCES public.utente(id) ON DELETE CASCADE;
 
 
--- Completed on 2026-04-04 12:54:44
+-- Completed on 2026-06-19 07:46:24
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict S3JWmTikT0zGbhu67ltoLXLNNvVRO1WvcKbj7iNBIC5kQUqxvbo4t8Ip0KY7ZE3
+\unrestrict FV0uy2MSvP0LazEaJnHoRqHV2VbW0GIuYrIPd6hDoDnpYNSMOtVIuQ0s5J3aT05
 

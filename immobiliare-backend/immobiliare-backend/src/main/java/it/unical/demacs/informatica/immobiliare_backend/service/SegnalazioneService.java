@@ -42,7 +42,7 @@ public class SegnalazioneService {
         Messaggio msgAdmin = new Messaggio();
         msgAdmin.setIdAnnuncio(segnalazione.getIdAnnuncio());
         msgAdmin.setIdMittente(utente.getId());
-        msgAdmin.setOggetto("⚠️ Segnalazione annuncio");
+        msgAdmin.setOggetto("Segnalazione annuncio");
         msgAdmin.setTesto("L'utente " + utente.getNome() + " " + utente.getCognome() +
                 " ha segnalato l'annuncio: \"" + (annuncio != null ? annuncio.getTitolo() : "#" + segnalazione.getIdAnnuncio()) + "\"." +
                 "\n\nCategoria: " + segnalazione.getCategoria() +
