@@ -54,6 +54,12 @@ public class AstaDao {
                 if (rs.next()) asta.setId(rs.getLong("id"));
             }
         }
+        // L'INSERT scrive attiva=true nel database, ma quel valore non viene mai
+        // riportato sull'oggetto Java restituito al chiamante: senza questa riga,
+        // la risposta JSON inviata subito dopo la creazione avrebbe "attiva" a false,
+        // e il frontend (che mostra l'asta solo se asta.attiva è true) non la mostrerebbe
+        // finché la pagina non viene ricaricata e l'asta riletta dal database.
+        asta.setAttiva(true);
         return asta;
     }
 
@@ -86,5 +92,20 @@ public class AstaDao {
             }
         }
         return null;
+    }
+
+    // Tutte le aste ancora attive la cui data di scadenza è già passata.
+    // Usato dal job schedulato che le chiude automaticamente.
+    public List<Asta> findScadute() throws SQLException {
+        List<Asta> lista = new ArrayList<>();
+        String sql = "SELECT * FROM asta WHERE attiva = true AND data_scadenza < ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(mapRow(rs));
+            }
+        }
+        return lista;
     }
 }

@@ -32,6 +32,7 @@ public class UtenteDao {
             Timestamp ts = rs.getTimestamp("token_reset_scadenza");
             if (ts != null) u.setTokenResetScadenza(ts.toLocalDateTime());
         } catch (Exception ignored) {}
+        try { u.setDescrizione(rs.getString("descrizione")); } catch (Exception ignored) {}
         return u;
     }
 
@@ -129,6 +130,20 @@ public class UtenteDao {
                 ps.setNull(1, java.sql.Types.VARCHAR);
             } else {
                 ps.setString(1, url);
+            }
+            ps.setLong(2, id);
+            ps.executeUpdate();
+        }
+    }
+
+    public void aggiornaDescrizione(Long id, String descrizione) throws SQLException {
+        String sql = "UPDATE utente SET descrizione = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (descrizione == null) {
+                ps.setNull(1, java.sql.Types.VARCHAR);
+            } else {
+                ps.setString(1, descrizione);
             }
             ps.setLong(2, id);
             ps.executeUpdate();

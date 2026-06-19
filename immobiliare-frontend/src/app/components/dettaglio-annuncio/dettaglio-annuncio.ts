@@ -1,6 +1,6 @@
 import { ModalService } from '../../services/modal.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +18,7 @@ import { PreferitoService } from '../../services/preferito';
   templateUrl: './dettaglio-annuncio.html',
   styleUrl: './dettaglio-annuncio.css'
 })
-export class DettaglioAnnuncio implements OnInit {
+export class DettaglioAnnuncio implements OnInit, OnDestroy {
 
   annuncio: any = null;
   utente: any = null;
@@ -39,6 +39,7 @@ export class DettaglioAnnuncio implements OnInit {
   lightboxAperto = false;
   isPreferito = false;
   oggi = new Date();
+  private intervalloAsta: any = null;
 
   // Segnalazione
   mostraSegnalazione = false;
@@ -154,12 +155,43 @@ export class DettaglioAnnuncio implements OnInit {
   caricaAsta() {
     this.astaService.getByAnnuncio(this.annuncio.id).subscribe({
       next: (data: any) => {
+        const astaPrecedente = this.asta;
         this.asta = data;
         this.caricaOfferte();
+        // Se è la prima volta che troviamo un'asta attiva, avviamo il controllo periodico
+        // che la ricontrolla ogni minuto: serve a far sì che la pagina si accorga da sola
+        // se l'asta scade nel frattempo (chiusura automatica lato server), senza bisogno
+        // che l'utente ricarichi manualmente.
+        if (data && !this.intervalloAsta) {
+          this.intervalloAsta = setInterval(() => this.controllaScadenzaAsta(), 60000);
+        }
+        // Se invece l'asta non è più attiva (è appena scaduta), fermiamo il timer:
+        // non serve più ricontrollare.
+        if (!data && astaPrecedente) {
+          this.fermaControlloAsta();
+        }
         this.cdr.detectChanges();
       },
       error: () => this.asta = null
     });
+  }
+
+  // Richiamato periodicamente mentre la pagina è aperta e c'è un'asta attiva.
+  // Non duplica logica: si appoggia allo stesso metodo già usato per il caricamento iniziale.
+  private controllaScadenzaAsta() {
+    if (!this.annuncio) return;
+    this.caricaAsta();
+  }
+
+  private fermaControlloAsta() {
+    if (this.intervalloAsta) {
+      clearInterval(this.intervalloAsta);
+      this.intervalloAsta = null;
+    }
+  }
+
+  ngOnDestroy() {
+    this.fermaControlloAsta();
   }
 
   caricaOfferte() {
@@ -209,14 +241,19 @@ export class DettaglioAnnuncio implements OnInit {
         this.astaCreata = true;
         this.annuncio.inAsta = true;
         this.nuovaAsta = { prezzoBase: null, dataScadenza: '' };
+        setTimeout(() => { this.astaCreata = false; this.cdr.detectChanges(); }, 3000);
         this.cdr.detectChanges();
       },
-      error: (err: any) => console.error(err)
+      error: (err: any) => {
+        this.erroreAsta = err.error || 'Errore durante la creazione dell\'asta';
+        this.cdr.detectChanges();
+      }
     });
   }
 
   faiOfferta() {
     if (!this.nuovaOfferta || !this.asta) return;
+    this.erroreAsta = '';
     this.astaService.faiOfferta(this.asta.id, this.nuovaOfferta).subscribe({
       next: () => {
         this.offertaInviata = true;
@@ -224,7 +261,13 @@ export class DettaglioAnnuncio implements OnInit {
         this.caricaOfferte();
         this.cdr.detectChanges();
       },
-      error: (err: any) => console.error(err)
+      error: (err: any) => {
+        this.erroreAsta = err.error || 'Errore durante l\'invio dell\'offerta';
+        // Se il backend dice che l'asta è scaduta o già chiusa, ricarichiamo subito
+        // lo stato dell'asta così la UI si allinea (es. nasconde il form di offerta).
+        this.caricaAsta();
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -345,6 +388,7 @@ export class DettaglioAnnuncio implements OnInit {
             this.annuncio = data;
             this.asta = null;
             this.offerte = [];
+            this.fermaControlloAsta();
             this.cdr.detectChanges();
           }
         });

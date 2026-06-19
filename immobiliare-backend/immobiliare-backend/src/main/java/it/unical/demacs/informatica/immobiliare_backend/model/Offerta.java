@@ -8,6 +8,10 @@ public class Offerta {
     private Long idUtente;
     private Double importo;
     private LocalDateTime dataOfferta;
+    // Valorizzato dal service solo se chi fa la richiesta ha diritto di vederlo
+    // (venditore dell'annuncio o amministratore). Per chiunque altro resta null,
+    // così il nome di chi offre non esce mai nella risposta JSON per chi non deve vederlo.
+    private String nomeOfferente;
 
     public Offerta() {}
 
@@ -25,4 +29,7 @@ public class Offerta {
 
     public LocalDateTime getDataOfferta() { return dataOfferta; }
     public void setDataOfferta(LocalDateTime dataOfferta) { this.dataOfferta = dataOfferta; }
+
+    public String getNomeOfferente() { return nomeOfferente; }
+    public void setNomeOfferente(String nomeOfferente) { this.nomeOfferente = nomeOfferente; }
 }

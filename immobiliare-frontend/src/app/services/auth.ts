@@ -91,11 +91,38 @@ export class AuthService {
   uploadFotoProfilo(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.apiUrl}/foto-profilo`, formData, { withCredentials: true, responseType: 'text' });
+    return this.http.post(`${this.apiUrl}/foto-profilo`, formData, { withCredentials: true, responseType: 'text' }).pipe(
+      tap((url: any) => {
+        // Aggiorniamo anche l'utente nel BehaviorSubject, così la Navbar si aggiorna subito
+        const utenteAttuale = this.utenteSubject.value;
+        if (utenteAttuale) {
+          this.utenteSubject.next({ ...utenteAttuale, fotoProfilo: url });
+        }
+      })
+    );
   }
 
   rimuoviFotoProfilo(): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/foto-profilo`, { withCredentials: true, responseType: 'text' });
+    return this.http.delete(`${this.apiUrl}/foto-profilo`, { withCredentials: true, responseType: 'text' }).pipe(
+      tap(() => {
+        // Stessa logica dell'upload: aggiorniamo subito anche la Navbar
+        const utenteAttuale = this.utenteSubject.value;
+        if (utenteAttuale) {
+          this.utenteSubject.next({ ...utenteAttuale, fotoProfilo: null });
+        }
+      })
+    );
+  }
+
+  aggiornaDescrizione(descrizione: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/descrizione`, { descrizione }, { withCredentials: true, responseType: 'text' }).pipe(
+      tap(() => {
+        const utenteAttuale = this.utenteSubject.value;
+        if (utenteAttuale) {
+          this.utenteSubject.next({ ...utenteAttuale, descrizione });
+        }
+      })
+    );
   }
 
   getUtenteById(id: number): Observable<any> {

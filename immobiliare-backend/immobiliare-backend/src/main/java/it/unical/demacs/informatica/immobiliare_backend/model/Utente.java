@@ -13,6 +13,7 @@ public class Utente {
     private String tokenVerifica;
     private String tokenReset;
     private java.time.LocalDateTime tokenResetScadenza;
+    private String descrizione;
 
     public Utente() {}
 
@@ -51,4 +52,7 @@ public class Utente {
 
     public java.time.LocalDateTime getTokenResetScadenza() { return tokenResetScadenza; }
     public void setTokenResetScadenza(java.time.LocalDateTime tokenResetScadenza) { this.tokenResetScadenza = tokenResetScadenza; }
+
+    public String getDescrizione() { return descrizione; }
+    public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
 }

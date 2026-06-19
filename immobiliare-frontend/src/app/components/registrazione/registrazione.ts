@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
+import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-registrazione',
@@ -26,7 +27,18 @@ export class Registrazione {
   mostraPassword = false;
   registrazioneCompletata = false;
 
-  constructor(private authService: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private modalService: ModalService
+  ) {}
+
+  // Passa direttamente al modale di login, senza dover chiudere
+  // manualmente questo modale con la X.
+  vaiALogin() {
+    this.modalService.apriLogin();
+  }
 
   emailValida(): boolean {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

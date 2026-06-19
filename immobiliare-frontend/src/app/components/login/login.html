@@ -33,7 +33,7 @@
       </button>
     </div>
     <div class="text-end mt-2">
-      <a routerLink="/recupera-password" style="font-size:12px; color:#8a919e; text-decoration:none;">
+      <a (click)="vaiARecuperaPassword()" style="font-size:12px; color:#8a919e; text-decoration:none; cursor:pointer;">
         Password dimenticata?
       </a>
     </div>
@@ -45,7 +45,7 @@
 
   <p style="font-size:14px; color:#8a919e; text-align:center; margin-top:20px; margin-bottom:0;">
     Non hai un account?
-    <a routerLink="/registrazione" style="color:#b5001a; font-weight:600; text-decoration:none;">Registrati</a>
+    <a (click)="vaiARegistrazione()" style="color:#b5001a; font-weight:600; text-decoration:none; cursor:pointer;">Registrati</a>
   </p>
 
 </div>

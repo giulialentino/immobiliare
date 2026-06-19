@@ -97,4 +97,14 @@ public class AuthController {
         authService.aggiornaSessione(session, utente);
         return ResponseEntity.ok("Foto rimossa");
     }
+
+    @PatchMapping("/descrizione")
+    public ResponseEntity<?> aggiornaDescrizione(@RequestBody Map<String, String> body,
+                                                 HttpSession session) throws SQLException {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
+        authService.aggiornaDescrizione(utente, body.get("descrizione"));
+        authService.aggiornaSessione(session, utente);
+        return ResponseEntity.ok("Descrizione aggiornata");
+    }
 }

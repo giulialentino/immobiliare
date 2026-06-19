@@ -28,6 +28,7 @@ export class Profilo implements OnInit {
   modificando = false;
   descrizione = '';
   salvatoOk = false;
+  salvataggioErrore = '';
   profiloProprio = true;
   sezioneAttiva = 'annunci';
   preferiti: any[] = [];
@@ -252,9 +253,19 @@ export class Profilo implements OnInit {
   }
 
   salvaDescrizione() {
-    this.salvatoOk = true;
-    this.modificando = false;
-    setTimeout(() => this.salvatoOk = false, 3000);
+    this.salvataggioErrore = '';
+    this.authService.aggiornaDescrizione(this.descrizione).subscribe({
+      next: () => {
+        this.salvatoOk = true;
+        this.modificando = false;
+        setTimeout(() => this.salvatoOk = false, 3000);
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.salvataggioErrore = err.error || 'Errore durante il salvataggio della descrizione';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   cambiaPassword() {
@@ -325,4 +336,4 @@ export class Profilo implements OnInit {
       error: (err: any) => console.error(err)
     });
   }
-}
+}queueMicrotask

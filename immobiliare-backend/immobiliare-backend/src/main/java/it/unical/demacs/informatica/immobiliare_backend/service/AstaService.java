@@ -39,6 +39,21 @@ public class AstaService {
         if (importo == null) {
             throw new IllegalArgumentException("Importo mancante");
         }
+        Asta asta = astaDao.findById(idAsta);
+        if (asta == null) {
+            throw new IllegalArgumentException("Asta non trovata");
+        }
+        if (!asta.isAttiva()) {
+            throw new IllegalStateException("L'asta è già chiusa");
+        }
+        if (asta.getDataScadenza() != null && asta.getDataScadenza().isBefore(java.time.LocalDateTime.now())) {
+            // L'asta è scaduta ma il job automatico non l'ha ancora marcata come chiusa
+            // (può succedere nei pochi secondi tra la scadenza e il prossimo ciclo dello scheduler):
+            // la chiudiamo subito qui, invece di accettare un'offerta su un'asta di fatto già finita.
+            astaDao.chiudi(idAsta);
+            annuncioDao.aggiornaInAsta(asta.getIdAnnuncio(), false);
+            throw new IllegalStateException("L'asta è scaduta");
+        }
         Offerta offerta = new Offerta();
         offerta.setIdAsta(idAsta);
         offerta.setIdUtente(utente.getId());
@@ -47,8 +62,31 @@ public class AstaService {
         astaDao.aggiornaOfferta(idAsta, importo, utente.getId());
     }
 
-    public List<Offerta> getOfferte(Long idAsta) throws SQLException {
-        return offertaDao.findByAsta(idAsta);
+    public List<Offerta> getOfferte(Long idAsta, Utente richiedente) throws SQLException {
+        List<Offerta> offerte = offertaDao.findByAsta(idAsta);
+
+        boolean puoVedereNomi = false;
+        if (richiedente != null) {
+            if (richiedente.getRuolo().equals("AMMINISTRATORE")) {
+                puoVedereNomi = true;
+            } else if (richiedente.getRuolo().equals("VENDITORE")) {
+                Asta asta = astaDao.findById(idAsta);
+                if (asta != null) {
+                    Annuncio annuncio = annuncioDao.findById(asta.getIdAnnuncio());
+                    puoVedereNomi = annuncio != null && annuncio.getIdVenditore().equals(richiedente.getId());
+                }
+            }
+        }
+
+        // Chi non ha diritto di vedere i nomi (acquirenti, visitatori non loggati) riceve
+        // comunque gli importi, ma con nomeOfferente svuotato: il filtro avviene qui,
+        // lato server, prima che la risposta esca — non è un nascondimento solo grafico.
+        if (!puoVedereNomi) {
+            for (Offerta o : offerte) {
+                o.setNomeOfferente(null);
+            }
+        }
+        return offerte;
     }
 
     public void chiudiAsta(Long idAsta, Utente utente) throws SQLException {
@@ -65,6 +103,22 @@ public class AstaService {
         astaDao.chiudi(idAsta);
         if (annuncio != null) {
             annuncioDao.aggiornaInAsta(asta.getIdAnnuncio(), false);
+        }
+    }
+
+    // Job schedulato: chiude automaticamente tutte le aste la cui scadenza è passata.
+    // Eseguito dallo scheduler di Spring (vedi @Scheduled), non da un utente:
+    // qui non serve il controllo sui permessi presente in chiudiAsta().
+    @org.springframework.scheduling.annotation.Scheduled(fixedRate = 60000)
+    public void chiudiAsteScadute() {
+        try {
+            List<Asta> scadute = astaDao.findScadute();
+            for (Asta asta : scadute) {
+                astaDao.chiudi(asta.getId());
+                annuncioDao.aggiornaInAsta(asta.getIdAnnuncio(), false);
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante la chiusura automatica delle aste scadute: " + e.getMessage());
         }
     }
 }

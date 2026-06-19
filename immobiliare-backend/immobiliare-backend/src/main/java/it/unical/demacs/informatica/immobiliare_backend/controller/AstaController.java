@@ -46,8 +46,9 @@ public class AstaController {
     }
 
     @GetMapping("/{idAsta}/offerte")
-    public ResponseEntity<?> getOfferte(@PathVariable Long idAsta) throws SQLException {
-        return ResponseEntity.ok(astaService.getOfferte(idAsta));
+    public ResponseEntity<?> getOfferte(@PathVariable Long idAsta, HttpSession session) throws SQLException {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        return ResponseEntity.ok(astaService.getOfferte(idAsta, utente));
     }
 
     @PatchMapping("/{idAsta}/chiudi")

@@ -154,6 +154,18 @@ export class ModificaAnnuncio implements OnInit {
 
   onFileSelected(event: any) {
     const files: File[] = Array.from(event.target.files);
+
+    const totaleFoto = this.fotoEsistenti.length + files.length;
+    if (totaleFoto > 10) {
+      const postiLiberi = 10 - this.fotoEsistenti.length;
+      this.errore = postiLiberi > 0
+        ? `Puoi aggiungere al massimo altre ${postiLiberi} foto (hai già ${this.fotoEsistenti.length} foto su 10)`
+        : `Hai già raggiunto il limite di 10 foto. Rimuovi qualche foto esistente prima di aggiungerne altre.`;
+      event.target.value = '';
+      this.nuoveFoto = [];
+      return;
+    }
+
     const nonValidi = files.filter(f => {
       const ext = f.name.toLowerCase().split('.').pop();
       return !['jpg', 'jpeg', 'png'].includes(ext || '');
@@ -213,14 +225,28 @@ export class ModificaAnnuncio implements OnInit {
         };
 
         if (this.nuoveFoto.length > 0) {
-          let caricati = 0;
+          let completati = 0;
+          let erroriFoto: string[] = [];
+          const totale = this.nuoveFoto.length;
           this.nuoveFoto.forEach(file => {
             this.fotoService.upload(this.annuncio.id, file).subscribe({
               next: () => {
-                caricati++;
-                if (caricati === this.nuoveFoto.length) dopoFoto();
+                completati++;
+                if (completati === totale) {
+                  if (erroriFoto.length > 0) {
+                    this.errore = `Modifiche salvate, ma alcune foto non sono state caricate: ${erroriFoto.join(', ')}`;
+                  }
+                  dopoFoto();
+                }
               },
-              error: (err: any) => console.error(err)
+              error: (err: any) => {
+                completati++;
+                erroriFoto.push(err.error || file.name);
+                if (completati === totale) {
+                  this.errore = `Modifiche salvate, ma alcune foto non sono state caricate: ${erroriFoto.join(', ')}`;
+                  dopoFoto();
+                }
+              }
             });
           });
         } else {

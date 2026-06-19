@@ -20,7 +20,7 @@ export class AstaService {
   }
 
   faiOfferta(idAsta: number, importo: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/${idAsta}/offerta`, { importo }, { withCredentials: true });
+    return this.http.post(`${this.apiUrl}/${idAsta}/offerta`, { importo }, { withCredentials: true, responseType: 'text' });
   }
 
   getOfferte(idAsta: number): Observable<any[]> {
@@ -28,22 +28,6 @@ export class AstaService {
   }
 
   chiudi(idAsta: number): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/${idAsta}/chiudi`, {}, { withCredentials: true });
+    return this.http.patch(`${this.apiUrl}/${idAsta}/chiudi`, {}, { withCredentials: true, responseType: 'text' });
   }
-  uploadFotoProfilo(file: File): Observable<any> {
-  const formData = new FormData();
-  formData.append('file', file);
-  return this.http.post(
-    'http://localhost:8080/api/auth/foto-profilo',
-    formData,
-    { withCredentials: true, responseType: 'text' }
-  );
-}
-
-rimuoviFotoProfilo(): Observable<any> {
-  return this.http.delete(
-    'http://localhost:8080/api/auth/foto-profilo',
-    { withCredentials: true, responseType: 'text' }
-  );
-}
 }

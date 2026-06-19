@@ -35,18 +35,18 @@ export class AnnuncioService {
   }
 
   ribassaPrezzo(id: number, nuovoPrezzo: number): Observable<any> {
-    return this.http.patch<any>(
+    return this.http.patch(
       `${this.apiUrl}/${id}/ribassa`,
       { prezzo: nuovoPrezzo },
-      { withCredentials: true }
+      { withCredentials: true, responseType: 'text' }
     );
   }
 
   annullaRibasso(id: number): Observable<any> {
-    return this.http.patch<any>(
+    return this.http.patch(
       `${this.apiUrl}/${id}/annulla-ribasso`,
       {},
-      { withCredentials: true }
+      { withCredentials: true, responseType: 'text' }
     );
   }
 

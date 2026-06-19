@@ -179,6 +179,14 @@ public class AuthService {
         utente.setFotoProfilo(null);
     }
 
+    public void aggiornaDescrizione(Utente utente, String descrizione) throws SQLException {
+        if (descrizione != null && descrizione.length() > 1000) {
+            throw new IllegalArgumentException("La descrizione non può superare i 1000 caratteri");
+        }
+        utenteDao.aggiornaDescrizione(utente.getId(), descrizione);
+        utente.setDescrizione(descrizione);
+    }
+
     public Utente getUtenteById(Long id) throws SQLException {
         Utente utente = utenteDao.findById(id);
         if (utente == null) return null;

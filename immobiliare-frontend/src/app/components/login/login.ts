@@ -53,4 +53,18 @@ export class Login {
       }
     });
   }
+
+  // Passa direttamente al modale di registrazione, senza dover chiudere
+  // manualmente questo modale con la X (apriRegistrazione chiude già il login).
+  vaiARegistrazione() {
+    this.modalService.apriRegistrazione();
+  }
+
+  // "Password dimenticata" resta una pagina a sé stante (non un modale): qui ci
+  // limitiamo a chiudere il modale di login prima di navigarci, così l'utente
+  // non si ritrova il modale ancora aperto sopra la nuova pagina.
+  vaiARecuperaPassword() {
+    this.modalService.chiudi();
+    this.router.navigate(['/recupera-password']);
+  }
 }

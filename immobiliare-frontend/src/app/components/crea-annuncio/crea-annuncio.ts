@@ -157,15 +157,29 @@ export class CreaAnnuncio implements OnInit {
     }
   }
 
+  // Imposta il messaggio di errore. L'alert in crea-annuncio.html è "fixed" sotto
+  // la navbar (vedi style="top: 80px"), quindi resta sempre visibile sullo schermo
+  // indipendentemente da dove l'utente è scrollato nel form: non serve scrollare.
+  private mostraErrore(msg: string) {
+    this.errore = msg;
+  }
+
   onFileSelected(event: any) {
   const files: File[] = Array.from(event.target.files);
-  
+
+  if (files.length > 10) {
+    this.mostraErrore(`Puoi caricare al massimo 10 foto (selezionate: ${files.length})`);
+    event.target.value = '';
+    this.fileFoto = [];
+    return;
+  }
+
   const nonValidi = files.filter(f => {
     const ext = f.name.toLowerCase().split('.').pop();
     return !['jpg', 'jpeg', 'png'].includes(ext || '');
   });
   if (nonValidi.length > 0) {
-    this.errore = 'Sono accettati solo file JPG, PNG, JPEG';
+    this.mostraErrore('Sono accettati solo file JPG, PNG, JPEG');
     event.target.value = '';
     this.fileFoto = [];
     return;
@@ -173,7 +187,7 @@ export class CreaAnnuncio implements OnInit {
 
   const troppoGrosse = files.filter(f => f.size > 5 * 1024 * 1024);
   if (troppoGrosse.length > 0) {
-    this.errore = `Alcune foto superano il limite di 5MB: ${troppoGrosse.map(f => f.name).join(', ')}`;
+    this.mostraErrore(`Alcune foto superano il limite di 5MB: ${troppoGrosse.map(f => f.name).join(', ')}`);
     event.target.value = '';
     this.fileFoto = [];
     return;
@@ -224,14 +238,30 @@ export class CreaAnnuncio implements OnInit {
         };
 
         if (this.fileFoto.length > 0) {
-          let caricati = 0;
+          let completati = 0;
+          let erroriFoto: string[] = [];
+          const totale = this.fileFoto.length;
           this.fileFoto.forEach(file => {
             this.fotoService.upload(annuncioSalvato.id, file).subscribe({
               next: () => {
-                caricati++;
-                if (caricati === this.fileFoto.length) dopoFoto();
+                completati++;
+                if (completati === totale) {
+                  if (erroriFoto.length > 0) {
+                    // Alcune foto non sono state caricate: lo segnaliamo, ma l'annuncio
+                    // è comunque stato creato, quindi procediamo comunque alla pagina finale.
+                    this.errore = `Annuncio creato, ma alcune foto non sono state caricate: ${erroriFoto.join(', ')}`;
+                  }
+                  dopoFoto();
+                }
               },
-              error: (err: any) => console.error(err)
+              error: (err: any) => {
+                completati++;
+                erroriFoto.push(err.error || file.name);
+                if (completati === totale) {
+                  this.errore = `Annuncio creato, ma alcune foto non sono state caricate: ${erroriFoto.join(', ')}`;
+                  dopoFoto();
+                }
+              }
             });
           });
         } else {

@@ -63,14 +63,23 @@ public class AnnuncioDao {
 
     public List<Annuncio> findByFiltri(String tipoOperazione, Long idCategoria) throws SQLException {
         List<Annuncio> lista = new ArrayList<>();
+        // "ASTA" non è un valore della colonna tipo_operazione (che resta VENDITA/AFFITTO):
+        // è un filtro speciale sugli annunci attualmente in asta, quindi va tradotto
+        // nella condizione sulla colonna in_asta invece che su tipo_operazione.
+        boolean soloAsta = "ASTA".equals(tipoOperazione);
+
         String sql = "SELECT * FROM annuncio WHERE 1=1 AND stato='APPROVATO'";
-        if (tipoOperazione != null) sql += " AND tipo_operazione = ?";
+        if (soloAsta) {
+            sql += " AND in_asta = true";
+        } else if (tipoOperazione != null) {
+            sql += " AND tipo_operazione = ?";
+        }
         if (idCategoria != null) sql += " AND id_categoria = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             int i = 1;
-            if (tipoOperazione != null) ps.setString(i++, tipoOperazione);
+            if (!soloAsta && tipoOperazione != null) ps.setString(i++, tipoOperazione);
             if (idCategoria != null) ps.setLong(i++, idCategoria);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) lista.add(mapRow(rs));

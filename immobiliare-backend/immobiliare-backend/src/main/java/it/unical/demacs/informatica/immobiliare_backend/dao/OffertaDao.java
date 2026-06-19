@@ -24,12 +24,22 @@ public class OffertaDao {
         if (importo != null) o.setImporto(((java.math.BigDecimal) importo).doubleValue());
         Timestamp ts = rs.getTimestamp("data_offerta");
         if (ts != null) o.setDataOfferta(ts.toLocalDateTime());
+        // Nome e cognome sono presenti solo se la query li include (vedi findByAsta,
+        // che fa un JOIN con utente). Il try/catch evita errori se, in altri punti del
+        // codice, mapRow viene riusato su una query senza quel JOIN.
+        try {
+            String nome = rs.getString("nome_offerente");
+            String cognome = rs.getString("cognome_offerente");
+            if (nome != null) o.setNomeOfferente(nome + " " + cognome);
+        } catch (Exception ignored) {}
         return o;
     }
 
     public List<Offerta> findByAsta(Long idAsta) throws SQLException {
         List<Offerta> lista = new ArrayList<>();
-        String sql = "SELECT * FROM offerta WHERE id_asta = ? ORDER BY importo DESC";
+        String sql = "SELECT o.*, u.nome AS nome_offerente, u.cognome AS cognome_offerente " +
+                "FROM offerta o JOIN utente u ON u.id = o.id_utente " +
+                "WHERE o.id_asta = ? ORDER BY o.importo DESC";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, idAsta);

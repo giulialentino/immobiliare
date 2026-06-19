@@ -144,6 +144,9 @@
           <div class="card mb-4 border-warning">
             <div class="card-body">
               <h5><i class="bi bi-hammer"></i> Asta in corso</h5>
+              @if (astaCreata) {
+                <div class="alert alert-success">Asta creata!</div>
+              }
               <p>Prezzo base: <strong>€ {{ asta.prezzoBase | number }}</strong></p>
               @if (asta.offertaMax) {
                 <p>Offerta attuale: <strong class="text-success">€ {{ asta.offertaMax | number }}</strong></p>
@@ -157,8 +160,11 @@
               @if (offerte.length > 0) {
                 <h6 class="mt-3">Storico offerte</h6>
                 @for (o of offerte; track o.id) {
-                  <div class="border-bottom py-1">
+                  <div class="border-bottom py-1 d-flex justify-content-between">
                     <span>€ {{ o.importo | number }}</span>
+                    @if (o.nomeOfferente) {
+                      <span class="text-muted small">{{ o.nomeOfferente }}</span>
+                    }
                   </div>
                 }
               }
@@ -203,9 +209,6 @@
               <h5><i class="bi bi-hammer"></i> Crea un'asta</h5>
               @if (erroreAsta) {
                 <div class="alert alert-danger py-2">{{ erroreAsta }}</div>
-              }
-              @if (astaCreata) {
-                <div class="alert alert-success">Asta creata!</div>
               }
               <div class="mb-2">
                 <label class="form-label">Prezzo base (€)</label>
