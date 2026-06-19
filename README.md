@@ -47,19 +47,25 @@ createdb immobiliare
 psql immobiliare < dump.sql
 ```
 
-Il file `application.properties` contiene valori segnaposto per i servizi esterni (credenziali email, chiave Gemini) e per la connessione al database. Prima di avviare il backend, copiarlo in `application-local.properties` (già escluso dal tracking) e impostare i valori reali:
+Il file `application.properties` (tracciato da Git) contiene solo segnaposto, senza credenziali reali: chi esegue il progetto deve fornire le proprie. Per farlo, copiare `application.properties` in un nuovo file `application-local.properties` nella stessa cartella (già escluso dal tracking tramite `.gitignore`, quindi sicuro da popolare con dati reali) e compilarlo così:
 
 ```
 spring.datasource.url=jdbc:postgresql://localhost:5432/immobiliare
-spring.datasource.username=...
-spring.datasource.password=...
+spring.datasource.username=postgres
+spring.datasource.password=LA_PROPRIA_PASSWORD_POSTGRES
 
 spring.mail.username=...
 spring.mail.password=...        # App Password di Gmail, non la password dell'account
 
 gemini.api.key=...
-gemini.api.url=...
+gemini.api.url=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent
 ```
+
+Note sui singoli valori:
+
+- `spring.datasource.password`: la password dell'utente PostgreSQL usato per creare il database al passo precedente, scelta da chi esegue il progetto sul proprio computer — non è una credenziale fornita da chi ha sviluppato il progetto.
+- `spring.mail.*`: opzionali. Senza queste, il backend si avvia comunque, ma le email di verifica registrazione e di reset password non vengono inviate.
+- `gemini.api.key`: una chiave Gemini personale, ottenibile gratuitamente su [Google AI Studio](https://aistudio.google.com/apikey). **Opzionale**: senza una chiave valida, il resto del sito funziona normalmente, ma il chatbot e la generazione automatica delle descrizioni annuncio restituiranno un errore quando richiamati.
 
 Avviare il backend dalla cartella `immobiliare-backend/immobiliare-backend`:
 
@@ -84,7 +90,7 @@ L'app è disponibile su `http://localhost:4200`.
 
 ### Autenticazione e gestione account
 
-Registrazione con verifica email obbligatoria prima del primo accesso, login basato su sessione server-side, recupero password via email con token e reset, cambio password da profilo, upload e rimozione della foto profilo. Le password sono salvate con hashing BCrypt.
+Registrazione con verifica email obbligatoria prima del primo accesso, login basato su sessione server-side, recupero password via email con token e reset, cambio password da profilo, upload e rimozione della foto profilo, descrizione personale del profilo modificabile in qualsiasi momento. Le password sono salvate con hashing BCrypt.
 
 ### Ruoli utente
 
@@ -100,11 +106,11 @@ Un amministratore eredita tutte le funzionalità del venditore. Dal pannello di 
 
 ### Annunci
 
-Pubblicazione di annunci di vendita, affitto o asta con titolo, descrizione, prezzo, categoria, città, indirizzo, coordinate geografiche, metri quadri, numero di locali e bagni. Caricamento di un massimo di 10 foto per annuncio (5 MB ciascuna). Visualizzazione degli annunci in modalità griglia o lista, con filtri per tipo di operazione, tipologia immobile, città e fascia di prezzo. Mappa di posizione dell'immobile tramite Leaflet. Limite di 50 annunci pubblicabili per venditore e di 10 modifiche consentite su un annuncio già approvato (nessun limite sulle modifiche prima dell'approvazione); indirizzo e coordinate non sono più modificabili dopo l'approvazione.
+Pubblicazione di annunci di vendita, affitto o asta con titolo, descrizione, prezzo, categoria, città, indirizzo, coordinate geografiche, metri quadri, numero di locali e bagni. Caricamento di un massimo di 10 foto per annuncio (5 MB ciascuna), con verifica del limite sia lato client che lato server. Visualizzazione degli annunci in modalità griglia o lista, con filtri per tipo di operazione (vendita, affitto, oppure solo gli annunci attualmente in asta), tipologia immobile, città e fascia di prezzo. Mappa di posizione dell'immobile tramite Leaflet. Limite di 50 annunci pubblicabili per venditore e di 10 modifiche consentite su un annuncio già approvato (nessun limite sulle modifiche prima dell'approvazione); indirizzo e coordinate non sono più modificabili dopo l'approvazione.
 
 ### Asta
 
-Un venditore può mettere un proprio annuncio in asta impostando una data di scadenza. Gli acquirenti possono presentare offerte fino alla scadenza; lo storico delle offerte per ciascuna asta è consultabile, e l'asta può essere chiusa dal venditore.
+Un venditore può mettere un proprio annuncio in asta impostando un prezzo base e una data di scadenza. Gli acquirenti possono presentare offerte fino alla scadenza, con verifica lato server che l'asta sia ancora attiva al momento dell'offerta. Lo storico delle offerte è consultabile da chiunque acceda alla pagina dell'annuncio; il nome di chi ha presentato ciascuna offerta è visibile solo al venditore dell'annuncio e agli amministratori, non agli altri acquirenti né ai visitatori. L'asta può essere chiusa manualmente dal venditore (o da un amministratore) in qualsiasi momento, oppure si chiude automaticamente alla scadenza tramite un controllo pianificato lato server che gira ogni minuto.
 
 ### Recensioni e segnalazioni
 
