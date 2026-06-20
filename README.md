@@ -15,7 +15,7 @@ Frontend: Angular 21 (standalone components, control flow `@if`/`@for`), TypeScr
 
 Backend: Java 21, Spring Boot 3.4, accesso al database tramite JDBC puro con pattern DAO (nessun ORM, per scelta progettuale), HikariCP per il connection pooling, Spring Mail per l'invio di email transazionali, Spring Security Crypto (BCrypt) per l'hashing delle password.
 
-Database: PostgreSQL, schema relazionale con 11 tabelle (utente, annuncio, categoria, foto, asta, offerta, messaggio, recensione, preferito, richiesta_promozione, storico_prezzi).
+Database: PostgreSQL, schema relazionale con 11 tabelle (utente, annuncio, categoria, foto, asta, offerta, messaggio, recensione, segnalazione, preferito, richiesta_promozione).
 
 Servizi esterni: Google Gemini API per la chat assistita e la generazione di descrizioni.
 
