@@ -31,7 +31,7 @@ immobiliare/
 │   └── src/app/
 │       ├── components/           Un componente per ogni vista
 │       └── services/             Client HTTP verso il backend
-└── dump.sql                      Dump dello schema PostgreSQL con dati di esempio
+└── immobiliare_backup.sql                      Dump dello schema PostgreSQL con dati di esempio
 ```
 
 ## Requisiti
@@ -44,7 +44,7 @@ Creare un database PostgreSQL e importare lo schema:
 
 ```
 createdb immobiliare
-psql immobiliare < dump.sql
+psql immobiliare < immobiliare_backup.sql
 ```
 
 Il file `application.properties` (tracciato da Git) contiene solo segnaposto, senza credenziali reali: chi esegue il progetto deve fornire le proprie. Per farlo, copiare `application.properties` in un nuovo file `application-local.properties` nella stessa cartella (già escluso dal tracking tramite `.gitignore`, quindi sicuro da popolare con dati reali) e compilarlo così:
