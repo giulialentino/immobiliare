@@ -31,7 +31,11 @@ export class DettaglioAnnuncio implements OnInit, OnDestroy {
   erroreAsta = '';
   nuovaRecensione = { punteggio: 5, commento: '' };
   messaggioInviato = false;
+  testoMessaggioContatto = '';
+  errorePagina = '';
+  mostraFormContatto = false;
   recensioneInviata = false;
+  erroreRecensione = '';
   nuovoPrezzo: any = null;
   prezzoRibassato = false;
   mappaUrl: SafeResourceUrl | null = null;
@@ -45,6 +49,7 @@ export class DettaglioAnnuncio implements OnInit, OnDestroy {
   mostraSegnalazione = false;
   segnalazioneInviata = false;
   giaSegnalato = false;
+  puoRecensire = false;
   segnalazione = { categoria: '', motivo: '' };
 
   constructor(
@@ -74,6 +79,12 @@ export class DettaglioAnnuncio implements OnInit, OnDestroy {
             next: (res) => { this.giaSegnalato = res === 'true'; this.cdr.detectChanges(); },
             error: () => this.giaSegnalato = false
           });
+          this.http.get<boolean>(`http://localhost:8080/api/recensioni/puo-recensire/${id}`,
+            { withCredentials: true }
+          ).subscribe({
+            next: (res) => { this.puoRecensire = res; this.cdr.detectChanges(); },
+            error: () => this.puoRecensire = false
+          });
         }
         this.cdr.detectChanges();
       },
@@ -84,6 +95,7 @@ export class DettaglioAnnuncio implements OnInit, OnDestroy {
       this.annuncioService.getById(+id).subscribe({
         next: (data: any) => {
           this.annuncio = data;
+          this.testoMessaggioContatto = `Salve, sono interessato/a all'annuncio "${data.titolo}". Contattatemi via email per ulteriori informazioni. Grazie.`;
           this.caricaAsta();
           if (data.latitudine && data.longitudine) {
             const url = `https://www.openstreetmap.org/export/embed.html?bbox=${data.longitudine - 0.01},${data.latitudine - 0.01},${data.longitudine + 0.01},${data.latitudine + 0.01}&layer=mapnik&marker=${data.latitudine},${data.longitudine}`;
@@ -304,16 +316,35 @@ export class DettaglioAnnuncio implements OnInit, OnDestroy {
     }
   }
 
+  // Apre il popup del form di contatto. Il body resta scrollabile dietro al popup
+  // di proposito: a differenza dei modali di login/registrazione (gestiti da
+  // ModalService, che bloccano lo scroll), qui non tocchiamo quel comportamento
+  // globale per evitare interferenze con l'altro sistema di modali del sito.
+  apriFormContatto() {
+    this.errorePagina = '';
+    this.mostraFormContatto = true;
+  }
+
+  chiudiFormContatto() {
+    this.mostraFormContatto = false;
+  }
+
   inviaMessaggioStandard() {
     if (!this.annuncio || !this.utente) return;
+    this.errorePagina = '';
+    if (!this.testoMessaggioContatto || !this.testoMessaggioContatto.trim()) {
+      this.errorePagina = 'Scrivi un messaggio prima di inviarlo';
+      return;
+    }
     const messaggio = {
       idAnnuncio: this.annuncio.id,
-      oggetto: `Interesse per: ${this.annuncio.titolo}`,
-      testo: `Salve, sono interessato/a all'annuncio "${this.annuncio.titolo}". Contattatemi via email (${this.utente.email}) per ulteriori informazioni. Grazie.`
+      oggetto: `Interesse per: #${this.annuncio.id} - ${this.annuncio.titolo}`,
+      testo: `${this.testoMessaggioContatto.trim()}\n\n(Contatto email: ${this.utente.email})`
     };
     this.annuncioService.inviaMessaggio(messaggio).subscribe({
       next: () => {
         this.messaggioInviato = true;
+        this.mostraFormContatto = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => console.error(err)
@@ -322,6 +353,7 @@ export class DettaglioAnnuncio implements OnInit, OnDestroy {
 
   inviaRecensione() {
     if (!this.annuncio) return;
+    this.erroreRecensione = '';
     const recensione = {
       idAnnuncio: this.annuncio.id,
       punteggio: this.nuovaRecensione.punteggio,
@@ -330,11 +362,15 @@ export class DettaglioAnnuncio implements OnInit, OnDestroy {
     this.annuncioService.inviaRecensione(recensione).subscribe({
       next: () => {
         this.recensioneInviata = true;
+        this.puoRecensire = false;        // ← blocca subito eventuali re-invii
         this.annuncio.recensioni.push(recensione);
         this.nuovaRecensione = { punteggio: 5, commento: '' };
         this.cdr.detectChanges();
       },
-      error: (err: any) => console.error(err)
+      error: (err: any) => {
+        this.erroreRecensione = err.error || 'Errore durante l\'invio della recensione';
+        this.cdr.detectChanges();
+      }
     });
   }
 

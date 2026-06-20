@@ -28,4 +28,15 @@ public class RecensioneController {
         if (utente == null) return ResponseEntity.status(401).body("Non autenticato");
         return ResponseEntity.ok(recensioneService.salva(recensione, utente));
     }
+
+    // Usato dal frontend per decidere se mostrare il form di recensione:
+    // true solo se l'utente loggato ha già contattato il venditore per questo annuncio.
+    @GetMapping("/puo-recensire/{idAnnuncio}")
+    public ResponseEntity<?> puoRecensire(@PathVariable Long idAnnuncio, HttpSession session) throws SQLException {
+        Utente utente = (Utente) session.getAttribute("utenteLoggato");
+        if (utente == null || !utente.getRuolo().equals("ACQUIRENTE")) {
+            return ResponseEntity.ok(false);
+        }
+        return ResponseEntity.ok(recensioneService.puoRecensire(idAnnuncio, utente));
+    }
 }

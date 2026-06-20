@@ -53,4 +53,20 @@ public class RecensioneDao {
         }
         return r;
     }
+
+    // Verifica se l'utente ha già inviato almeno un messaggio per questo annuncio.
+    // Usato come condizione di "visita" prima di permettere una recensione: solo chi
+    // ha manifestato interesse contattando il venditore può recensire l'immobile.
+    public boolean haContattatoVenditore(Long idAnnuncio, Long idUtente) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM messaggio WHERE id_annuncio = ? AND id_mittente = ? AND per_admin = false";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, idAnnuncio);
+            ps.setLong(2, idUtente);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
 }

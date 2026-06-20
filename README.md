@@ -138,4 +138,4 @@ Le regole di business implementate includono: massimo 10 foto per annuncio, mass
 
 ## Note
 
-Il file `dump.sql` contiene dati di esempio a scopo dimostrativo. Le credenziali in `application.properties` sono segnaposto: non committare mai credenziali reali nel file tracciato da Git.
+Il file `immobiliare_backup.sql` contiene dati di esempio a scopo dimostrativo. Le credenziali in `application.properties` sono segnaposto: non committare mai credenziali reali nel file tracciato da Git.
