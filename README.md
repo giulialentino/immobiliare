@@ -1,7 +1,7 @@
 # Progetto Web Applications – Annunci Immobiliari
 
 **Corso:** Web Applications (A.A. 2025/26)
-**Autore:** Giulia Lentino — Università della Calabria
+**Autore:** Giulia Rita Lentino — Università della Calabria
 
 ---
 
