@@ -36,7 +36,12 @@ export class App implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.avviaSequenza();
+    const giaVisto = sessionStorage.getItem('splashVisto');
+    if (giaVisto) {
+      this.showSplash = false;
+    } else {
+      this.avviaSequenza();
+    }
     this.authService.utente$.subscribe(u => {
       this.utente = u;
       this.cdr.detectChanges();
@@ -111,6 +116,7 @@ export class App implements OnInit {
           this.cdr.detectChanges();
           setTimeout(() => {
             this.showSplash = false;
+            sessionStorage.setItem('splashVisto', '1');
             this.cdr.detectChanges();
           }, 850);
         }, 600);

@@ -159,7 +159,8 @@ export class Home implements OnInit, AfterViewInit {
 
   caricaAnnunci() {
     this.loading = true;
-    this.annuncioService.getAll(this.tipoOperazione || undefined, this.idCategoria || undefined).subscribe({
+    const idCat = this.idCategoria ? +this.idCategoria : undefined;
+    this.annuncioService.getAll(this.tipoOperazione || undefined, idCat).subscribe({
       next: (data: any) => {
         this.annunci = data;
         this.ultimiAnnunci = [...data].sort((a, b) => 
@@ -259,6 +260,7 @@ export class Home implements OnInit, AfterViewInit {
 
   filtra() {
     this.comuniFiltrati = [];
+    if (this.idCategoria) this.idCategoria = +this.idCategoria;
     this.caricaAnnunci();
     setTimeout(() => document.getElementById('tutti-annunci')?.scrollIntoView({ behavior: 'smooth' }), 100);
   }
